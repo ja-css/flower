@@ -3,6 +3,7 @@ build/
 out/
 
 # Gradle
+gradle
 .gradle/
 .gradle
 .gradletasknamecache
