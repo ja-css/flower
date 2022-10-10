@@ -4,15 +4,25 @@ Flower
 Flower is a lightweight workflow engine.
 
 [Introduction](#introduction)
+
 [Example: "Hello world" flow](#example-1-hello-world-flow)
+
 [Example: Initializing Flower and running an instance of "Hello world" flow](#example-2-initializing-flower-and-running-an-instance-of-hello-world-flow)
+
 [Flows and Steps](#flows-and-steps)
+
 [Step Function and Transit Function](#step-function-and-transit-function)
+
 [Flow and Function names](#flow-and-function-names)
+
 [Flow State](#flow-state)
+
 [Functions and parameters](#functions-and-parameters)
+
 [Parameter passing: defaults](#parameter-passing-defaults)
+
 [Reusing Transit Functions](#reusing-transit-functions)
+
 [Global Functions and Global Function Calls](#global-functions-and-global-function-calls)
 
 
