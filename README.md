@@ -275,7 +275,7 @@ But now we have a problem - as you can see from the diagram, `HELLO_STEP` transi
      9 |  }
     
 Having said that, both those Transit Functions perform the same exact logic (or absence of) and the only real difference between them is the parameter they're accepting. In practice, it's more likely that different Steps would transition to different next Steps, but very likely that said Steps will use the same general transition logic - which can range from something as simple as the above, to strategies like exponential waiting, or requesting some state from external services to make a decision between waiting or failing. Usually there are only a handful of strategies, and they are reused everywhere, so duplicating this logic by expressing everything as `@SimpleStepFunction` or multiple identical Transition Functions is clearly suboptimal.
-
+ 
 To allow reuse of Transit Functions a feature called Transit Parameter Override was implemented. This is how the final version of the code would look for the example:
 
      1 |  @StepFunction(transit = "TRANSIT")
