@@ -1,0 +1,164 @@
+
+
+
+Uniqueness
+
++1. Flow name globally unique;
++1.1 Flow Type must be annotated with @FlowType
++1.2. FirstStep must be assigned, and there must be only one FirstStep.
++1.3 Flow State Fields unique names;
++2. Global Function name globally unique;
++3. Step name unique within a flow;
++    - Step;
++    - StepCall;
++    - Step and StepCall;
++4. Flow's TransitionFunction unique within a flow;
++    - Transitioner;
++    - TransitionerCall;
++    - Transitioner and TransitionerCall;
++5. Function Parameter names must be unique;
++    - Step;
++    - Transitioner;
++    - GlobalFunction;
++    - StepCall;
++    - TransitionerCall;
++6. All parameters must be annotated
++    - Step;
++    - StepCall;
++    - Transitioner;
++    - TransitionerCall;
++    - GlobalFunction;
++7.1 Duplicate parameter annotations
++    - Step;
++    - StepCall;
++    - Transitioner;
++    - TransitionerCall;
++    - GlobalFunction;
++7.2 Duplicate method annotation
++7.3 Non-static method annotation
++    @GlobalFunction
++    @SimpleStepCall
++    @SimpleStepFunction
++    @StepCall
++    @StepFunction
++    @TransitCall
++    @TransitFunction
+--
++5.1.1 Wrong types for annotations for functions - stepRefPrm, transit, step_and_transit, global
++    @Out
++    @InOut
++    @FlowTypeFactory
++    @StepRef
++    @Terminal
++    @InRet - only transit function
++
++ Type safety - arrays of inherited types
++ Type safety - ... parameter and array
+
+
+Validation - parameter doesn't exist (thrown NPE now)
+
+5.1.2 Wrong types for annotations for calls - step_call, transit_call, step_and_transit_call, transit_override
+    @Out
+    @InOut
+    @FlowTypeFactory
+    @StepRef
+    @Terminal
+    @InRet - only transit call
+
+* Duplicate name for Step and StepAndTransit
+
+* For stepRefPrm - either transit or globalTransit must be specified
+* For stepRefPrm - globalTransit function must exist if specified
+
+
+* type match - StepFunction.returnTo, StepCall.returnTo
+* type match - InRet for TransitFunction, TransitCall, reference to Global Transit Function
+* type match - In, Out, InOut - flow field types
+
+* Function method can't be generic
+* Flow class can't be generic
+* Global function container class can't be generic
+* Static state field must be final
+
+* Event function without binding
+* @Out and @InOut parameters are only allowed in @Exclusive events
+
+
+5.2 Global function must exist for call
+5.3 Transit function must exist for Step
+5.3 TransitCall / StepAndTransitCall must call a global function that returns Transition or ListenableFuture<Transition>
+5.4 Transitioner must return Transition or ListenableFuture<Transition>
+5.5 No matching state parameter For (@In / @InOut / @Out)
+5.6 No matching global parameter from a call
+5.7 Override parameter names match (calls and transit override)
+5.8 Override parameter annotations match (calls and transit override - @In to @In, etc)
+    - Annotation @InRet can override @In and vice versa
+5.9 Override parameter types match (calls and transit override - types and underlying generic types)
+5.10 @InRet parameter should match return value of stepRefPrm function
+5.11 @StepAndTransit must return Transit
+5.12 TransitParametersOverride shouldn't apply to StepAndTransit/Call or Transit/Call
+5.13 TransitParametersOverride.TransitStepRef and other parameters should refer to actual parameters of 
+
+
+6. StepCall override parameters
+    - Anonymous Parameters must be realized - @In/@InRet, @Out, @InOut, @StepRef/@Terminal, @FlowTypeFactory
+    - Parameters must be proper references
+
+7. TransitionerCall override parameters
+    - Anonymous Parameters must be realized - @In/@InRet, @Out, @InOut, @StepRef/@Terminal, @FlowTypeFactory
+    - Parameters must be proper references
+
+8. TransitParameterOverride override parameters
+    - Anonymous Parameters must be realized - @In/@InRet, @Out, @InOut, @StepRef/@Terminal, @FlowTypeFactory
+    - Parameters must be proper references
+
+* Calls must all return void and have no implementation
+
+* Unreachable stepRefPrm
+* unused Flow-local EventFunction
+
+* Can't have duplicate Transit Override
+
+* return direct / return ListenableFuture
+
+* Global functions with the same name from different containers
+
+* Event Profile must have a default constructor or if it has no constructors it must be public
+    - i.e. creatable by FlowCallContext.createFlow
+
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+
+Add to StepAndTransitFunction and StepAndTransitCall
+
+
+
+Validations to perform:
+6. StepFunction parameters and parameter overrides must be mapped to valid Flow fields.
+7. TransitFunction parameters with non-empty mapping must be mapped to valid Flow fields.
+8. TransitFunction parameters with empty mapping must be overridden in all StepFunctions that use the TransitFunction.
+9. Parameter passing type safety.
+
+11. Transit function to return Transition or ListenableFuture<Transition>
+13. Transit function must be defined for Step
+14. Global function must be defined for Call
+    and if Transit call, must return ListenableFuture<Transition>
+14.1 Call function must return void
+15. Duplicate annotations:
+    - multiple/conflicting class-level annotations
+    - multiple/conflicting method-level annotations
+    - multiple/conflicting parameter-level annotations
+
+* If flow state fields are of special types - StepRef, Transition, FlowerEngine, etc. - show warning
+* Annotation mismatch - Step, Transitioner, Event (perhaps, in flow inheritance?)
+
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+
+
+
+
+

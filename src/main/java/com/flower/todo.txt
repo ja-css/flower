@@ -1,0 +1,264 @@
+Flower - lightweight workflow engine
+
++ Global functions
++    @Global @Call
++ StepFunction to declare global function reference as transit
+
++- Flow inheritance
++    - State override - Flow inheritance is accompanied by Java inheritance
++    - ParentFlow must be ChildFlow's immediate superclass
++    -
++    - Functions/Calls are always inherited
++    - Functions/Calls can be overridden (by name)
++        - must override all parameters
++    - new Functions/Calls can be added
++    -
++    - State fields are always inherited (via Java inheritance is in place)
++    - State fields can be overridden (by name)
++    - new State fields can be added
+
++ Consider the requirement that call must override all parameters (readability)
+
+- Child flows
+    - get flow future by FlowId
+    - Rename Factory to LocalFactory (better now than later)
+    - Local execution flag
+
+- Step/Transitioner should act as try/finally
+    - therefore, a way to catch exceptions from exec should be introduced in Transitioner
+    - if not present, Flow should throw.
+    - @Transitioner(catch=true) must have @StepException parameter (Optional<Throwable>)
+        - consider this vs parameter that can be used anywhere?
+            - we can only have 1 transitioner
+        - Problem - that makes @InRet - Optional<...> as well?
+            - better, a special parameter @InRetOrException which will either have step's RetVal or Exception
+                - for catching Transitioners only, while @InRet only for non-catching.
+
+- Validations / Test coverage
+
+- Timeout on Functions: ability to time out if function takes too long to complete
+    - throw an exception that can be caught in Transitioner
+
+- Events
+    - Configuration and plugins.
+    - Event profiles (e.g. single log, persist)
+        - Multiple Event profiles on a Flow
+        - EventProfile inheritance (by analogy with Flow inheritance)
+            - We inherit EventProfiles with FlowInheritance, and those can be disabled with ""@DisableEventProfiles"
+    - State in EventProfile
+    - ?? @LoggingContext - state fields? custom annotations + getAnnotatedFlowStateFields?
+    - Use queue to gather EventRunners for sequential events (e.g. BEFORE_FLOW, BEFORE_STEP, BEFORE_STEP_ITERATION, BEFORE_EXEC)
+    - @FlowException for EXCEPTION event?
+    - ?? Should we allow to disable Engine-level EventProfiles with @DisableEventProfiles?
+        - TLDR version: ATM we DO allow to disable default EventProfiles on a Flow level with "@DisableEventProfiles"
+        - The idea is that knowledge about default EventProfiles doesn't exist on Flow level, and Flow should be able to run
+        on any Engine with any default EventProfile configurations. From this perspective it's possible to say that disabling
+        a default EventProfile from a Flow is a hack at best, because those Event contexts should be orthogonal and invisible
+        to the Flows.
+        - While that's a valid point theoretically, there can be practical reasons why in real-world situation a particular
+        default EventProfile configuration on an Engine must or is highly desirable to be disabled on a particular Flow that
+        happens to run on that Engine. For such exceptional cases disabling of default EventProfiles on a Flow is allowed.
+
+- Doc gen - mermaid diagram / graph
+- Visualization (Flows and Event Profiles)
+    - with function parameters
+    - with call trace
+    - with child flows
+    - with events
+    - state field trace (including events)
+
+- If a state field is final it can't be used in @Out and @InOut - add test
+
+- Instead of Engine.run(FlowInstance) implement Engine.getRunner(T clazz) and Runner<T>.run(FlowInstance)
+    - The point is to fail "Flow not registered" early, because all Runners likely will be created on startup.
+    - Call run(...) -> runUnsafe(...) and deprecate it. Or simply remove, because it's an alfa version nobody is using so who cares.
+
+//----------------------------------------
+
+- Signals to wake up/interrupt flows?
+- Change flow status from functions?
+
+- Codelab
+
+- GlobalFunctionContainer - optional namespace field?
+
+- Refactor/generalize/DRY?
+    - FunctionCallParameterCreator
+    - StepCallContextCreator
+    - FlowCallContextCreator
+
+---------------------------------------------------------
+---------------------------------------------------------
+---------------------------------------------------------
+
+Questionable ideas:
+
+- Auto generate console app from a Flow
+    - Generate a picocli java program
+    - How to choose constructors and convert fields?
+- Events fine-tuning: only run for specific steps/transitioners
+    - value uncertain (can be replaced by steps), most elegant way to implement TBD
+    - technically speaking, if we have @StepName / @TransitName / etc, this can be programmatically implemented in EventProfile implementation.
+        i.e. this can be kept as a quirk, as opposed to first-class feature.
+- Step-based flow (Single stepRefPrm) (?)
+    - maybe more like a quick way to launch a Step as a Flow, without extra configuration.
+    - probably is a bad idea - requires alternative launching mechanism, breaks awareness of the flow structure.
+- Annotations for anonymous parameters (?) - probably too confusing?
+    @In0 @Out0 @InOut0 - to make references mandatory in @In @Out @InOut
+- Access to sub-fields/sub-structures of state - "Object.Field.Subfield" (?)
+- Return Result_Or_Exception (?) - caller can just catch
+- Prohibit storing special types in in Flow state (@StepRef, @Terminal, @FlowFactory, @Transition, etc)
+    (that disables retVal for Transitioners) (?) - too cumbersome
+- Flow instance by itself can be generic (?) - anything special there?
+- Run flow methods
+    runFlow(parentFlowId) - implemented in child flows?
+    runFlow starting with Step - possible, but why (unless we persist)?
+- @TransitParametersOverride
+    Maybe TransitOverride on Step is excessive and instead a transit call should be used always, while Override is a prototype of GlobalFunction (logically)
+        - define Transit functions instead
+        - arguably, TransitOverride is unreadable
+        - not sure about removing those actually. But removing it later is easier than implementing it again later
+- @EventProfileContainer to act as @GlobalFunctionContainer for @EventFunctions?
+    - Use @Container name as namespace (@EventProfileContainer and @GlobalFunctionContainer)?
+    - We don't want @Flow to act as a container because we don't want to complicate moving Flows around by introducing extra dependencies (except for inheritance)
+- Transition - status message?
+    - not sure about that. Probably not, why bloat the spec?
+
+---------------------------------------------------------
+---------------------------------------------------------
+
+NextGen (might never happen):
+- Flow persistence / loading.
+    - load/save state function defined on flow
+    - Serialize state / load state
+    - "EphemeralNode" for a server - is a Flow (Empty EventProfile)
+    - Persistence - SimpleFlowFactory (fire & forget + superficial transient future)
+        vs ChildFlowManager (keep ids, query state of child flows, ChildFlowState future)
+    - special params?
+
+- Cross-server child flows.
+- Remote flow creation (RPC-style).
+- Serializable/non-serializable Flow state parts.
+
+- Codegen (getting rid of reflection)
+
+- Flow Persistence and cross-server child flows probably calls for alternative synchronization mechanism for parent flows to
+    be able to understand state updates of their child flows.
+    - Listenable Futures are not good enough anymore, because if a parent flow will be restored from persisted state
+        those futures for child flows will be lost, and a way should exist for them to be recreated from persisted flow state.
+    - Also such synchronization needs to work in cross-server.
+    - It's possible to think about receiving more granular events from child flows via the same mechanism, like stepRefPrm switch events etc.
+        - not sure if implementation of such feature would be well-founded. Theoretically, a need to have such events
+            most likely indicates that there are problems in flow design.
+
+---------------------------------------------------------
+---------------------------------------------------------
+
+Q/A, rejected ideas
+- How did it work without FirstStep?
+    - there was a bug.
+- Is "name" for input parameters required?
+    - name is required for call definition
+- Explicit / implicit state fields. (Warn?)
+    - all state fields are explicit
+- Not going to do:
+    5. Flow's TransitionFunction name can clash with Global TransitionFunction name. Local takes precedence.
+        To specify one or another - use {"local." + name} and {"global." + name}.
+    - In fact it can't, because calls to global functions are separated into @StepCall/@TransitionerCall annotations
+- Constant Parameters
+    the original idea makes notation overly complicated, replaced with the following updates:
+    1) "final" flow fields are respected - can't be passed as Out and InOut
+    2) "static final" fields are allowed to be marked as state members (essentially predefined const parameters)
+        Original idea -
+        // Parameters of certain types (json-like?) should be declarable with constant values
+        String defaultVal(); - also for enums.
+        byte defaultVal();
+        short defaultVal();
+        int defaultVal();
+        long defaultVal();
+        float defaultVal();
+        double defaultVal();
+        boolean defaultVal();
+        char defaultVal();
+
+        String[] defaultVal();
+        byte[] defaultVal();
+        short[] defaultVal();
+        int[] defaultVal();
+        long[] defaultVal();
+        float[] defaultVal();
+        double[] defaultVal();
+        boolean[] defaultVal();
+        char[] defaultVal();
+- Error handler
+    - @InRet_or_Exception to complement @InRet and allow Transitioner to act as an Exception handler.
+    This can be simply defined as try/catch + return value.
+    Don't see a need to overcomplicate notation.
+- Should @In parameter be required to be final?
+    possible, but will not add additional value, and will be more verbose and awkward
+- Events
+    - Concurrency.BLOCKING status - Doesn't block main flow. Blocks other event handlers.
+        - use case for this status is not strong, will likely be used for access synchronization, which should be done
+            by mutexes;
+        - it can cause a bit of confusion and unexpected blocking:
+            e.g. let's look at 2 events - BEFORE_STEP_ITERATION and BEFORE_EXEC.
+            If there is a BLOCKING handler on BEFORE_STEP_ITERATION there can be 2 options.
+            1) BLOCKING handlers run before PARALLEL - if we have non-PARALLEL handlers on BEFORE_EXEC we can't start
+                those handlers and therefore can't start next step;
+            2) BLOCKING handlers run after PARALLEL - that would mean both BLOCKING and PARALLEL handlers
+                will block BEFORE_EXEC handlers and next step.
+            So in many cases BLOCKING will factually block execution of main flow, which would violate its definition
+            and overall is counterintuitive.
+    - special flag SEQUENTIAL/PARALLEL for EventTypeHandlers (m.b. boolean collapseEvents)
+        - too confusing, there is a clear sequence of Events, and the handlers should be run accordingly.
+            while it's acceptable under some circumstances to allow PARALLEL from different events to run simultaneously,
+            but the start sequence should correspond to sequence of events
+    - We don't inherit EventProfiles with FlowInheritance, but we append EventProfiles from Engine / Engine.registerBaseEventProfile
+        - as such, Events defined on a superflow can be viewed as an integral part of flow's logic, and by default subflow
+        should act EXACTLY as a superflow, which is a natural and expected behavior.
+        Therefore, EventProfiles should be inherited by child flows.
+        Altering those behaviors on subflows can be achieved by using "@DisableEventProfiles"
+    - A Flow is also an "EventProfileContainer" implicitly. Events defined are specific to that flow. / Makes it easy
+        to extract EventProfiles from Flows to EventProfileContainers.
+        - In principle, this feature is about allowing Flows to act as EventProfile for concise notation. It means that those
+        features can be extracted to a standalone EventProfile.
+        At the same time an uncertainty arises with Flow inheritance, where we face ambiguity between FlowEventProfiles and
+        regular EventProfiles, and it's not clear which mechanisms to use for altering those behaviors in subflows.
+        It's much less confusing to cleanly separate EventProfile and Flows and use unambiguous means to bind events to Flows
+        and alter behavior of subflows in this regard, such as "@DisableEventProfiles".
+
+- "Breaking" event functions, exception results in main flow failure.
+    - e.g.
+        /** Blocks main flow. Doesn't block other event handlers. Exception fails the flow. */
+        SYNCHRONIZED_BREAKING,
+        /** Blocks main flow. Blocks other event handlers. Exception fails the flow. */
+        EXCLUSIVE_BREAKING
+    - Many shortcomings - adds undefined behavior to Flow processing and breaks separation of concerns between
+        EventProfiles and Flows. If something in the event function should affect Flow execution - that logic should
+        become a part of Flow's logic.
+
+- Annotations for logging and metrics collection
+    - @Logger(Holder)
+    - @Meter(Holder)
+        Metrics collection example: DelegatingTaskProcessor
+    - Realized that it's not a first-class citizen in Flower.
+
+- @OutFromFlow and @InOutFromFlow
+    - I decided to remove @OutFromFlow and @InOutFromFlow from EventFunctions for the following reasons:
+        1. From the start I wasn't super-convinced that it's such a great idea to allow EventFunctions to alter FlowState;
+        Especially so, when it comes to validating NullAway -
+        2. Makes it tricky to trace initialized variables in the Flow;
+        3. Makes it tricky to trace initialized variables cross-EventProfile;
+        Also -
+        4. Lots of undefined behavior scenarios in FlowState may happen by adding and removing EventProfiles each of
+            which may alter FlowState;
+        5. Overall complexity grows dramatically, making Flows much harder to read.
+    - Perhaps it's possible to find more reasons, but even those mentioned above show that @OutFromFlow and @InOutFromFlow
+        create more problems than solve.
+    - Mainly it's the idea that somehow some external logic will mess with your Flow State is what makes the entire
+        structure particularly unstable. Ideally EventFunctions should be Flow-agnostic, and work for any flow.
+    - Having said that, we still don't want to fully close Flow State from Event Profiles. Flows may want to define certain
+        configuration to EventFunctions in a non-intrusive fashion, and Optional/Nullable input parameters in Event Functions
+        are ideal for this purpose (especially if we use "static final" source field on the Flow side).
+    - As it appears to me now, much more elegant, predictable, easy to read, debug and maintain layout is to keep FlowState
+        read-only to Event Profiles, allowing EventFunctions to read Flow State fields, but not alter anything directly owned by the Flow.

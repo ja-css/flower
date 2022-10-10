@@ -1,0 +1,8 @@
+1. Logging - flowId to replace spanId / traceId. Also, ability to trace child flows / parent flows.
+2. Possible remote flow creation - uniform Flow servers?
+3. Plugins -
+    - Flow state persistence, fault-tolerance.
+    - auto-logging
+    - auto-metrics
+4. Clear code structure - flow diagram creation
+5. Reporting via state - e.g. to UI. Step granularity.
