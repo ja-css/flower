@@ -40,7 +40,7 @@ public class WrongTypesForAnnotationsTest {
 
     AnnotationFormatError e = assertThrows(AnnotationFormatError.class, flower::initialize);
     Assertions.assertTrue(
-        e.getMessage().contains("annotated as @Out should be of type com.css.flower.conf.OutPrm"));
+        e.getMessage().contains("annotated as @Out should be of type com.flower.conf.OutPrm"));
   }
 
   @Test
@@ -128,7 +128,7 @@ public class WrongTypesForAnnotationsTest {
     AnnotationFormatError e = assertThrows(AnnotationFormatError.class, flower::initialize);
     Assertions.assertTrue(
         e.getMessage()
-            .contains("annotated as @InOut should be of type com.css.flower.conf.InOutPrm"));
+            .contains("annotated as @InOut should be of type com.flower.conf.InOutPrm"));
   }
 
   @Test
@@ -140,7 +140,7 @@ public class WrongTypesForAnnotationsTest {
     Assertions.assertTrue(
         e.getMessage()
             .contains(
-                "annotated as @FlowTypeFactory should be of type com.css.flower.conf.FlowFactoryPrm"));
+                "annotated as @FlowTypeFactory should be of type com.flower.conf.FlowFactoryPrm"));
   }
 
   @Test
@@ -180,7 +180,7 @@ public class WrongTypesForAnnotationsTest {
 
     AnnotationFormatError e = assertThrows(AnnotationFormatError.class, flower::initialize);
     Assertions.assertTrue(
-        e.getMessage().contains("annotated as @Out should be of type com.css.flower.conf.OutPrm"));
+        e.getMessage().contains("annotated as @Out should be of type com.flower.conf.OutPrm"));
   }
 
   @Test
@@ -267,7 +267,7 @@ public class WrongTypesForAnnotationsTest {
     AnnotationFormatError e = assertThrows(AnnotationFormatError.class, flower::initialize);
     Assertions.assertTrue(
         e.getMessage()
-            .contains("annotated as @InOut should be of type com.css.flower.conf.InOutPrm"));
+            .contains("annotated as @InOut should be of type com.flower.conf.InOutPrm"));
   }
 
   @Test
@@ -288,7 +288,7 @@ public class WrongTypesForAnnotationsTest {
     AnnotationFormatError e = assertThrows(AnnotationFormatError.class, flower::initialize);
     Assertions.assertTrue(
         e.getMessage()
-            .contains("annotated as @StepRef should be of type com.css.flower.conf.Transition"));
+            .contains("annotated as @StepRef should be of type com.flower.conf.Transition"));
   }
 
   @Test
@@ -299,7 +299,7 @@ public class WrongTypesForAnnotationsTest {
     AnnotationFormatError e = assertThrows(AnnotationFormatError.class, flower::initialize);
     Assertions.assertTrue(
         e.getMessage()
-            .contains("annotated as @Terminal should be of type com.css.flower.conf.Transition"));
+            .contains("annotated as @Terminal should be of type com.flower.conf.Transition"));
   }
 
   @Test
@@ -309,7 +309,7 @@ public class WrongTypesForAnnotationsTest {
 
     AnnotationFormatError e = assertThrows(AnnotationFormatError.class, flower::initialize);
     Assertions.assertTrue(
-        e.getMessage().contains("annotated as @Out should be of type com.css.flower.conf.OutPrm"));
+        e.getMessage().contains("annotated as @Out should be of type com.flower.conf.OutPrm"));
   }
 
   @Test
@@ -357,7 +357,7 @@ public class WrongTypesForAnnotationsTest {
     AnnotationFormatError e = assertThrows(AnnotationFormatError.class, flower::initialize);
     Assertions.assertTrue(
         e.getMessage()
-            .contains("annotated as @InOut should be of type com.css.flower.conf.InOutPrm"));
+            .contains("annotated as @InOut should be of type com.flower.conf.InOutPrm"));
   }
 
   @Test
@@ -369,7 +369,7 @@ public class WrongTypesForAnnotationsTest {
     Assertions.assertTrue(
         e.getMessage()
             .contains(
-                "annotated as @FlowTypeFactory should be of type com.css.flower.conf.FlowFactoryPrm"));
+                "annotated as @FlowTypeFactory should be of type com.flower.conf.FlowFactoryPrm"));
   }
 
   @Test
@@ -380,7 +380,7 @@ public class WrongTypesForAnnotationsTest {
     AnnotationFormatError e = assertThrows(AnnotationFormatError.class, flower::initialize);
     Assertions.assertTrue(
         e.getMessage()
-            .contains("annotated as @StepRef should be of type com.css.flower.conf.Transition"));
+            .contains("annotated as @StepRef should be of type com.flower.conf.Transition"));
   }
 
   @Test
@@ -391,7 +391,7 @@ public class WrongTypesForAnnotationsTest {
     AnnotationFormatError e = assertThrows(AnnotationFormatError.class, flower::initialize);
     Assertions.assertTrue(
         e.getMessage()
-            .contains("annotated as @Terminal should be of type com.css.flower.conf.Transition"));
+            .contains("annotated as @Terminal should be of type com.flower.conf.Transition"));
   }
 
   @Test
@@ -401,7 +401,7 @@ public class WrongTypesForAnnotationsTest {
 
     AnnotationFormatError e = assertThrows(AnnotationFormatError.class, flower::initialize);
     Assertions.assertTrue(
-        e.getMessage().contains("annotated as @Out should be of type com.css.flower.conf.OutPrm"));
+        e.getMessage().contains("annotated as @Out should be of type com.flower.conf.OutPrm"));
   }
 
   @Test
@@ -489,7 +489,7 @@ public class WrongTypesForAnnotationsTest {
     AnnotationFormatError e = assertThrows(AnnotationFormatError.class, flower::initialize);
     Assertions.assertTrue(
         e.getMessage()
-            .contains("annotated as @InOut should be of type com.css.flower.conf.InOutPrm"));
+            .contains("annotated as @InOut should be of type com.flower.conf.InOutPrm"));
   }
 
   @Test
@@ -501,7 +501,7 @@ public class WrongTypesForAnnotationsTest {
     Assertions.assertTrue(
         e.getMessage()
             .contains(
-                "annotated as @FlowTypeFactory should be of type com.css.flower.conf.FlowFactoryPrm"));
+                "annotated as @FlowTypeFactory should be of type com.flower.conf.FlowFactoryPrm"));
   }
 
   @Test
@@ -512,7 +512,7 @@ public class WrongTypesForAnnotationsTest {
     AnnotationFormatError e = assertThrows(AnnotationFormatError.class, flower::initialize);
     Assertions.assertTrue(
         e.getMessage()
-            .contains("annotated as @StepRef should be of type com.css.flower.conf.Transition"));
+            .contains("annotated as @StepRef should be of type com.flower.conf.Transition"));
   }
 
   @Test
@@ -523,7 +523,7 @@ public class WrongTypesForAnnotationsTest {
     AnnotationFormatError e = assertThrows(AnnotationFormatError.class, flower::initialize);
     Assertions.assertTrue(
         e.getMessage()
-            .contains("annotated as @Terminal should be of type com.css.flower.conf.Transition"));
+            .contains("annotated as @Terminal should be of type com.flower.conf.Transition"));
   }
 
   @Test

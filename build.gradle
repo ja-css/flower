@@ -3,6 +3,13 @@ plugins {
     id "net.ltgt.errorprone" version "1.1.1"
 }
 
+compileJava {
+    options.compilerArgs << '-parameters'
+}
+compileTestJava {
+    options.compilerArgs << '-parameters'
+}
+
 sourceSets {
     main { java { srcDir 'src/main' } }
     test { java { srcDir 'src/test' } }
@@ -21,12 +28,17 @@ dependencies {
 
     testImplementation 'junit:junit:4.13'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     testImplementation 'org.mockito:mockito-all:1.10.19'
 
     annotationProcessor "com.uber.nullaway:nullaway:0.7.9"
     compileOnly "com.google.code.findbugs:jsr305:3.0.2"
     errorprone "com.google.errorprone:error_prone_core:2.3.4"
     errorproneJavac "com.google.errorprone:javac:9+181-r4173-1"
+}
+
+test {
+    useJUnitPlatform()
 }
 
 import net.ltgt.gradle.errorprone.CheckSeverity
