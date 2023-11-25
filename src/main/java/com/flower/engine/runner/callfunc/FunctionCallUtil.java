@@ -573,9 +573,10 @@ public class FunctionCallUtil {
       ParameterType parameterType = callParameter.getFunctionParameterType();
       if ((parameterType == ParameterType.OUT || parameterType == ParameterType.IN_OUT)
           && callParameter.getOutput() == Output.MANDATORY)
+        //TODO: inject flow and function name here for better message clarity
         throw new IllegalStateException(
             String.format(
-                "Fatal: Out or InOut parameter value wasn't set in the Function call. FlowField [%s] FunctionPrm [%s]",
+                "Fatal: value of Out or InOut parameter with Output.MANDATORY wasn't set in the Function call. FlowField [%s] FunctionPrm [%s]",
                 callParameter.getStateFieldName(), callParameter.getFunctionParameterName()));
     }
   }

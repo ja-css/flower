@@ -38,6 +38,12 @@ public class Flower implements FlowerEngine {
     this(1);
   }
 
+  public void registerFlows(final Class<?>... flowTypes) {
+    for (Class<?> flowType : flowTypes) {
+      registerFlow(flowType);
+    }
+  }
+
   // Flow Types can be generic
   public void registerFlow(final Class<?> flowType) {
     /*    if (flowType.getTypeParameters().length > 0)
@@ -86,5 +92,9 @@ public class Flower implements FlowerEngine {
   @Override
   public <T> FlowExec<T> getFlowExec(Class<T> flowType) {
     return flowRunner.getFlowExec(flowType);
+  }
+
+  public void shutdownScheduler() {
+    scheduler.shutdownNow();
   }
 }

@@ -1,5 +1,7 @@
 package com.flower.engine.function;
 
+import com.flower.utilities.FlowerException;
+
 import java.lang.reflect.Field;
 
 public class StateField {
@@ -18,7 +20,7 @@ public class StateField {
     try {
       return field.get(flowState);
     } catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
+      throw new FlowerException(e);
     }
   }
 
@@ -26,7 +28,7 @@ public class StateField {
     try {
       field.set(flowState, newValue);
     } catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
+      throw new FlowerException(e);
     }
   }
 }

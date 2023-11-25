@@ -3,6 +3,7 @@ package com.flower.engine.runner;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
 import com.flower.anno.event.EventType;
+import com.flower.conf.FlowExec;
 import com.flower.conf.FlowExecCallback;
 import com.flower.conf.FlowFuture;
 import com.flower.conf.FlowId;
@@ -12,6 +13,7 @@ import com.flower.engine.FlowImpl;
 import com.flower.engine.FlowerId;
 import com.flower.engine.runner.step.InternalTransition;
 import com.flower.engine.runner.step.StepCallContext;
+import com.flower.utilities.FlowerException;
 import com.flower.utilities.FutureCombiner;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FluentFuture;
@@ -32,16 +34,19 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
   static final String END = "END";
   static final String LINK = "-->";
 
+  final FlowRunner flowRunner;
   final Class<T> flowType;
   final FlowCallContext flowCallContext;
   final FlowExecCallback flowExecCallback;
   final ListeningScheduledExecutorService scheduler;
 
   public FlowExecImpl(
+      FlowRunner flowRunner,
       Class<T> flowType,
       FlowCallContext flowCallContext,
       FlowExecCallback flowExecCallback,
       ListeningScheduledExecutorService scheduler) {
+    this.flowRunner = flowRunner;
     this.flowType = flowType;
     this.flowCallContext = flowCallContext;
     this.flowExecCallback = flowExecCallback;
@@ -63,7 +68,7 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
 
   public FlowFuture<T> runFlow(FlowId flowId, T flow, Duration startupDelay) {
     // TODO: implement
-    throw new UnsupportedOperationException("Not implemented yet");
+    throw new UnsupportedOperationException("Running flow with startup delay is not implemented yet");
   }
 
   @Override
@@ -80,6 +85,12 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
   }
 
   public FlowFuture<T> runFlow(FlowId flowId, T flowState) {
+    if (!flowState.getClass().equals(flowType)) {
+      //Inherited flows will have a different executor.
+      FlowExec childExec = flowRunner.getFlowExec(flowState.getClass());
+      return childExec.runFlow(flowState);
+    }
+
     FlowImpl<T> flow_ = null;
     ListenableFuture<T> checkReturnValue;
     try {
@@ -92,7 +103,7 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
       final ListenableFuture<InternalTransition> firstStepCallFuture = flowContextPair.getRight();
 
       ListenableFuture<T> flowFuture =
-          FluentFuture.from(transitionToNextStep(flowInstance, firstStepCallFuture))
+          FluentFuture.from(transitionToNextStep(flowInstance, firstStepCallFuture, flowCallContext.flowName, flowCallContext.firstStepName))
               .transform(
                   t -> {
                     flow.setStepInfo(null);
@@ -183,10 +194,14 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
   }
 
   ListenableFuture<T> transitionToNextStep(
-      FlowImpl<T> flowInstance, ListenableFuture<InternalTransition> stepCallFuture) {
+      FlowImpl<T> flowInstance, ListenableFuture<InternalTransition> stepCallFuture, String flowTypeName, String stepName) {
     return FluentFuture.from(stepCallFuture)
         .transformAsync(
             transition -> {
+              if (transition == null) {
+                throw new FlowerException("Step [" + stepName + "] of Flow type [" + flowTypeName + "] provided `null` Transition object.");
+              }
+
               // 1. Check final state in the form of transition to Terminal step
               if (transition.isTerminal()) {
                 if (transition.getDelay() != null) {
@@ -250,7 +265,7 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
       stepCallFuture = flowCallContext.runStep(flowInstance, nextStepName);
     }
 
-    return transitionToNextStep(flowInstance, stepCallFuture);
+    return transitionToNextStep(flowInstance, stepCallFuture, flowCallContext.flowName, nextStepName);
   }
 
   public Class<T> getFlowType() {

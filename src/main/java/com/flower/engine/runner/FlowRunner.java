@@ -124,7 +124,7 @@ public class FlowRunner implements FlowExecCallback, FlowRepoPrm {
   }
 
   private <T> InternalFlowExec<T> createExec(Class<T> flowType, FlowCallContext flowCallContext) {
-    return new FlowExecImpl<>(flowType, flowCallContext, this, scheduler);
+    return new FlowExecImpl<>(this, flowType, flowCallContext, this, scheduler);
   }
 
   // ------------------------------------------------------------------
