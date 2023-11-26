@@ -153,17 +153,18 @@ class F_ChildFlow2 {
 @FlowType(firstStep = "step")
 class F_ParentFlow {
   @SimpleStepFunction
-  static Transition step(
+  static ListenableFuture<Transition> step(
       @Terminal Transition end,
       @FlowFactory(flowTypeName = "F_ChildFlow") FlowFactoryPrm<F_ChildFlow> flowFactory)
       throws ExecutionException, InterruptedException {
     System.out.println("F_ParentFlow step start");
 
-    flowFactory.runChildFlow(new F_ChildFlow()).getFuture().get();
-
-    System.out.println("F_ParentFlow step end");
-
-    return end;
+    return Futures.transform(flowFactory.runChildFlow(new F_ChildFlow()).getFuture(),
+        cfr -> {
+          System.out.println("F_ParentFlow step end");
+          return end;
+        },
+        MoreExecutors.directExecutor());
   }
 }
 
