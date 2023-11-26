@@ -29,6 +29,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.util.concurrent.ListeningScheduledExecutorService;
 import org.apache.commons.lang3.StringUtils;
 
 public class FlowCallContextCreator {
@@ -43,6 +45,7 @@ public class FlowCallContextCreator {
   // ----------- Flow call context -----------
 
   public FlowCallContext createFlowCallContext(
+      ListeningScheduledExecutorService scheduler,
       FlowTypeRecord flowTypeRecord,
       Map<String, GlobalFunctionRecord> globalFunctionByName,
       Map<String, EventProfileContainerRecord> eventProfilesByName,
@@ -142,7 +145,8 @@ public class FlowCallContextCreator {
         flowTypeRecord.flowType,
         stepCalls,
         firstStepName,
-        eventContexts);
+        eventContexts,
+        scheduler);
   }
 
   class StepInitializationEntry {

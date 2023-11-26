@@ -163,7 +163,7 @@ public class FlowerNullabilityTest {
     Exception e = assertThrows(Exception.class, () -> flowFuture.getFuture().get());
     Assertions.assertTrue(
         e.getMessage()
-            .contains("Fatal: Out or InOut parameter value wasn't set in the Function call"));
+            .contains("Fatal: value of Out or InOut parameter with Output.MANDATORY wasn't set in the Function call"));
   }
 
   @Test
@@ -179,7 +179,7 @@ public class FlowerNullabilityTest {
     Exception e = assertThrows(Exception.class, () -> flowFuture.getFuture().get());
     Assertions.assertTrue(
         e.getMessage()
-            .contains("Fatal: Out or InOut parameter value wasn't set in the Function call"));
+            .contains("Fatal: value of Out or InOut parameter with Output.MANDATORY wasn't set in the Function call"));
   }
 
   @Test

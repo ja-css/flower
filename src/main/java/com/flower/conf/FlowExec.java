@@ -2,6 +2,16 @@ package com.flower.conf;
 
 import java.time.Duration;
 
+/**
+ * This interface is user-facing, and we don't allow explixitly set FlowId or start child flows.
+ *
+ * For that reason the following methods are extracted to InternalFlowExec sub-interface.
+ * FlowFuture<T> runChildFlow(FlowId parentFlowId, T flow);
+ * FlowFuture<T> runChildFlow(FlowId parentFlowId, T flow, Duration startupDelay);
+ *
+ * InternalFlowExec
+ * @param <T>
+ */
 public interface FlowExec<T> {
   /**
    * Run a flow.

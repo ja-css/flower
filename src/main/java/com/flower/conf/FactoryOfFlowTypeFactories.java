@@ -18,6 +18,7 @@ public class FactoryOfFlowTypeFactories<T> {
 
   final String childFlowName;
   final Class<T> childFlowType;
+  final boolean dynamic;
   final ParameterizedType genericParameterType;
 
   public FactoryOfFlowTypeFactories(
@@ -27,10 +28,12 @@ public class FactoryOfFlowTypeFactories<T> {
       FlowRunner flowRunner,
       String childFlowName,
       Class<T> childFlowType,
+      boolean dynamic,
       ParameterizedType genericParameterType) {
     this.parentFlowName = parentFlowName;
     this.functionName = functionName;
     this.functionParameterName = functionParameterName;
+    this.dynamic = dynamic;
     this.flowRunner = flowRunner;
     this.flowExec = null;
     this.childFlowName = childFlowName;
@@ -43,23 +46,27 @@ public class FactoryOfFlowTypeFactories<T> {
   }
 
   public void initFlowExec() {
-    if (!StringUtils.isBlank(childFlowName)) {
-      flowExec = flowRunner.getInternalFlowExec(childFlowName);
+    if (dynamic) {
+      flowExec = flowRunner.getDynamicFlowExec();
     } else {
-      flowExec = flowRunner.getInternalFlowExec(childFlowType);
-    }
+      if (!StringUtils.isBlank(childFlowName)) {
+        flowExec = flowRunner.getInternalFlowExec(childFlowName);
+      } else {
+        flowExec = flowRunner.getInternalFlowExec(childFlowType);
+      }
 
-    Type genericParameterFlowType = genericParameterType.getActualTypeArguments()[0];
-    Class<T> execFlowType = flowExec.getFlowType();
-    if (!genericParameterFlowType.equals(flowExec.getFlowType())) {
-      throw new IllegalStateException(
-          String.format(
-              "Flow factory parameter generic subtype mismatch: Flow type from FlowExec [%s] Parameter generic subtype [%s]. Flow: [%s] Function/Call: [%s] Parameter: [%s]",
-              execFlowType,
-              genericParameterFlowType,
-              parentFlowName,
-              functionName,
-              functionParameterName));
+      Type genericParameterFlowType = genericParameterType.getActualTypeArguments()[0];
+      Class<T> execFlowType = flowExec.getFlowType();
+      if (!genericParameterFlowType.equals(flowExec.getFlowType())) {
+        throw new IllegalStateException(
+            String.format(
+                "Flow factory parameter generic subtype mismatch: Flow type from FlowExec [%s] Parameter generic subtype [%s]. Flow: [%s] Function/Call: [%s] Parameter: [%s]",
+                execFlowType,
+                genericParameterFlowType,
+                parentFlowName,
+                functionName,
+                functionParameterName));
+      }
     }
   }
 }

@@ -1,7 +1,5 @@
 package com.flower.engine.runner;
 
-import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-
 import com.flower.anno.event.EventType;
 import com.flower.conf.FlowExec;
 import com.flower.conf.FlowExecCallback;
@@ -20,7 +18,6 @@ import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningScheduledExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
@@ -110,11 +107,11 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
                     flowCallContext.runEvents(EventType.AFTER_FLOW, flow, flow, null, null);
                     return t;
                   },
-                  directExecutor());
+                  scheduler);
 
       checkReturnValue =
           FluentFuture.from(flowFuture)
-              .transformAsync(f -> flowFuture, directExecutor())
+              .transformAsync(f -> flowFuture, scheduler)
               .catchingAsync(
                   Throwable.class,
                   t -> {
@@ -122,7 +119,7 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
                     flowCallContext.runEvents(EventType.FLOW_EXCEPTION, flow, flow, null, t);
                     return flowFuture;
                   },
-                  directExecutor());
+                  scheduler);
 
       flowExecCallback.flowStarted(flowId, checkReturnValue);
 
@@ -132,7 +129,7 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
                 flowExecCallback.flowFinished(flowId);
                 return null;
               },
-              MoreExecutors.directExecutor());
+              scheduler);
 
       return new SimpleFlowFuture<>(flowId, checkReturnValue);
     } catch (Throwable t) {
@@ -190,7 +187,7 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
   ListenableFuture<T> runEventsForLastStep(FlowImpl<T> flowInstance) {
     return FluentFuture.from(
             flowCallContext.runEvents(EventType.AFTER_STEP, flowInstance, flowInstance, null, null))
-        .transform(void_ -> flowInstance.getState(), directExecutor());
+        .transform(void_ -> flowInstance.getState(), scheduler);
   }
 
   ListenableFuture<T> transitionToNextStep(
@@ -258,9 +255,9 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
                     return flowCallContext.runEvents(
                         EventType.BEFORE_STEP, flowInstance, flowInstance, null, null);
                   },
-                  directExecutor())
+                  scheduler)
               .transformAsync(
-                  void_ -> flowCallContext.runStep(flowInstance, nextStepName), directExecutor());
+                  void_ -> flowCallContext.runStep(flowInstance, nextStepName), scheduler);
     } else {
       stepCallFuture = flowCallContext.runStep(flowInstance, nextStepName);
     }

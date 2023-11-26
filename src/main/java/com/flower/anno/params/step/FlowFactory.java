@@ -29,4 +29,9 @@ public @interface FlowFactory {
 
   /** @return Referenced Flow class */
   Class<?> flowType() default void.class;
+
+  /** As deducible from the name, dynamic FlowFactory can't validate the possibility of running FlowType on startup.
+   * That can potentially result in runtime errors related to flow registry.
+   * If possible, avoid using dynamic and specify FlowType explicitly, to fail fast in case of any configuration issues. */
+  boolean dynamic() default false;
 }

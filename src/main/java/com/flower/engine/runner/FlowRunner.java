@@ -18,6 +18,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningScheduledExecutorService;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +36,8 @@ public class FlowRunner implements FlowExecCallback, FlowRepoPrm {
   private final FlowCallContextCreator flowCallContextCreator;
   private final Map<FlowId, ListenableFuture<Object>> activeFlows;
   private final Cache<FlowId, ListenableFuture<Object>> flowsCache;
+
+  private final DynamicFlowExec dynamicFlowExec;
 
   @Nullable private Map<Class<?>, InternalFlowExec> flowExecByClass;
   @Nullable private Map<String, InternalFlowExec> flowExecByName;
@@ -54,6 +57,7 @@ public class FlowRunner implements FlowExecCallback, FlowRepoPrm {
     this.flowConfigurationRepo = flowConfigurationRepo;
     this.flowCallContextCreator = new FlowCallContextCreator(this);
     this.scheduler = scheduler;
+    this.dynamicFlowExec = new DynamicFlowExec(this);
     activeFlows = new ConcurrentHashMap<>();
     flowsCache =
         CacheBuilder.newBuilder()
@@ -109,7 +113,7 @@ public class FlowRunner implements FlowExecCallback, FlowRepoPrm {
     for (FlowTypeRecord flowTypeRecord : flowConfigurationRepo.getFlowTypes()) {
       FlowCallContext flowCallContext =
           flowCallContextCreator.createFlowCallContext(
-              flowTypeRecord, globalFunctionsByName, eventProfilesByName, defaultEventProfiles);
+              scheduler, flowTypeRecord, globalFunctionsByName, eventProfilesByName, defaultEventProfiles);
       Class<?> flowType = flowTypeRecord.flowType;
       InternalFlowExec<?> flowExec = createExec(flowType, flowCallContext);
       flowExecByClass.put(flowTypeRecord.flowType, flowExec);
@@ -201,5 +205,9 @@ public class FlowRunner implements FlowExecCallback, FlowRepoPrm {
   public void registerFactoryOfFlowTypeFactories(
       FactoryOfFlowTypeFactories factoryOfFlowTypeFactories) {
     Preconditions.checkNotNull(flowTypeFactoriesList).add(factoryOfFlowTypeFactories);
+  }
+
+  public <T> InternalFlowExec<T> getDynamicFlowExec() {
+    return dynamicFlowExec;
   }
 }

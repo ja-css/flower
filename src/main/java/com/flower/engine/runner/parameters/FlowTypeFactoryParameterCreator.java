@@ -80,15 +80,18 @@ public class FlowTypeFactoryParameterCreator extends ParameterCreator {
 
     childFlowName = flowFactoryAnnotation.flowTypeName();
     flowType = flowFactoryAnnotation.flowType();
+    boolean dynamic = flowFactoryAnnotation.dynamic();
 
-    if (StringUtils.isBlank(childFlowName) && flowType.equals(void.class)) {
-      throw new IllegalStateException(
-          String.format(
-              "Function parameter of type [%s] should refer to a ChildFlow by name or type. Flow: [%s] Function/Call: [%s] Parameter: [%s]",
-              ParameterType.CHILD_FLOW_FACTORY_REF,
-              flowTypeRecord.flowTypeName,
-              functionOrCallName,
-              parameterName));
+    if (!dynamic) {
+      if (StringUtils.isBlank(childFlowName) && flowType.equals(void.class)) {
+        throw new IllegalStateException(
+            String.format(
+                "Function parameter of type [%s] should refer to a ChildFlow by name or type. Flow: [%s] Function/Call: [%s] Parameter: [%s]",
+                ParameterType.CHILD_FLOW_FACTORY_REF,
+                flowTypeRecord.flowTypeName,
+                functionOrCallName,
+                parameterName));
+      }
     }
 
     if (!(genericParameterType instanceof ParameterizedType)) {
@@ -109,6 +112,7 @@ public class FlowTypeFactoryParameterCreator extends ParameterCreator {
             flowRunner,
             childFlowName,
             flowType,
+            dynamic,
             (ParameterizedType) genericParameterType);
 
     // We can't ensure that FLOW_TYPE used in a parameter FlowFactoryPrm<FLOW_TYPE> is the right

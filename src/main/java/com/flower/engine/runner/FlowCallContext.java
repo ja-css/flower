@@ -1,7 +1,5 @@
 package com.flower.engine.runner;
 
-import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-
 import com.flower.anno.event.EventType;
 import com.flower.conf.FlowId;
 import com.flower.conf.StepInfoPrm;
@@ -28,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
+
+import com.google.common.util.concurrent.ListeningScheduledExecutorService;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class FlowCallContext implements EventRunner {
@@ -38,18 +38,21 @@ public class FlowCallContext implements EventRunner {
 
   final String flowName;
   final Class<?> flowType;
+  final ListeningScheduledExecutorService scheduler;
 
   public FlowCallContext(
       String flowName,
       Class<?> flowType,
       Map<String, StepCallContext> stepCalls,
       String firstStepName,
-      Map<String, EventProfileForFlowTypeCallContext> eventContexts) {
+      Map<String, EventProfileForFlowTypeCallContext> eventContexts,
+      ListeningScheduledExecutorService scheduler) {
     this.flowName = flowName;
     this.flowType = flowType;
     this.stepCalls = stepCalls;
     this.firstStepName = firstStepName;
     this.eventContexts = eventContexts;
+    this.scheduler = scheduler;
     if (!stepCalls.containsKey(firstStepName))
       throw new IllegalStateException(
           String.format(
@@ -115,8 +118,9 @@ public class FlowCallContext implements EventRunner {
 
                   return runEvents(EventType.BEFORE_STEP, flow, flow, null, null);
                 },
-                directExecutor())
-            .transformAsync(void_ -> runStep(flow, firstStepName), directExecutor()));
+                //important to context switch here, to untie the calling thread, initiating the flow execution.
+                scheduler)
+            .transformAsync(void_ -> runStep(flow, firstStepName), scheduler));
   }
 
   StepCallContext getStep(String stepName) {
@@ -130,14 +134,14 @@ public class FlowCallContext implements EventRunner {
       return FluentFuture.from(runEvents(EventType.BEFORE_STEP_ITERATION, flow, flow, null, null))
           .transformAsync(
               void_ -> stepCallContext.call(flow.getId(), flow.getState(), this, flow, flow),
-              directExecutor())
+              scheduler)
           .transformAsync(
               t ->
                   Futures.transform(
                       runEvents(EventType.AFTER_STEP_ITERATION, flow, flow, null, null),
                       void_ -> t,
-                      directExecutor()),
-              directExecutor());
+                      scheduler),
+              scheduler);
     } catch (Throwable t) {
       return Futures.immediateFailedFuture(t);
     }
