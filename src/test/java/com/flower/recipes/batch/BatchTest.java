@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 public class BatchTest {
     static final int RUN_ACTION_COUNT = 10;
@@ -33,10 +34,10 @@ public class BatchTest {
         AtomicInteger minSimultaneousExecutions = new AtomicInteger(Integer.MAX_VALUE);
         AtomicInteger maxSimultaneousExecutions = new AtomicInteger(Integer.MIN_VALUE);
 
-        BatchFlow<Integer, TestActionFlow> batchFlow = new BatchFlow<>(
+        BatchFlow<Integer, String, TestActionFlow> batchFlow = new BatchFlow<>(
             IntStream.rangeClosed(1, RUN_ACTION_COUNT).boxed().toList(),
             (id, batchActionProgressCallback) -> new TestActionFlow(id, counter, activeCounter, minSimultaneousExecutions, maxSimultaneousExecutions),
-            (id, isFinal, exception) -> { /*Noop*/ },
+            (id, isFinal, msg, exception) -> { /*Noop*/ },
             MAXIMUM_SIMULTANEOUS_EXECUTIONS
         );
 
@@ -44,6 +45,60 @@ public class BatchTest {
         flowExec.runFlow(batchFlow).getFuture().get();
 
         assertEquals(RUN_ACTION_COUNT, counter.get());
+        assertEquals(0, activeCounter.get());
+        assertEquals(0, minSimultaneousExecutions.get());
+        assertEquals(MAXIMUM_SIMULTANEOUS_EXECUTIONS, maxSimultaneousExecutions.get());
+    }
+
+    @Test
+    public void testWithException() throws ExecutionException, InterruptedException {
+        Flower flower = new Flower(10);
+        flower.registerFlow(BatchFlow.class);
+        flower.registerFlow(TestActionFlow.class);
+        flower.initialize();
+
+        FlowExec<BatchFlow> flowExec = flower.getFlowExec(BatchFlow.class);
+        AtomicInteger counter = new AtomicInteger(0);
+        AtomicInteger activeCounter = new AtomicInteger(0);
+        AtomicInteger minSimultaneousExecutions = new AtomicInteger(Integer.MAX_VALUE);
+        AtomicInteger maxSimultaneousExecutions = new AtomicInteger(Integer.MIN_VALUE);
+
+        BatchFlow<Integer, String, TestActionFlow> batchFlow = new BatchFlow<>(
+            IntStream.rangeClosed(RUN_ACTION_COUNT + 1, RUN_ACTION_COUNT * 2).boxed().toList(),
+            (id, batchActionProgressCallback) -> new TestActionFlow(id, counter, activeCounter, minSimultaneousExecutions, maxSimultaneousExecutions),
+            (id, isFinal, msg, exception) -> { /*Noop*/ },
+            MAXIMUM_SIMULTANEOUS_EXECUTIONS
+        );
+
+        assertThrows(ExecutionException.class, () -> flowExec.runFlow(batchFlow).getFuture().get());
+    }
+
+    @Test
+    public void testWithExceptionIgnored() throws ExecutionException, InterruptedException {
+        Flower flower = new Flower(10);
+        flower.registerFlow(BatchFlow.class);
+        flower.registerFlow(TestActionFlow.class);
+        flower.initialize();
+
+        FlowExec<BatchFlow> flowExec = flower.getFlowExec(BatchFlow.class);
+        AtomicInteger counter = new AtomicInteger(0);
+        AtomicInteger activeCounter = new AtomicInteger(0);
+        AtomicInteger minSimultaneousExecutions = new AtomicInteger(Integer.MAX_VALUE);
+        AtomicInteger maxSimultaneousExecutions = new AtomicInteger(Integer.MIN_VALUE);
+
+        BatchFlow<Integer, String, TestActionFlow> batchFlow = new BatchFlow<>(
+            IntStream.rangeClosed(RUN_ACTION_COUNT + 1, RUN_ACTION_COUNT * 2).boxed().toList(),
+            (id, batchActionProgressCallback) -> new TestActionFlow(id, counter, activeCounter, minSimultaneousExecutions, maxSimultaneousExecutions),
+            (id, isFinal, msg, exception) -> { /*Noop*/ },
+            MAXIMUM_SIMULTANEOUS_EXECUTIONS,
+            false
+        );
+
+        //Doesn't throw
+        flowExec.runFlow(batchFlow).getFuture().get();
+
+        //one flow (id == RUN_ACTION_COUNT + 1) failed
+        assertEquals(RUN_ACTION_COUNT-1, counter.get());
         assertEquals(0, activeCounter.get());
         assertEquals(0, minSimultaneousExecutions.get());
         assertEquals(MAXIMUM_SIMULTANEOUS_EXECUTIONS, maxSimultaneousExecutions.get());
@@ -77,6 +132,10 @@ class TestActionFlow {
                                     @In AtomicInteger min,
                                     @In AtomicInteger max,
                                     @Terminal Transition end) {
+        if (id == BatchTest.RUN_ACTION_COUNT + 1) {
+            throw new RuntimeException("testException");
+        }
+
         System.out.println("Start: id " + id);
 
         counter.incrementAndGet();

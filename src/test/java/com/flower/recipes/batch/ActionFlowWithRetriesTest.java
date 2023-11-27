@@ -25,7 +25,7 @@ public class ActionFlowWithRetriesTest {
         TestActionFlowWithRetries flowFails2RetryAttempts = new TestActionFlowWithRetries("dummyActionId",
             2,
             "dummyOperationType",
-            (isFinal, exception) -> {
+            (isFinal, msg, exception) -> {
                 System.out.println(exception);
             });
         assertThrows(ExecutionException.class, () -> flowExec.runFlow(flowFails2RetryAttempts).getFuture().get());
@@ -33,7 +33,7 @@ public class ActionFlowWithRetriesTest {
         TestActionFlowWithRetries flowSucceeds3RetryAttempts = new TestActionFlowWithRetries("dummyActionId",
             3,
             "dummyOperationType",
-            (isFinal, exception) -> {
+            (isFinal, msg, exception) -> {
                 System.out.println(exception);
             });
         //Doesn't throw
@@ -42,11 +42,11 @@ public class ActionFlowWithRetriesTest {
 }
 
 @FlowType(extendz="ActionFlowWithRetries", firstStep="init")
-class TestActionFlowWithRetries extends ActionFlowWithRetries<String> {
+class TestActionFlowWithRetries extends ActionFlowWithRetries<String, String> {
     public TestActionFlowWithRetries(String actionId,
                                      Integer maxRetryAttempts,
                                      String operationType,
-                                     BatchActionProgressCallback actionCallback) {
+                                     BatchActionProgressCallback<String> actionCallback) {
         super(actionId, maxRetryAttempts, operationType, actionCallback);
     }
 

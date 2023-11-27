@@ -22,19 +22,19 @@ import com.google.common.util.concurrent.ListenableFuture;
 import javax.annotation.Nullable;
 
 @FlowType(name="ActionFlowWithRetries", firstStep = "init")
-public class ActionFlowWithRetries<ID> {
-    @State final ID entityId;
+public class ActionFlowWithRetries<ID, MSG> {
+    @State final ID actionId;
     @State final Integer maxRetryAttempts;
     @State final String operationType;
-    @State final BatchActionProgressCallback actionCallback;
+    @State final BatchActionProgressCallback<MSG> actionCallback;
 
     @State @Nullable Integer currentAttempt;
 
-    public ActionFlowWithRetries(ID entityId,
+    public ActionFlowWithRetries(ID actionId,
                                  Integer maxRetryAttempts,
                                  String operationType,
-                                 BatchActionProgressCallback actionCallback) {
-        this.entityId = entityId;
+                                 BatchActionProgressCallback<MSG> actionCallback) {
+        this.actionId = actionId;
         this.maxRetryAttempts = maxRetryAttempts;
         this.operationType = operationType;
         this.actionCallback = actionCallback;
@@ -53,29 +53,28 @@ public class ActionFlowWithRetries<ID> {
     }
 
     @TransitFunction
-    public static <ID> ListenableFuture<Transition> retry(@InRetOrException ReturnValueOrException<Void> retValOrExc,
-                                                          @In ID entityId,
-                                                          @In String operationType,
+    public static <MSG> ListenableFuture<Transition> retry(@InRetOrException ReturnValueOrException<Void> retValOrExc,
                                                           @InOut(out=Output.OPTIONAL) InOutPrm<Integer> currentAttempt,
                                                           @In Integer maxRetryAttempts,
-                                                          @In BatchActionProgressCallback actionCallback,
-                                                          @StepRef Transition action,
-                                                          @Terminal Transition end) {
+                                                          @In BatchActionProgressCallback<MSG> actionCallback,
+                                                          @StepRef(stepName="action") Transition retry,
+                                                          @Terminal Transition next) {
         int currentAttemptVal = currentAttempt.getInValue();
         currentAttempt.setOutValue(currentAttemptVal);
 
         if (retValOrExc.exception().isPresent()) {
             Throwable exception = retValOrExc.exception().get();
-            actionCallback.progressCallback(false, exception);
             if (currentAttemptVal < maxRetryAttempts) {
                 //Increment attempt counter and retry
+                actionCallback.progressCallback(false, null, exception);
                 currentAttempt.setOutValue(currentAttemptVal + 1);
-                return Futures.immediateFuture(action);
+                return Futures.immediateFuture(retry);
             } else {
                 //Attempts exceeded, fatal.
+                actionCallback.progressCallback(true, null, exception);
                 return Futures.immediateFailedFuture(exception);
             }
         }
-        return Futures.immediateFuture(end);
+        return Futures.immediateFuture(next);
     }
 }
