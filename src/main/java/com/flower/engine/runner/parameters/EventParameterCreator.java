@@ -61,7 +61,7 @@ public class EventParameterCreator extends ParameterCreator {
     }
     if (baseParameter.flowExceptionAnnotation != null) {
       functionParameterType = ParameterType.FLOW_EXCEPTION;
-      parameterType = FlowInfoPrm.class;
+      parameterType = Throwable.class;
     }
 
     Preconditions.checkNotNull(functionParameterType);

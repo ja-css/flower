@@ -38,18 +38,10 @@ public class Flower implements FlowerEngine {
     this(1);
   }
 
-  public void registerFlows(final Class<?>... flowTypes) {
+  public void registerFlow(final Class<?>... flowTypes) {
     for (Class<?> flowType : flowTypes) {
-      registerFlow(flowType);
+      flowConfigurationRepo.registerFlowType(flowType);
     }
-  }
-
-  // Flow Types can be generic
-  public void registerFlow(final Class<?> flowType) {
-    /*    if (flowType.getTypeParameters().length > 0)
-    throw new IllegalStateException(
-        String.format("Flow type can't be generic: type [%s]", flowType));*/
-    flowConfigurationRepo.registerFlowType(flowType);
   }
 
   // TODO: Global function containers can't be generic, but global functions CAN be generic
