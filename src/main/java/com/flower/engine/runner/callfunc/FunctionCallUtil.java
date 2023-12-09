@@ -46,12 +46,14 @@ public class FunctionCallUtil {
                 callState.returnValueToFlowParameterName,
                 callContext.functionParameters,
                 functionCallParameters,
-                functionReturnValue),
+                functionReturnValue,
+                callContext.getFlowStepInfo()),
         MoreExecutors.directExecutor());
   }
 
   static List<Object> getStepParametersFromFlowState(
       FlowId flowId, StepFunctionCallState callState, FunctionCallContext functionCallContext) {
+    String flowStepInfo = functionCallContext.getFlowStepInfo();
     List<Object> parameters = new ArrayList<>();
     for (FunctionCallParameter callParameter : functionCallContext.functionParameters) {
       ParameterType parameterType = callParameter.getFunctionParameterType();
@@ -59,8 +61,9 @@ public class FunctionCallUtil {
         case IN:
         case OUT:
         case IN_OUT:
-          parameters.add(getInOutParameter(callState.stateAccess, callParameter));
+          parameters.add(getInOutParameter(callState.stateAccess, callParameter, flowStepInfo));
           break;
+        case EXEC:
         case FLOW_REPO:
           parameters.add(callParameter.getSpecialObject());
           break;
@@ -74,14 +77,12 @@ public class FunctionCallUtil {
         case IN_FROM_FLOW: // Event-only
         case FLOW_INFO: // Event-only
         case STEP_INFO: // Event-only
-          // case TRANSITIONER_INFO: // Event-only
         case TRANSITION_INFO: // Event-only
         case EVENT_INFO: // Event-only
         case FLOW_EXCEPTION: // Event-only
-          //        case RUNNING_TIME_STATS: // Event-only
           throw new IllegalStateException(
               String.format(
-                  "Fatal: Function parameter type is not supported in step functions: [%s]. FlowField [%s] FunctionPrm [%s]",
+                  flowStepInfo + " Fatal: Function parameter type is not supported in step functions: [%s]. FlowField [%s] FunctionPrm [%s]",
                   parameterType,
                   callParameter.getStateFieldName(),
                   callParameter.getFunctionParameterName()));
@@ -111,7 +112,8 @@ public class FunctionCallUtil {
                 callState.stateAccess,
                 callContext.functionParameters,
                 functionParameterObjects,
-                (InternalTransition) functionReturnValue),
+                (InternalTransition) functionReturnValue,
+                callContext.getFlowStepInfo()),
         MoreExecutors.directExecutor());
   }
 
@@ -133,12 +135,14 @@ public class FunctionCallUtil {
                 callState.stateAccess,
                 callContext.functionParameters,
                 functionParameterObjects,
-                (InternalTransition) functionReturnValue),
+                (InternalTransition) functionReturnValue,
+                callContext.getFlowStepInfo()),
         MoreExecutors.directExecutor());
   }
 
   static List<Object> getTransitParametersFromFlowState(
       TransitFunctionCallState callState, FunctionCallContext functionCallContext) {
+    String flowStepInfo = functionCallContext.getFlowStepInfo();
     List<Object> parameters = new ArrayList<>();
     for (FunctionCallParameter callParameter : functionCallContext.functionParameters) {
       ParameterType parameterType = callParameter.getFunctionParameterType();
@@ -146,8 +150,9 @@ public class FunctionCallUtil {
         case IN:
         case OUT:
         case IN_OUT:
-          parameters.add(getInOutParameter(callState.stateAccess, callParameter));
+          parameters.add(getInOutParameter(callState.stateAccess, callParameter, flowStepInfo));
           break;
+        case EXEC:
         case STEP_REF:
         case TERMINAL:
           parameters.add(callParameter.getSpecialObject());
@@ -170,7 +175,7 @@ public class FunctionCallUtil {
           //        case RUNNING_TIME_STATS: // Event-only
           throw new IllegalStateException(
               String.format(
-                  "Fatal: Function parameter type is not supported in transit functions: [%s]. FlowField [%s] FunctionPrm [%s]",
+                  flowStepInfo + " Fatal: Function parameter type is not supported in transit functions: [%s]. FlowField [%s] FunctionPrm [%s]",
                   parameterType,
                   callParameter.getStateFieldName(),
                   callParameter.getFunctionParameterName()));
@@ -181,6 +186,7 @@ public class FunctionCallUtil {
 
   static List<Object> getTransitParametersFromFlowState(
       TransitFunctionExceptionCallState callState, FunctionCallContext functionCallContext) {
+    String flowStepInfo = functionCallContext.getFlowStepInfo();
     List<Object> parameters = new ArrayList<>();
     for (FunctionCallParameter callParameter : functionCallContext.functionParameters) {
       ParameterType parameterType = callParameter.getFunctionParameterType();
@@ -188,8 +194,9 @@ public class FunctionCallUtil {
         case IN:
         case OUT:
         case IN_OUT:
-          parameters.add(getInOutParameter(callState.stateAccess, callParameter));
+          parameters.add(getInOutParameter(callState.stateAccess, callParameter, flowStepInfo));
           break;
+        case EXEC:
         case STEP_REF:
         case TERMINAL:
           parameters.add(callParameter.getSpecialObject());
@@ -211,7 +218,7 @@ public class FunctionCallUtil {
           //        case RUNNING_TIME_STATS: // Event-only
           throw new IllegalStateException(
               String.format(
-                  "Fatal: Function parameter type is not supported in transit functions: [%s]. FlowField [%s] FunctionPrm [%s]",
+                  flowStepInfo + " Fatal: Function parameter type is not supported in transit functions: [%s]. FlowField [%s] FunctionPrm [%s]",
                   parameterType,
                   callParameter.getStateFieldName(),
                   callParameter.getFunctionParameterName()));
@@ -241,7 +248,8 @@ public class FunctionCallUtil {
                 callState.stateAccess,
                 callContext.functionParameters,
                 functionCallParameters,
-                (InternalTransition) functionReturnValue),
+                (InternalTransition) functionReturnValue,
+                callContext.getFlowStepInfo()),
         MoreExecutors.directExecutor());
   }
 
@@ -249,6 +257,7 @@ public class FunctionCallUtil {
       FlowId flowId,
       StepAndTransitFunctionCallState callState,
       FunctionCallContext functionCallContext) {
+    String flowStepInfo = functionCallContext.getFlowStepInfo();
     List<Object> parameters = new ArrayList<>();
     for (FunctionCallParameter callParameter : functionCallContext.functionParameters) {
       ParameterType parameterType = callParameter.getFunctionParameterType();
@@ -256,8 +265,9 @@ public class FunctionCallUtil {
         case IN:
         case OUT:
         case IN_OUT:
-          parameters.add(getInOutParameter(callState.stateAccess, callParameter));
+          parameters.add(getInOutParameter(callState.stateAccess, callParameter, flowStepInfo));
           break;
+        case EXEC:
         case STEP_REF:
         case TERMINAL:
         case FLOW_REPO:
@@ -278,7 +288,7 @@ public class FunctionCallUtil {
           //        case RUNNING_TIME_STATS: // Event-only
           throw new IllegalStateException(
               String.format(
-                  "Fatal: Function parameter type is not supported in step-and-transit functions: [%s]. FlowField [%s] FunctionPrm [%s]",
+                  flowStepInfo + " Fatal: Function parameter type is not supported in step-and-transit functions: [%s]. FlowField [%s] FunctionPrm [%s]",
                   parameterType,
                   callParameter.getStateFieldName(),
                   callParameter.getFunctionParameterName()));
@@ -319,7 +329,8 @@ public class FunctionCallUtil {
                 callState.eventProfileStateAccess,
                 callContext.functionParameters,
                 functionCallParameters,
-                functionReturnValue),
+                functionReturnValue,
+                callContext.getFlowStepInfo()),
         MoreExecutors.directExecutor());
   }
 
@@ -330,18 +341,21 @@ public class FunctionCallUtil {
       EventType eventType,
       @Nullable Transition transition,
       @Nullable Throwable flowException) {
+    String flowStepInfo = functionCallContext.getFlowStepInfo();
     List<Object> parameters = new ArrayList<>();
     for (FunctionCallParameter callParameter : functionCallContext.functionParameters) {
       ParameterType parameterType = callParameter.getFunctionParameterType();
       switch (parameterType) {
         case IN_FROM_FLOW:
-          parameters.add(getInOutParameter(callState.flowStateAccess, callParameter));
+          parameters.add(getInOutParameter(callState.flowStateAccess, callParameter, flowStepInfo));
           break;
         case IN:
         case OUT:
         case IN_OUT:
-          parameters.add(getInOutParameter(callState.eventProfileStateAccess, callParameter));
+          parameters.add(getInOutParameter(callState.eventProfileStateAccess, callParameter, flowStepInfo));
           break;
+        case EXEC:
+          parameters.add(callParameter.getSpecialObject());
         case FLOW_INFO:
           parameters.add(eventParametersProvider.getFlowInfo());
           break;
@@ -364,7 +378,7 @@ public class FunctionCallUtil {
         case FLOW_REPO: // Step-only
           throw new IllegalStateException(
               String.format(
-                  "Fatal: Function parameter type is not supported in event functions: [%s]. FlowField [%s] FunctionPrm [%s]",
+                  flowStepInfo + " Fatal: Function parameter type is not supported in event functions: [%s]. FlowField [%s] FunctionPrm [%s]",
                   parameterType,
                   callParameter.getStateFieldName(),
                   callParameter.getFunctionParameterName()));
@@ -376,7 +390,7 @@ public class FunctionCallUtil {
   // ---------------- COMMON ----------------
 
   @Nullable
-  static Object getInOutParameter(StateAccess stateAccess, FunctionCallParameter callParameter) {
+  static Object getInOutParameter(StateAccess stateAccess, FunctionCallParameter callParameter, String flowStepInfo) {
     ParameterType parameterType = callParameter.getFunctionParameterType();
     Object parameterValue;
     if (parameterType == ParameterType.OUT) parameterValue = new FlowerOutPrm<>();
@@ -407,6 +421,17 @@ public class FunctionCallUtil {
         }
       }
     }
+
+    if (callParameter.isCheckNotNull()) {
+      if (parameterValue == null) {
+        throw new IllegalStateException(
+            String.format(
+                flowStepInfo + " Fatal: Function parameter marked as `CheckNotNull` has value null: [%s]. FlowField [%s] FunctionPrm [%s]",
+                parameterType,
+                callParameter.getStateFieldName(),
+                callParameter.getFunctionParameterName()));
+      }
+    }
     return parameterValue;
   }
 
@@ -432,7 +457,8 @@ public class FunctionCallUtil {
       @Nullable String returnValueToFlowParameterName,
       List<FunctionCallParameter> functionParameters,
       List<Object> functionParameterObjects,
-      Object returnValue) {
+      Object returnValue,
+      String flowStepInfo) {
     return Futures.transformAsync(
         waitForOutParams(functionParameters, functionParameterObjects),
         void_ -> {
@@ -442,7 +468,8 @@ public class FunctionCallUtil {
               returnValueToFlowParameterName,
               functionParameters,
               functionParameterObjects,
-              returnValue);
+              returnValue,
+              flowStepInfo);
           return Futures.immediateFuture(returnValue);
         },
         MoreExecutors.directExecutor());
@@ -452,7 +479,8 @@ public class FunctionCallUtil {
       StateAccess flowStateAccess,
       List<FunctionCallParameter> functionParameters,
       List<Object> functionParameterObjects,
-      InternalTransition transitionReturnValue) {
+      InternalTransition transitionReturnValue,
+      String flowStepInfo) {
     return Futures.transformAsync(
         waitForOutParams(functionParameters, functionParameterObjects),
         void_ -> {
@@ -462,7 +490,8 @@ public class FunctionCallUtil {
               null,
               functionParameters,
               functionParameterObjects,
-              transitionReturnValue);
+              transitionReturnValue,
+              flowStepInfo);
           return Futures.immediateFuture(transitionReturnValue);
         },
         MoreExecutors.directExecutor());
@@ -473,7 +502,8 @@ public class FunctionCallUtil {
       StateAccess eventProfileStateAccess,
       List<FunctionCallParameter> functionParameters,
       List<Object> functionParameterObjects,
-      Object returnValue) {
+      Object returnValue,
+      String flowStepInfo) {
     return Futures.transformAsync(
         waitForOutParams(functionParameters, functionParameterObjects),
         void_ -> {
@@ -483,10 +513,11 @@ public class FunctionCallUtil {
               null,
               functionParameters,
               functionParameterObjects,
-              returnValue);
+              returnValue,
+              flowStepInfo);
           // Flow State
           updateState0(
-              flowStateAccess, null, functionParameters, functionParameterObjects, returnValue);
+              flowStateAccess, null, functionParameters, functionParameterObjects, returnValue, flowStepInfo);
           return Futures.immediateVoidFuture();
         },
         MoreExecutors.directExecutor());
@@ -520,7 +551,8 @@ public class FunctionCallUtil {
       @Nullable String returnValueToFlowParameterName,
       List<FunctionCallParameter> functionParameters,
       List<Object> functionParameterObjects,
-      Object returnValue)
+      Object returnValue,
+      String flowStepInfo)
       throws Exception {
     ParameterType outType = ParameterType.OUT;
     ParameterType inOutType = ParameterType.IN_OUT;
@@ -531,7 +563,7 @@ public class FunctionCallUtil {
       ParameterType parameterType = callParameter.getFunctionParameterType();
       if (parameterType == outType || parameterType == inOutType) {
         FlowerOutPrm<?> flowerOutPrm = (FlowerOutPrm<?>) functionParameterObjects.get(i);
-        updateOutParameter(callParameter, flowerOutPrm, stateAccess);
+        updateOutParameter(callParameter, flowerOutPrm, stateAccess, flowStepInfo);
       }
       i++;
     }
@@ -549,7 +581,7 @@ public class FunctionCallUtil {
   }
 
   static void updateOutParameter(
-      FunctionCallParameter callParameter, FlowerOutPrm<?> flowerOutPrm, StateAccess stateAccess)
+      FunctionCallParameter callParameter, FlowerOutPrm<?> flowerOutPrm, StateAccess stateAccess, String flowStepInfo)
       throws Exception {
     Object value = null;
     if (flowerOutPrm.getOpt().isPresent()) {
@@ -576,7 +608,7 @@ public class FunctionCallUtil {
         //TODO: inject flow and function name here for better message clarity
         throw new IllegalStateException(
             String.format(
-                "Fatal: value of Out or InOut parameter with Output.MANDATORY wasn't set in the Function call. FlowField [%s] FunctionPrm [%s]",
+                flowStepInfo + " Fatal: value of Out or InOut parameter with Output.MANDATORY wasn't set in the Function call. FlowField [%s] FunctionPrm [%s]",
                 callParameter.getStateFieldName(), callParameter.getFunctionParameterName()));
     }
   }

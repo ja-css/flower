@@ -188,7 +188,7 @@ public class FlowCallContextCreator {
       StateAccessConfig flowStateAccessConfig) {
     Set<String> constructorInitializedFields = new HashSet<>();
     for (StateField fields : flowStateAccessConfig.stateFieldMap.values()) {
-      if (fields.isFinal) {
+      if (fields.isFinal && !fields.isNullable) {
         constructorInitializedFields.add(fields.field.getName());
       }
     }
@@ -263,7 +263,8 @@ public class FlowCallContextCreator {
           new StateField(
               stateFieldRecord.stateFieldClass,
               stateFieldRecord.stateField,
-              stateFieldRecord.isFinal));
+              stateFieldRecord.isFinal,
+              stateFieldRecord.isNullable));
 
     return new StateAccessConfig(stateParameterMap);
   }

@@ -515,6 +515,7 @@ public class FlowTypeRecord extends ContainerRecord {
     for (Field field : flowType.getDeclaredFields()) {
       if (field.isAnnotationPresent(State.class)) {
         State annotation = field.getAnnotation(State.class);
+        Nullable nullable = field.getAnnotation(Nullable.class);
         String stateFieldName = annotation.name();
         boolean isFinal = Modifier.isFinal(field.getModifiers());
 
@@ -533,7 +534,7 @@ public class FlowTypeRecord extends ContainerRecord {
 
         if (stateFieldName.trim().equals("")) stateFieldName = field.getName();
         StateFieldRecord record =
-            new StateFieldRecord(flowType, field, annotation, stateFieldName, isFinal);
+            new StateFieldRecord(flowType, field, annotation, stateFieldName, isFinal, nullable != null);
 
         if (stateFieldMap.containsKey(stateFieldName))
           throw new IllegalStateException(

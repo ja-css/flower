@@ -82,7 +82,11 @@ public class StepParameterInitProfile {
           initializedFields.add(param.getStateFieldName());
         }
       } else if (paramType.equals(ParameterType.IN_OUT)) {
-        if (Preconditions.checkNotNull(param.getOutput()).equals(Output.MANDATORY)) {
+        if (Preconditions.checkNotNull(param.getOutput()).equals(Output.MANDATORY) || (param.isCheckNotNull())) {
+          initializedFields.add(param.getStateFieldName());
+        }
+      } else if (paramType.equals(ParameterType.IN)) {
+        if (param.isCheckNotNull()) {
           initializedFields.add(param.getStateFieldName());
         }
       }
@@ -96,7 +100,7 @@ public class StepParameterInitProfile {
     for (FunctionCallParameter param : functionCall.functionParameters) {
       ParameterType paramType = param.getFunctionParameterType();
       if (paramType.equals(ParameterType.IN) || paramType.equals(ParameterType.IN_OUT)) {
-        if (!param.isNullableParameter()) {
+        if (!param.isNullableParameter() && !param.isCheckNotNull()) {
           String filedName = Preconditions.checkNotNull(param.getStateFieldName());
           if (!preInitializedFields.contains(filedName)) {
             expectedFields.add(new ExpectedInitializedField(filedName, functionCall.functionName));

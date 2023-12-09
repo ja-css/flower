@@ -5,6 +5,7 @@ public enum ParameterType {
   IN,
   OUT,
   IN_OUT,
+  EXEC,
 
   // ======= BEGIN Exec-specific =======
   CHILD_FLOW_FACTORY_REF, // Special object FlowTypeFactory

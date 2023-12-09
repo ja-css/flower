@@ -77,7 +77,7 @@ public class EventProfileContainerRecord extends ContainerRecord {
 
     Map<String, Boolean> stateFieldsInit = new HashMap<>();
     for (StateFieldRecord stateFieldRecord : state.values()) {
-      stateFieldsInit.put(stateFieldRecord.stateFieldName, stateFieldRecord.isFinal);
+      stateFieldsInit.put(stateFieldRecord.stateFieldName, stateFieldRecord.isFinal && !stateFieldRecord.isNullable);
     }
 
     // Informational, in case this will be needed in future NullAway versions:
@@ -153,7 +153,7 @@ public class EventProfileContainerRecord extends ContainerRecord {
     // Non-Nullable parameters
     for (FunctionParameterRecord param : signature) {
       if (param.type == FunctionParameterType.IN) {
-        if (param.nullableAnnotation == null) {
+        if (param.nullableAnnotation == null && !Preconditions.checkNotNull(param.inAnnotation).checkNotNull()) {
           String fieldName = Preconditions.checkNotNull(param.fieldName);
           if (!stateFieldsInit.containsKey(fieldName) || !stateFieldsInit.get(fieldName)) {
             throw new IllegalStateException(
@@ -167,7 +167,7 @@ public class EventProfileContainerRecord extends ContainerRecord {
             param.genericParameterType instanceof ParameterizedType
                 ? ((ParameterizedType) param.genericParameterType).getRawType()
                 : param.genericParameterType;
-        if (!rawType.equals(NullableInOutPrm.class)) {
+        if (!rawType.equals(NullableInOutPrm.class) && !Preconditions.checkNotNull(param.inOutAnnotation).checkNotNull()) {
           String fieldName = Preconditions.checkNotNull(param.fieldName);
           if (!stateFieldsInit.containsKey(fieldName) || !stateFieldsInit.get(fieldName)) {
             throw new IllegalStateException(
@@ -183,7 +183,11 @@ public class EventProfileContainerRecord extends ContainerRecord {
           && Preconditions.checkNotNull(param.outAnnotation).out() == Output.MANDATORY) {
         stateFieldsInitUpdate.put(param.fieldName, true);
       } else if (param.type == FunctionParameterType.IN_OUT
-          && Preconditions.checkNotNull(param.inOutAnnotation).out() == Output.MANDATORY) {
+          && (Preconditions.checkNotNull(param.inOutAnnotation).out() == Output.MANDATORY ||
+              Preconditions.checkNotNull(param.inOutAnnotation).checkNotNull())) {
+        stateFieldsInitUpdate.put(param.fieldName, true);
+      } else if (param.type == FunctionParameterType.IN
+          && Preconditions.checkNotNull(param.inAnnotation).checkNotNull()) {
         stateFieldsInitUpdate.put(param.fieldName, true);
       }
     }

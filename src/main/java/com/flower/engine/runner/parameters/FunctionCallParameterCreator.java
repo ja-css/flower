@@ -19,6 +19,7 @@ public class FunctionCallParameterCreator {
   final InParameterCreator inParameterCreator;
   final InRetParameterCreator inRetParameterCreator;
   final InRetOrExceptionParameterCreator inRetOrExceptionParameterCreator;
+  final ExecParameterCreator execParameterCreator;
   final InOutParameterCreator inOutParameterCreator;
   final OutParameterCreator outParameterCreator;
   final StepRefOrTerminalParameterCreator stepRefOrTerminalParameterCreator;
@@ -32,6 +33,7 @@ public class FunctionCallParameterCreator {
     inParameterCreator = new InParameterCreator();
     inRetParameterCreator = new InRetParameterCreator();
     inRetOrExceptionParameterCreator = new InRetOrExceptionParameterCreator();
+    execParameterCreator = new ExecParameterCreator(flowRunner.getScheduler());
     inOutParameterCreator = new InOutParameterCreator();
     outParameterCreator = new OutParameterCreator();
     stepRefOrTerminalParameterCreator = new StepRefOrTerminalParameterCreator();
@@ -70,6 +72,8 @@ public class FunctionCallParameterCreator {
       parameterCreator = inRetParameterCreator;
     } else if (functionParameter.inRetOrExceptionAnnotation != null) {
       parameterCreator = inRetOrExceptionParameterCreator;
+    } else if (functionParameter.execAnnotation != null) {
+      parameterCreator = execParameterCreator;
     } else if (functionParameter.outAnnotation != null) {
       parameterCreator = outParameterCreator;
       // @Out for event functions references EventProfileState

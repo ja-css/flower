@@ -93,7 +93,8 @@ public class EventParameterCreator extends ParameterCreator {
             functionParameterType,
             parameterType,
             null,
-            baseParameter.nullableAnnotation != null),
+            baseParameter.nullableAnnotation != null,
+            false),
         ImmutableList.of());
   }
 }

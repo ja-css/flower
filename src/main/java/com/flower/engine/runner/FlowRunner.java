@@ -55,8 +55,8 @@ public class FlowRunner implements FlowExecCallback, FlowRepoPrm {
       int ttlInCacheMillis,
       int maxCacheSize) {
     this.flowConfigurationRepo = flowConfigurationRepo;
-    this.flowCallContextCreator = new FlowCallContextCreator(this);
     this.scheduler = scheduler;
+    this.flowCallContextCreator = new FlowCallContextCreator(this);
     this.dynamicFlowExec = new DynamicFlowExec(this);
     activeFlows = new ConcurrentHashMap<>();
     flowsCache =
@@ -209,5 +209,9 @@ public class FlowRunner implements FlowExecCallback, FlowRepoPrm {
 
   public <T> InternalFlowExec<T> getDynamicFlowExec() {
     return dynamicFlowExec;
+  }
+
+  public ListeningScheduledExecutorService getScheduler() {
+    return scheduler;
   }
 }

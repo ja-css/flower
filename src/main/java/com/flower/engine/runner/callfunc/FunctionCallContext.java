@@ -16,4 +16,9 @@ public class FunctionCallContext {
     this.function = function;
     this.functionName = functionName;
   }
+
+  //TODO: Maybe at some point rewire everything and replace this with expected Flow/Step info
+  public String getFlowStepInfo() {
+    return String.format("{ Class: %s; Method: %s }", function.getDeclaringClass().getName(), function.getName());
+  }
 }

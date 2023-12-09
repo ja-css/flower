@@ -103,7 +103,8 @@ public class OutParameterCreator extends ParameterCreator {
             functionParameterType,
             parameterType,
             null,
-            baseParameter.nullableAnnotation != null),
+            baseParameter.nullableAnnotation != null,
+            false),
         Lists.newArrayList(outContext.getAssumedType()));
   }
 
@@ -197,7 +198,8 @@ public class OutParameterCreator extends ParameterCreator {
             functionParameterType,
             baseParameter.genericParameterType,
             null,
-            baseParameter.nullableAnnotation != null),
+            baseParameter.nullableAnnotation != null,
+            false),
         Lists.newArrayList(fieldCallContext.getAssumedType(), callGlobalContext.getAssumedType()));
   }
 
@@ -358,7 +360,8 @@ public class OutParameterCreator extends ParameterCreator {
             functionParameterType,
             baseParameter.genericParameterType,
             null,
-            baseParameter.nullableAnnotation != null),
+            baseParameter.nullableAnnotation != null,
+            false),
         assumedTypes);
   }
 

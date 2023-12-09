@@ -129,7 +129,8 @@ public class FlowTypeFactoryParameterCreator extends ParameterCreator {
             functionParameterType,
             genericParameterType,
             specialObject,
-            baseParameter.nullableAnnotation != null),
+            baseParameter.nullableAnnotation != null,
+            false),
         ImmutableList.of());
   }
 }

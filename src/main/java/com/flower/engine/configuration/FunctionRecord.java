@@ -1,6 +1,7 @@
 package com.flower.engine.configuration;
 
 import com.flower.anno.event.EventType;
+import com.flower.anno.params.common.Exec;
 import com.flower.anno.params.common.In;
 import com.flower.anno.params.common.InOut;
 import com.flower.anno.params.common.Out;
@@ -37,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executor;
 import javax.annotation.Nullable;
 
 public class FunctionRecord {
@@ -126,6 +128,7 @@ public class FunctionRecord {
     In inAnnotation = prm.getAnnotation(In.class);
     Out outAnnotation = prm.getAnnotation(Out.class);
     InOut inOutAnnotation = prm.getAnnotation(InOut.class);
+    Exec executorAnnotation = prm.getAnnotation(Exec.class);
     StepRef stepRefAnnotation = prm.getAnnotation(StepRef.class);
     Terminal terminalAnnotation = prm.getAnnotation(Terminal.class);
     InRet inRetAnnotation = prm.getAnnotation(InRet.class);
@@ -149,6 +152,7 @@ public class FunctionRecord {
           inAnnotation,
           outAnnotation,
           inOutAnnotation,
+          executorAnnotation,
           stepRefAnnotation,
           terminalAnnotation,
           inRetAnnotation,
@@ -209,6 +213,15 @@ public class FunctionRecord {
       }
       return new FunctionParameterRecord(
           inOutAnnotation, nullableAnnotation, prm, genericParameterType, flowType);
+    } else if (executorAnnotation != null) {
+      if (!prm.getType().equals(Executor.class)) {
+        throw new AnnotationFormatError(
+            String.format(
+                "Function %s. Parameter %s annotated as @Out should be of type %s",
+                physicalFunctionName, prm.getName(), OutPrm.class.getCanonicalName()));
+      }
+      return new FunctionParameterRecord(
+          executorAnnotation, nullableAnnotation, prm, genericParameterType, flowType);
     } else if (stepRefAnnotation != null) {
       if (functionType != FunctionType.TRANSIT
           && functionType != FunctionType.STEP_AND_TRANSIT

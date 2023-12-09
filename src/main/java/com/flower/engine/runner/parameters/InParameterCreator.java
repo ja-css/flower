@@ -27,6 +27,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 
+//TODO: looks like InOut logic here is not used, due to InOutParameterCreator
 public class InParameterCreator extends ParameterCreator {
   static final InRetParameterCreator IN_RET_PARAMETER_CREATOR = new InRetParameterCreator();
 
@@ -41,6 +42,7 @@ public class InParameterCreator extends ParameterCreator {
 
     final String flowStateFieldName;
     final ParameterType functionParameterType;
+    final boolean checkNotNull;
 
     Type parameterType = baseParameter.genericParameterType;
 
@@ -50,6 +52,7 @@ public class InParameterCreator extends ParameterCreator {
       functionParameterType = ParameterType.IN;
       flowStateFieldName = StringUtils.defaultIfEmpty(inAnnotation.from().trim(), parameterName);
       typeStr = "@In";
+      checkNotNull = inAnnotation.checkNotNull();
     } else if (baseParameter.inFromFlowAnnotation != null) {
       InFromFlow inFromFlowAnnotation =
           Preconditions.checkNotNull(baseParameter.inFromFlowAnnotation);
@@ -57,12 +60,14 @@ public class InParameterCreator extends ParameterCreator {
       flowStateFieldName =
           StringUtils.defaultIfEmpty(inFromFlowAnnotation.from().trim(), parameterName);
       typeStr = "@InFromFlow";
+      checkNotNull = false;
     } else {
       InOut inOutAnnotation = Preconditions.checkNotNull(baseParameter.inOutAnnotation);
       functionParameterType = ParameterType.IN_OUT;
       flowStateFieldName =
           StringUtils.defaultIfEmpty(inOutAnnotation.fromAndTo().trim(), parameterName);
       typeStr = "@InOut";
+      checkNotNull = inOutAnnotation.checkNotNull();
 
       parameterType = getInnerType(parameterType);
     }
@@ -121,7 +126,9 @@ public class InParameterCreator extends ParameterCreator {
             functionParameterType,
             parameterType,
             null,
-            baseParameter.nullableAnnotation != null),
+            baseParameter.nullableAnnotation != null,
+            checkNotNull
+            ),
         assumedTypes);
   }
 
@@ -153,6 +160,7 @@ public class InParameterCreator extends ParameterCreator {
     final ParameterType functionParameterType;
     final String flowStateFieldName;
     final String typeStr;
+    final boolean checkNotNull;
     Type callParameterType = parameterOverrideFromCall.genericParameterType;
 
     if (parameterOverrideFromCall.inAnnotation != null) {
@@ -160,6 +168,8 @@ public class InParameterCreator extends ParameterCreator {
       functionParameterType = ParameterType.IN;
       flowStateFieldName = StringUtils.defaultIfEmpty(inOverrideAnnotation.from(), parameterName);
       typeStr = "@In";
+      checkNotNull = inOverrideAnnotation.checkNotNull();
+
     } else if (parameterOverrideFromCall.inFromFlowAnnotation != null) {
       InFromFlow inFromFlowOverrideAnnotation =
           Preconditions.checkNotNull(parameterOverrideFromCall.inFromFlowAnnotation);
@@ -167,6 +177,8 @@ public class InParameterCreator extends ParameterCreator {
       flowStateFieldName =
           StringUtils.defaultIfEmpty(inFromFlowOverrideAnnotation.from(), parameterName);
       typeStr = "@InFromFlow";
+
+      checkNotNull = false;
     } else {
       InOut inOutOverrideAnnotation =
           Preconditions.checkNotNull(parameterOverrideFromCall.inOutAnnotation);
@@ -174,6 +186,7 @@ public class InParameterCreator extends ParameterCreator {
       flowStateFieldName =
           StringUtils.defaultIfEmpty(inOutOverrideAnnotation.fromAndTo(), parameterName);
       typeStr = "@InOut";
+      checkNotNull = inOutOverrideAnnotation.checkNotNull();
 
       callParameterType = getInnerType(callParameterType);
     }
@@ -231,7 +244,8 @@ public class InParameterCreator extends ParameterCreator {
             functionParameterType,
             callParameterType,
             null,
-            baseParameter.nullableAnnotation != null),
+            baseParameter.nullableAnnotation != null,
+            checkNotNull),
         Lists.newArrayList(fieldCallContext.getAssumedType(), callGlobalContext.getAssumedType()));
   }
 
@@ -272,6 +286,7 @@ public class InParameterCreator extends ParameterCreator {
     final String flowStateFieldName;
     final ParameterType functionParameterType;
     final String typeStr;
+    final boolean checkNotNull;
     Type parameterType = baseParameter.genericParameterType;
     Type callParameterType =
         parameterOverrideFromCall == null ? null : parameterOverrideFromCall.genericParameterType;
@@ -284,6 +299,7 @@ public class InParameterCreator extends ParameterCreator {
           StringUtils.defaultIfEmpty(
               transitParameterOverride.transitInPrmAnnotation.from(), parameterName);
       typeStr = "@In";
+      checkNotNull = transitParameterOverride.transitInPrmAnnotation.checkNotNull();
     } else {
       functionParameterType = ParameterType.IN_OUT;
       flowStateFieldName =
@@ -292,6 +308,7 @@ public class InParameterCreator extends ParameterCreator {
                   .fromAndTo(),
               parameterName);
       typeStr = "@InOut";
+      checkNotNull = transitParameterOverride.transitInOutPrmAnnotation.checkNotNull();
 
       parameterType = getInnerType(parameterType);
       if (callParameterType != null) callParameterType = getInnerType(callParameterType);
@@ -402,7 +419,8 @@ public class InParameterCreator extends ParameterCreator {
             functionParameterType,
             parameterType,
             null,
-            baseParameter.nullableAnnotation != null),
+            baseParameter.nullableAnnotation != null,
+            checkNotNull),
         assumedTypes);
   }
 

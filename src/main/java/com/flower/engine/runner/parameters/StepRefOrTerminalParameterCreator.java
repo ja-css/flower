@@ -149,7 +149,8 @@ public class StepRefOrTerminalParameterCreator extends ParameterCreator {
             functionParameterType,
             baseParameter.genericParameterType,
             specialObject,
-            baseParameter.nullableAnnotation != null),
+            baseParameter.nullableAnnotation != null,
+            false),
         ImmutableList.of());
   }
 

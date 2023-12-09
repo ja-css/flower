@@ -8,12 +8,14 @@ public class StateField {
   public final Class<?> stateFieldClass;
   public final Field field;
   public final boolean isFinal;
+  public final boolean isNullable;
 
-  public StateField(Class<?> stateFieldClass, Field field, boolean isFinal) {
+  public StateField(Class<?> stateFieldClass, Field field, boolean isFinal, boolean isNullable) {
     this.stateFieldClass = stateFieldClass;
     this.field = field;
     this.field.setAccessible(true);
     this.isFinal = isFinal;
+    this.isNullable = isNullable;
   }
 
   public Object getFieldValue(Object flowState) {

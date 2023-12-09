@@ -14,6 +14,7 @@ public class FunctionCallParameter {
   // line 386
   final Type parameterType;
   final boolean isNullableParameter;
+  final boolean isCheckNotNull;
 
   public FunctionCallParameter(
       @Nullable String stateFieldName,
@@ -22,7 +23,8 @@ public class FunctionCallParameter {
       ParameterType functionParameterType,
       Type parameterType,
       @Nullable Object specialObject,
-      boolean isNullableParameter) {
+      boolean isNullableParameter,
+      boolean isCheckNotNull) {
     this.stateFieldName = stateFieldName;
     this.output = output;
     this.functionParameterName = functionParameterName;
@@ -30,6 +32,7 @@ public class FunctionCallParameter {
     this.parameterType = parameterType;
     this.specialObject = specialObject;
     this.isNullableParameter = isNullableParameter;
+    this.isCheckNotNull = isCheckNotNull;
   }
 
   public @Nullable String getStateFieldName() {
@@ -59,4 +62,6 @@ public class FunctionCallParameter {
   public boolean isNullableParameter() {
     return isNullableParameter;
   }
+
+  public boolean isCheckNotNull() { return isCheckNotNull; }
 }

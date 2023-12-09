@@ -34,12 +34,14 @@ public class InOutParameterCreator extends ParameterCreator {
     assert (functionParameterName.equals(outResult.parameter.getFunctionParameterName()));
     assert (functionParameterType.equals(outResult.parameter.getFunctionParameterType()));
 
+    // TODO: is it implemented?
     // TODO: implement isNullableParameter
     Type rawType =
         baseParameter.genericParameterType instanceof ParameterizedType
             ? ((ParameterizedType) baseParameter.genericParameterType).getRawType()
             : baseParameter.genericParameterType;
     boolean isNullableParameter = rawType.equals(NullableInOutPrm.class);
+    boolean checkNotNull = inResult.parameter.isCheckNotNull();
 
     return new ParameterCreationResult(
         new FunctionCallParameter(
@@ -50,7 +52,8 @@ public class InOutParameterCreator extends ParameterCreator {
             inResult.parameter.getParameterType(),
             // out parameters don't have special objects
             inResult.parameter.getSpecialObject(),
-            isNullableParameter),
+            isNullableParameter,
+            checkNotNull),
         Stream.concat(inResult.assumedTypes.stream(), outResult.assumedTypes.stream())
             .collect(Collectors.toList()));
   }

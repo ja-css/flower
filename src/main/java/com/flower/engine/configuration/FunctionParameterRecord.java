@@ -1,5 +1,6 @@
 package com.flower.engine.configuration;
 
+import com.flower.anno.params.common.Exec;
 import com.flower.anno.params.common.In;
 import com.flower.anno.params.common.InOut;
 import com.flower.anno.params.common.Out;
@@ -24,6 +25,7 @@ public class FunctionParameterRecord {
   @Nullable public In inAnnotation = null;
   @Nullable public Out outAnnotation = null;
   @Nullable public InOut inOutAnnotation = null;
+  @Nullable public Exec execAnnotation = null;
 
   @Nullable public InFromFlow inFromFlowAnnotation = null;
 
@@ -100,6 +102,23 @@ public class FunctionParameterRecord {
             outAnnotation.to(), StringUtils.defaultIfBlank(outAnnotation.name(), prm.getName())),
         nullableAnnotation);
     this.outAnnotation = outAnnotation;
+  }
+
+  FunctionParameterRecord(
+      Exec execAnnotation,
+      Nullable nullableAnnotation,
+      Parameter prm,
+      Type genericParameterType,
+      @Nullable Class<?> flowType) {
+    this(
+        prm,
+        genericParameterType,
+        FunctionParameterType.STEP_INFO,
+        execAnnotation.name(),
+        flowType,
+        null,
+        nullableAnnotation);
+    this.execAnnotation = execAnnotation;
   }
 
   FunctionParameterRecord(

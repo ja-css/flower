@@ -137,7 +137,10 @@ public class EventRunUtil {
                   transition,
                   flowException),
               Throwable.class,
-              e -> Futures.immediateVoidFuture(), // TODO: exception handling - log?
+              e ->  {
+                // TODO: exception handling - log?
+                return Futures.immediateVoidFuture();
+              },
               directExecutor()));
     }
 
@@ -153,14 +156,18 @@ public class EventRunUtil {
       EventType eventType,
       @Nullable Transition transition,
       @Nullable Throwable flowException) {
-    EventFunctionCallState callState =
-        new EventFunctionCallState(flowStateAccess, eventProfileStateAccess);
-    return FunctionCallUtil.invokeEventFunction(
-        callState,
-        functionCallContext,
-        eventParametersProvider,
-        eventType,
-        transition,
-        flowException);
+    try {
+      EventFunctionCallState callState =
+          new EventFunctionCallState(flowStateAccess, eventProfileStateAccess);
+      return FunctionCallUtil.invokeEventFunction(
+          callState,
+          functionCallContext,
+          eventParametersProvider,
+          eventType,
+          transition,
+          flowException);
+    } catch (Throwable t) {
+      return Futures.immediateFailedFuture(t);
+    }
   }
 }

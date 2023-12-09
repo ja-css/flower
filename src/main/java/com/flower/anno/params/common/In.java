@@ -25,4 +25,12 @@ public @interface In {
    * @return Parameter mapping - input from State field
    */
   String from() default "";
+
+  /**
+   * Ensure that the field is not null, similarly to com.google.common.base.Preconditions.checkNotNull
+   * Will throw an Exception if the field wasn't initialized.
+   *
+   * @return true - throw Exception if field is not initialized.
+   */
+  boolean checkNotNull() default false;
 }

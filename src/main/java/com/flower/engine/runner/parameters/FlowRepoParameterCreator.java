@@ -68,7 +68,8 @@ public class FlowRepoParameterCreator extends ParameterCreator {
             functionParameterType,
             baseParameter.genericParameterType,
             flowRunner,
-            baseParameter.nullableAnnotation != null),
+            baseParameter.nullableAnnotation != null,
+            false),
         ImmutableList.of());
   }
 }
