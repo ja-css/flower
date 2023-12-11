@@ -5,6 +5,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 //TODO: test coverage
@@ -61,5 +62,40 @@ public class FuturesTool {
         }
 
         return retFuture;
+    }
+
+
+    public static <I extends @org.checkerframework.checker.nullness.qual.Nullable Object,
+        O extends @org.checkerframework.checker.nullness.qual.Nullable Object,
+        X extends Throwable>
+    ListenableFuture<O> tryCatch(
+        ListenableFuture<I> input,
+        com.google.common.base.Function<? super I, ? extends O> function,
+        Class<X> exceptionType,
+        com.google.common.base.Function<? super X, ? extends O> fallback,
+        Executor executor) {
+        return Futures.catching(
+            Futures.transform( input, function, executor),
+            exceptionType,
+            fallback,
+            executor
+        );
+    }
+
+    public static <I extends @org.checkerframework.checker.nullness.qual.Nullable Object,
+        O extends @org.checkerframework.checker.nullness.qual.Nullable Object,
+        X extends Throwable>
+    ListenableFuture<O> tryCatchAsync(
+        ListenableFuture<I> input,
+        com.google.common.util.concurrent.AsyncFunction<? super I, ? extends O> function,
+        Class<X> exceptionType,
+        com.google.common.util.concurrent.AsyncFunction<? super X, ? extends O> fallback,
+        Executor executor) {
+        return Futures.catchingAsync(
+            Futures.transformAsync(input, function, executor),
+            exceptionType,
+            fallback,
+            executor
+        );
     }
 }

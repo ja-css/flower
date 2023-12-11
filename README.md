@@ -357,3 +357,45 @@ Flow Inheritance
 Event Profiles
 Child Flows
 Type System / Generics
+
+---
+
+# Note on Flow state updates in the execution process
+
+TLDR: if step execution raises an exception, we update state partially.
+
+There are two ways of looking at the flow state in presence of exceptions problem.
+
+1) Allow partial state updates. This means that if Step assigned some Out parameters etc., and then raised 
+an Exception, all the changes to the Flow that happened before the exception state will be applied.
+This is a discrete way of thinking that applies to programming in general, and is arguably a natural way to 
+think about execution and assignment of values. 
+2) All state updates related to Step processing must be idempotent. I.e. if Step assigned some 
+Out parameters etc., and then raised an Exception, none of those changes should be applied to the Flow state.
+This allows for a rather clean execution, in which the state of the flow is always updated in a transactional fashion, 
+and if the Step execution fails for whatever reason. 
+
+While 2 looks nice on the paper, in practice of using Flower with Java there are significant problems that
+are related to implementation of this approach.
+- First and foremost, it's the fact that apart from Flow state, each field in the Flow can potentially have its 
+own state (the plainest example would be collections). Thus, in order to implement the approach (2) cleanly, we
+will have to ensure that transactional state updates are somehow implemented for all the Fields of the state.
+It could theoretically  be done by mandating all Fields to implement some complicated transactional entity 
+interface, which would add an unbearable amount of complexity to the framework.
+Another way of doing it would be mandating the whole Flow to be serializable. Then it would be possible to roll 
+back the entire Flow state to the previous "save point", thus cancelling "local" changes.
+While this requirement by itself is not unreasonable, and in fact will be mandatory in Flower extensions related 
+to Flow State persistence to support distributed execution, as such, mandating it at the base/local execution 
+level seems to adding unnecessary complexity at the simplest levels of the framework where it's not needed and 
+probably will not be appreciated.
+
+- Secondly, with built-in quasi-try-catch constructs in Transit Functions, we already are faced with the problem
+of partial output from the Step. And we already are taking care of it on the level of Flower NullAway, 
+considering the output from such steps as non-initializing.
+In this way, it makes sense to let it behave just like the normal try-catch block would, and keeping whatever
+state updates were done by the Flow state prior to the exception.
+
+- Finally, we note that with this approach it's still possible to emulate "idempotent behavior" manually, 
+if desired.
+
+---

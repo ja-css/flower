@@ -72,7 +72,12 @@ public class FlowCallContext implements EventRunner {
         constructor.setAccessible(true);
         eventProfileStates.put(eventProfileName, constructor.newInstance());
       } catch (NoSuchMethodException nsme) {
-        eventProfileStates.put(eventProfileName, eventProfileContainerType.newInstance());
+        try {
+          eventProfileStates.put(eventProfileName, eventProfileContainerType.newInstance());
+        } catch(IllegalAccessException iae) {
+          //TODO: figure why this is happening and fix. Reproducible in StateUpdateOnErrorTest.partialStateUpdate5Test() / OnErrorEventProfile.
+          throw new IllegalStateException("This error happens when EventProfile class doesn't have a default constructor, please add default constructor.", iae);
+        }
       }
     }
 

@@ -13,6 +13,7 @@ import com.flower.engine.function.ParameterType;
 import com.flower.engine.runner.event.EventParametersProvider;
 import com.flower.engine.runner.state.StateAccess;
 import com.flower.engine.runner.step.InternalTransition;
+import com.flower.utilities.FuturesTool;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -33,22 +34,46 @@ public class FunctionCallUtil {
     List<Object> functionCallParameters =
         getStepParametersFromFlowState(flowId, callState, callContext);
 
-    // 2) Call function
-    ListenableFuture<?> functionFuture =
-        rawInvokeFunction(callContext.function, functionCallParameters);
+    try {
+      // 2) Call function
+      ListenableFuture<?> functionFuture =
+          rawInvokeFunction(callContext.function, functionCallParameters);
 
-    // 3) Update Flow state with Output parameters
-    return Futures.transformAsync(
-        functionFuture,
-        functionReturnValue ->
+      // 3) Update Flow state with Output parameters
+      return FuturesTool.tryCatchAsync(functionFuture,
+          functionReturnValue ->
+              updateState(
+                  callState.stateAccess,
+                  callState.returnValueToFlowParameterName,
+                  callContext.functionParameters,
+                  functionCallParameters,
+                  functionReturnValue,
+                  callContext.getFlowStepInfo(),
+                  false),
+          Throwable.class,
+          t -> {
             updateState(
                 callState.stateAccess,
                 callState.returnValueToFlowParameterName,
                 callContext.functionParameters,
                 functionCallParameters,
-                functionReturnValue,
-                callContext.getFlowStepInfo()),
-        MoreExecutors.directExecutor());
+                null,
+                callContext.getFlowStepInfo(),
+                true);
+            return Futures.immediateFailedFuture(t);
+          },
+          MoreExecutors.directExecutor());
+    } catch(Throwable t) {
+      updateState(
+          callState.stateAccess,
+          callState.returnValueToFlowParameterName,
+          callContext.functionParameters,
+          functionCallParameters,
+          null,
+          callContext.getFlowStepInfo(),
+          true);
+      throw t;
+    }
   }
 
   static List<Object> getStepParametersFromFlowState(
@@ -100,21 +125,44 @@ public class FunctionCallUtil {
     List<Object> functionParameterObjects =
         getTransitParametersFromFlowState(callState, callContext);
 
-    // 2) Call function
-    ListenableFuture<?> functionFuture =
-        rawInvokeFunction(callContext.function, functionParameterObjects);
+    try {
+      // 2) Call function
+      ListenableFuture<?> functionFuture =
+          rawInvokeFunction(callContext.function, functionParameterObjects);
 
-    // 3) Update Flow state with Output parameters
-    return Futures.transformAsync(
-        functionFuture,
-        functionReturnValue ->
+      // 3) Update Flow state with Output parameters
+      return FuturesTool.tryCatchAsync(
+          functionFuture,
+          functionReturnValue ->
+              updateTransitionState(
+                  callState.stateAccess,
+                  callContext.functionParameters,
+                  functionParameterObjects,
+                  (InternalTransition) functionReturnValue,
+                  callContext.getFlowStepInfo(),
+                  false),
+          Throwable.class,
+          t -> {
             updateTransitionState(
                 callState.stateAccess,
                 callContext.functionParameters,
                 functionParameterObjects,
-                (InternalTransition) functionReturnValue,
-                callContext.getFlowStepInfo()),
-        MoreExecutors.directExecutor());
+                null,
+                callContext.getFlowStepInfo(),
+                true);
+            return Futures.immediateFailedFuture(t);
+          },
+          MoreExecutors.directExecutor());
+    } catch(Throwable t) {
+      updateTransitionState(
+          callState.stateAccess,
+          callContext.functionParameters,
+          functionParameterObjects,
+          null,
+          callContext.getFlowStepInfo(),
+          true);
+      throw t;
+    }
   }
 
   public static ListenableFuture<InternalTransition> invokeTransitFunction(
@@ -123,21 +171,44 @@ public class FunctionCallUtil {
     List<Object> functionParameterObjects =
         getTransitParametersFromFlowState(callState, callContext);
 
-    // 2) Call function
-    ListenableFuture<?> functionFuture =
-        rawInvokeFunction(callContext.function, functionParameterObjects);
+    try {
+      // 2) Call function
+      ListenableFuture<?> functionFuture =
+          rawInvokeFunction(callContext.function, functionParameterObjects);
 
-    // 3) Update Flow state with Output parameters
-    return Futures.transformAsync(
-        functionFuture,
-        functionReturnValue ->
+      // 3) Update Flow state with Output parameters
+      return FuturesTool.tryCatchAsync(
+          functionFuture,
+          functionReturnValue ->
+              updateTransitionState(
+                  callState.stateAccess,
+                  callContext.functionParameters,
+                  functionParameterObjects,
+                  (InternalTransition) functionReturnValue,
+                  callContext.getFlowStepInfo(),
+                  false),
+          Throwable.class,
+          t -> {
             updateTransitionState(
                 callState.stateAccess,
                 callContext.functionParameters,
                 functionParameterObjects,
-                (InternalTransition) functionReturnValue,
-                callContext.getFlowStepInfo()),
-        MoreExecutors.directExecutor());
+                null,
+                callContext.getFlowStepInfo(),
+                true);
+            return Futures.immediateFailedFuture(t);
+          },
+          MoreExecutors.directExecutor());
+    } catch(Throwable t) {
+      updateTransitionState(
+          callState.stateAccess,
+          callContext.functionParameters,
+          functionParameterObjects,
+          null,
+          callContext.getFlowStepInfo(),
+          true);
+      throw t;
+    }
   }
 
   static List<Object> getTransitParametersFromFlowState(
@@ -236,12 +307,13 @@ public class FunctionCallUtil {
     List<Object> functionCallParameters =
         getStepAndTransitParametersFromFlowState(flowId, callState, callContext);
 
+    try {
     // 2) Call function
     ListenableFuture<?> functionFuture =
         rawInvokeFunction(callContext.function, functionCallParameters);
 
     // 3) Update Flow state with Output parameters
-    return Futures.transformAsync(
+    return FuturesTool.tryCatchAsync(
         functionFuture,
         functionReturnValue ->
             updateTransitionState(
@@ -249,8 +321,30 @@ public class FunctionCallUtil {
                 callContext.functionParameters,
                 functionCallParameters,
                 (InternalTransition) functionReturnValue,
-                callContext.getFlowStepInfo()),
+                callContext.getFlowStepInfo(),
+                false),
+        Throwable.class,
+        t -> {
+          updateTransitionState(
+              callState.stateAccess,
+              callContext.functionParameters,
+              functionCallParameters,
+              null,
+              callContext.getFlowStepInfo(),
+              true);
+          return Futures.immediateFailedFuture(t);
+        },
         MoreExecutors.directExecutor());
+    } catch(Throwable t) {
+      updateTransitionState(
+          callState.stateAccess,
+          callContext.functionParameters,
+          functionCallParameters,
+          null,
+          callContext.getFlowStepInfo(),
+          true);
+      throw t;
+    }
   }
 
   static List<Object> getStepAndTransitParametersFromFlowState(
@@ -310,28 +404,52 @@ public class FunctionCallUtil {
     List<Object> functionCallParameters =
         getEventParametersFromEventProfileAndFlowState(
             callState, callContext, eventParametersProvider, eventType, transition, flowException);
-
-    // 2) Call function
-    ListenableFuture<?> functionFuture;
-
     try {
-      functionFuture = rawInvokeFunction(callContext.function, functionCallParameters);
-    } catch (Throwable t) {
-      functionFuture = Futures.immediateFailedFuture(t);
-    }
+      // 2) Call function
+      ListenableFuture<?> functionFuture;
 
-    // 3) Update Flow state with Output parameters
-    return Futures.transformAsync(
-        functionFuture,
-        functionReturnValue ->
+      try {
+        functionFuture = rawInvokeFunction(callContext.function, functionCallParameters);
+      } catch (Throwable t) {
+        functionFuture = Futures.immediateFailedFuture(t);
+      }
+
+      // 3) Update Flow state with Output parameters
+      return FuturesTool.tryCatchAsync(
+          functionFuture,
+          functionReturnValue ->
+              updateEventState(
+                  callState.flowStateAccess,
+                  callState.eventProfileStateAccess,
+                  callContext.functionParameters,
+                  functionCallParameters,
+                  functionReturnValue,
+                  callContext.getFlowStepInfo(),
+                  false),
+          Throwable.class,
+          t -> {
             updateEventState(
                 callState.flowStateAccess,
                 callState.eventProfileStateAccess,
                 callContext.functionParameters,
                 functionCallParameters,
-                functionReturnValue,
-                callContext.getFlowStepInfo()),
-        MoreExecutors.directExecutor());
+                null,
+                callContext.getFlowStepInfo(),
+                true);
+            return Futures.immediateFailedFuture(t);
+          },
+          MoreExecutors.directExecutor());
+    } catch(Throwable t) {
+      updateEventState(
+          callState.flowStateAccess,
+          callState.eventProfileStateAccess,
+          callContext.functionParameters,
+          functionCallParameters,
+          null,
+          callContext.getFlowStepInfo(),
+          true);
+      throw t;
+    }
   }
 
   static List<Object> getEventParametersFromEventProfileAndFlowState(
@@ -457,8 +575,9 @@ public class FunctionCallUtil {
       @Nullable String returnValueToFlowParameterName,
       List<FunctionCallParameter> functionParameters,
       List<Object> functionParameterObjects,
-      Object returnValue,
-      String flowStepInfo) {
+      @Nullable Object returnValue,
+      String flowStepInfo,
+      boolean partial) {
     return Futures.transformAsync(
         waitForOutParams(functionParameters, functionParameterObjects),
         void_ -> {
@@ -469,7 +588,8 @@ public class FunctionCallUtil {
               functionParameters,
               functionParameterObjects,
               returnValue,
-              flowStepInfo);
+              flowStepInfo,
+              partial);
           return Futures.immediateFuture(returnValue);
         },
         MoreExecutors.directExecutor());
@@ -479,8 +599,9 @@ public class FunctionCallUtil {
       StateAccess flowStateAccess,
       List<FunctionCallParameter> functionParameters,
       List<Object> functionParameterObjects,
-      InternalTransition transitionReturnValue,
-      String flowStepInfo) {
+      @Nullable InternalTransition transitionReturnValue,
+      String flowStepInfo,
+      boolean partial) {
     return Futures.transformAsync(
         waitForOutParams(functionParameters, functionParameterObjects),
         void_ -> {
@@ -491,7 +612,8 @@ public class FunctionCallUtil {
               functionParameters,
               functionParameterObjects,
               transitionReturnValue,
-              flowStepInfo);
+              flowStepInfo,
+              partial);
           return Futures.immediateFuture(transitionReturnValue);
         },
         MoreExecutors.directExecutor());
@@ -502,8 +624,9 @@ public class FunctionCallUtil {
       StateAccess eventProfileStateAccess,
       List<FunctionCallParameter> functionParameters,
       List<Object> functionParameterObjects,
-      Object returnValue,
-      String flowStepInfo) {
+      @Nullable Object returnValue,
+      String flowStepInfo,
+      boolean partial) {
     return Futures.transformAsync(
         waitForOutParams(functionParameters, functionParameterObjects),
         void_ -> {
@@ -514,10 +637,20 @@ public class FunctionCallUtil {
               functionParameters,
               functionParameterObjects,
               returnValue,
-              flowStepInfo);
-          // Flow State
-          updateState0(
-              flowStateAccess, null, functionParameters, functionParameterObjects, returnValue, flowStepInfo);
+              flowStepInfo,
+              partial);
+
+          //TODO: I don't think this should be here, Event shouldn't be able to update flow state.
+          // commenting out for now.
+          // Update Flow State
+          /*updateState0(
+              flowStateAccess,
+              null,
+              functionParameters,
+              functionParameterObjects,
+              returnValue,
+              flowStepInfo,
+              partial);*/
           return Futures.immediateVoidFuture();
         },
         MoreExecutors.directExecutor());
@@ -551,8 +684,9 @@ public class FunctionCallUtil {
       @Nullable String returnValueToFlowParameterName,
       List<FunctionCallParameter> functionParameters,
       List<Object> functionParameterObjects,
-      Object returnValue,
-      String flowStepInfo)
+      @Nullable Object returnValue,
+      String flowStepInfo,
+      boolean partial)
       throws Exception {
     ParameterType outType = ParameterType.OUT;
     ParameterType inOutType = ParameterType.IN_OUT;
@@ -563,13 +697,15 @@ public class FunctionCallUtil {
       ParameterType parameterType = callParameter.getFunctionParameterType();
       if (parameterType == outType || parameterType == inOutType) {
         FlowerOutPrm<?> flowerOutPrm = (FlowerOutPrm<?>) functionParameterObjects.get(i);
-        updateOutParameter(callParameter, flowerOutPrm, stateAccess, flowStepInfo);
+        updateOutParameter(callParameter, flowerOutPrm, stateAccess, flowStepInfo, partial);
       }
       i++;
     }
-    // If function's return value is bound to a Flow field, update that field as well
-    if (returnValueToFlowParameterName != null && returnValue != null)
-      stateAccess.updateField(returnValueToFlowParameterName, returnValue);
+    if (!partial) {
+      // If function's return value is bound to a Flow field, update that field as well
+      if (returnValueToFlowParameterName != null && returnValue != null)
+        stateAccess.updateField(returnValueToFlowParameterName, returnValue);
+    }
   }
 
   static Exception getUnwrappedException(Exception e) {
@@ -581,7 +717,7 @@ public class FunctionCallUtil {
   }
 
   static void updateOutParameter(
-      FunctionCallParameter callParameter, FlowerOutPrm<?> flowerOutPrm, StateAccess stateAccess, String flowStepInfo)
+      FunctionCallParameter callParameter, FlowerOutPrm<?> flowerOutPrm, StateAccess stateAccess, String flowStepInfo, boolean partial)
       throws Exception {
     Object value = null;
     if (flowerOutPrm.getOpt().isPresent()) {
@@ -593,7 +729,10 @@ public class FunctionCallUtil {
         // the call to updateState0(...), which calls this method is preceded by waitForOutParams()
         value = flowerOutPrm.getOptFuture().get().get();
       } catch (Exception e) {
-        throw getUnwrappedException(e);
+        if (!partial) {
+          //Ignore Exceptions for partial updates
+          throw getUnwrappedException(e);
+        }
       }
     }
 
@@ -604,7 +743,7 @@ public class FunctionCallUtil {
       // TODO: to prevent raising this Exception at runtime
       ParameterType parameterType = callParameter.getFunctionParameterType();
       if ((parameterType == ParameterType.OUT || parameterType == ParameterType.IN_OUT)
-          && callParameter.getOutput() == Output.MANDATORY)
+          && callParameter.getOutput() == Output.MANDATORY && !partial)
         //TODO: inject flow and function name here for better message clarity
         throw new IllegalStateException(
             String.format(
