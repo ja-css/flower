@@ -19,6 +19,7 @@ import com.flower.conf.OutPrm;
 import com.flower.conf.ReturnValueOrException;
 import com.flower.conf.Transition;
 import com.flower.engine.Flower;
+import com.google.common.util.concurrent.Futures;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nullable;
@@ -127,6 +128,26 @@ public class StateUpdateOnErrorTest {
         }
         assertEquals(testFlow.outStr, null);
         assertEquals(outStrString.get(), "Out From Event");
+    }
+
+    @Test
+    public void partialStateUpdate6Test() {
+        Flower flower = new Flower();
+        flower.registerFlow(TestStateChange6.class);
+        flower.initialize();
+
+        FlowExec<TestStateChange6> flowExec = flower.getFlowExec(TestStateChange6.class);
+
+        TestStateChange6 testFlow = new TestStateChange6();
+        FlowFuture<TestStateChange6> flowFuture = flowExec.runFlow(testFlow);
+        System.out.println("Flow created. Id: " + flowFuture.getFlowId());
+
+        try {
+            flowFuture.getFuture().get();
+        } catch (Exception e) {
+            assertEquals(e.getCause().getMessage(), "TEST_EXCEPTION");
+        }
+        assertEquals(testFlow.outStr, "OUT");
     }
 
     @Test
@@ -266,5 +287,20 @@ class OnErrorEventProfile {
         System.out.println(outStr);
         StateUpdateOnErrorTest.outStrString.set(outStr);
         System.out.println("TestEventProfile: AFTER_FLOW");
+    }
+}
+
+@FlowType(firstStep="step")
+class TestStateChange6 {
+    @State String outStr;
+    @State String outStr2;
+
+    @SimpleStepFunction()
+    static Transition step(@Out OutPrm<String> outStr,
+                     @Out OutPrm<String> outStr2,
+                     @Terminal Transition end) {
+        outStr2.setOutFuture(Futures.immediateFailedFuture(new Exception("TEST_EXCEPTION")));
+        outStr.setOutValue("OUT");
+        return end;
     }
 }
