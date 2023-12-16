@@ -92,7 +92,7 @@ class CheckNullFlow {
     @State @Nullable final Integer i = null;
 
     @StepFunction(transit = "transit")
-    static void step(@In(checkNotNull = true) Integer i) {
+    static void step(@In(throwIfNull=true) Integer i) {
         System.out.println(i);
     }
 
@@ -127,7 +127,7 @@ class CheckNullEventProfile {
     }
 
     @EventFunction(types = EventType.BEFORE_FLOW)
-    static void beforeFlowEvent(@In(checkNotNull = true) Integer i) {
+    static void beforeFlowEvent(@In(throwIfNull=true) Integer i) {
         System.out.println("CheckNullEventProfile: BEFORE_FLOW");
     }
 }
@@ -141,7 +141,7 @@ class CheckNullEventProfile2 {
     }
 
     @EventFunction(types = EventType.BEFORE_FLOW)
-    static void beforeFlowEvent(@In(checkNotNull = true) Integer i) {
+    static void beforeFlowEvent(@In(throwIfNull=true) Integer i) {
         System.out.println("CheckNullEventProfile2: BEFORE_FLOW");
     }
 }

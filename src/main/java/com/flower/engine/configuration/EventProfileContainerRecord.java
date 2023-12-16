@@ -153,7 +153,7 @@ public class EventProfileContainerRecord extends ContainerRecord {
     // Non-Nullable parameters
     for (FunctionParameterRecord param : signature) {
       if (param.type == FunctionParameterType.IN) {
-        if (param.nullableAnnotation == null && !Preconditions.checkNotNull(param.inAnnotation).checkNotNull()) {
+        if (param.nullableAnnotation == null && !Preconditions.checkNotNull(param.inAnnotation).throwIfNull()) {
           String fieldName = Preconditions.checkNotNull(param.fieldName);
           if (!stateFieldsInit.containsKey(fieldName) || !stateFieldsInit.get(fieldName)) {
             throw new IllegalStateException(
@@ -167,7 +167,7 @@ public class EventProfileContainerRecord extends ContainerRecord {
             param.genericParameterType instanceof ParameterizedType
                 ? ((ParameterizedType) param.genericParameterType).getRawType()
                 : param.genericParameterType;
-        if (!rawType.equals(NullableInOutPrm.class) && !Preconditions.checkNotNull(param.inOutAnnotation).checkNotNull()) {
+        if (!rawType.equals(NullableInOutPrm.class) && !Preconditions.checkNotNull(param.inOutAnnotation).throwIfNull()) {
           String fieldName = Preconditions.checkNotNull(param.fieldName);
           if (!stateFieldsInit.containsKey(fieldName) || !stateFieldsInit.get(fieldName)) {
             throw new IllegalStateException(
@@ -184,10 +184,10 @@ public class EventProfileContainerRecord extends ContainerRecord {
         stateFieldsInitUpdate.put(param.fieldName, true);
       } else if (param.type == FunctionParameterType.IN_OUT
           && (Preconditions.checkNotNull(param.inOutAnnotation).out() == Output.MANDATORY ||
-              Preconditions.checkNotNull(param.inOutAnnotation).checkNotNull())) {
+              Preconditions.checkNotNull(param.inOutAnnotation).throwIfNull())) {
         stateFieldsInitUpdate.put(param.fieldName, true);
       } else if (param.type == FunctionParameterType.IN
-          && Preconditions.checkNotNull(param.inAnnotation).checkNotNull()) {
+          && Preconditions.checkNotNull(param.inAnnotation).throwIfNull()) {
         stateFieldsInitUpdate.put(param.fieldName, true);
       }
     }

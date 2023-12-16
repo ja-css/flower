@@ -19,10 +19,12 @@ public @interface TransitInPrm {
   String from();
 
   /**
-   * Ensure that the field is not null, similarly to com.google.common.base.Preconditions.checkNotNull
-   * Will throw an Exception if the field wasn't initialized.
+   * Use with CAUTION, this alters Flower NullAway behavior!
+   * Informs Flower that at this step the field will never be null.
+   * Flower will throw Exception at runtime if the field wasn't initialized at this step.
+   * Flower NullAway will consider the field as initialized for this and subsequent steps.
    *
    * @return true - throw Exception if field is not initialized.
    */
-  boolean checkNotNull() default false;
+  boolean throwIfNull() default false;
 }

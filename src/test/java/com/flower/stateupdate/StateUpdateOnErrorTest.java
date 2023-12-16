@@ -242,7 +242,7 @@ class TransitExceptionCatchFlow {
     @State Throwable exception;
 
     @StepFunction(transit = "endProcessing")
-    static void step(@In(checkNotNull=true) String nullField) {
+    static void step(@In(throwIfNull=true) String nullField) {
         System.out.println(nullField);
     }
 

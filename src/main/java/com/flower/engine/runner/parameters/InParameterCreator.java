@@ -52,7 +52,7 @@ public class InParameterCreator extends ParameterCreator {
       functionParameterType = ParameterType.IN;
       flowStateFieldName = StringUtils.defaultIfEmpty(inAnnotation.from().trim(), parameterName);
       typeStr = "@In";
-      checkNotNull = inAnnotation.checkNotNull();
+      checkNotNull = inAnnotation.throwIfNull();
     } else if (baseParameter.inFromFlowAnnotation != null) {
       InFromFlow inFromFlowAnnotation =
           Preconditions.checkNotNull(baseParameter.inFromFlowAnnotation);
@@ -67,7 +67,7 @@ public class InParameterCreator extends ParameterCreator {
       flowStateFieldName =
           StringUtils.defaultIfEmpty(inOutAnnotation.fromAndTo().trim(), parameterName);
       typeStr = "@InOut";
-      checkNotNull = inOutAnnotation.checkNotNull();
+      checkNotNull = inOutAnnotation.throwIfNull();
 
       parameterType = getInnerType(parameterType);
     }
@@ -168,7 +168,7 @@ public class InParameterCreator extends ParameterCreator {
       functionParameterType = ParameterType.IN;
       flowStateFieldName = StringUtils.defaultIfEmpty(inOverrideAnnotation.from(), parameterName);
       typeStr = "@In";
-      checkNotNull = inOverrideAnnotation.checkNotNull();
+      checkNotNull = inOverrideAnnotation.throwIfNull();
 
     } else if (parameterOverrideFromCall.inFromFlowAnnotation != null) {
       InFromFlow inFromFlowOverrideAnnotation =
@@ -186,7 +186,7 @@ public class InParameterCreator extends ParameterCreator {
       flowStateFieldName =
           StringUtils.defaultIfEmpty(inOutOverrideAnnotation.fromAndTo(), parameterName);
       typeStr = "@InOut";
-      checkNotNull = inOutOverrideAnnotation.checkNotNull();
+      checkNotNull = inOutOverrideAnnotation.throwIfNull();
 
       callParameterType = getInnerType(callParameterType);
     }
@@ -299,7 +299,7 @@ public class InParameterCreator extends ParameterCreator {
           StringUtils.defaultIfEmpty(
               transitParameterOverride.transitInPrmAnnotation.from(), parameterName);
       typeStr = "@In";
-      checkNotNull = transitParameterOverride.transitInPrmAnnotation.checkNotNull();
+      checkNotNull = transitParameterOverride.transitInPrmAnnotation.throwIfNull();
     } else {
       functionParameterType = ParameterType.IN_OUT;
       flowStateFieldName =
@@ -308,7 +308,7 @@ public class InParameterCreator extends ParameterCreator {
                   .fromAndTo(),
               parameterName);
       typeStr = "@InOut";
-      checkNotNull = transitParameterOverride.transitInOutPrmAnnotation.checkNotNull();
+      checkNotNull = transitParameterOverride.transitInOutPrmAnnotation.throwIfNull();
 
       parameterType = getInnerType(parameterType);
       if (callParameterType != null) callParameterType = getInnerType(callParameterType);
