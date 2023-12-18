@@ -3,34 +3,38 @@ package com.flower.anno.event;
 /**
  * Defines Concurrency.
  *
- * Running order:
- * 1) Fire and forget all PARALLEL for all Profiles;
- * 2) Run all BLOCKING for all Profiles:
- *      - concurrently between Profiles, but sequentially within the same Profile;
- * 3) Run all SYNCHRONIZED for all Profiles, strictly sequentially;
- * 4) Run all SYNCHRONIZED_BREAKING for all Profiles, strictly sequentially;
- * 5) Resume Flow execution.
+ * Execution order:
+ * 1) Fire and forget all PARALLEL Events on all EventProfiles;
+ * 2) At the same time, start all BLOCKING Events in parallel on all EventProfiles;
+ *      keep track of BLOCKING Events per EventProfile and wait for them to finish;
+ * 3) For a given EventProfile, when all BLOCKING Events on that EventProfile are done, run SYNCHRONIZED Events sequentially for that EventProfile
+ *      (i.e. different EventProfiles still run their SYNCHRONIZED Events in parallel,
+ *      but for a particular EventProfile its SYNCHRONIZED Events are executed sequentially);
+ * 4) Form a common queue for all EventProfiles for SYNCHRONIZED_BREAKING events:
+ *      - add all SYNCHRONIZED_BREAKING Events for a EventProfile to the queue once all SYNCHRONIZED Events for that EventProfile are done
+ *          (start ASAP, even if SYNCHRONIZED of even BLOCKING Events for other EventProfiles are still executing);
+ *      - run SYNCHRONIZED_BREAKING sequentially across all EventProfiles,
+ *          i.e. if more SYNCHRONIZED_BREAKING Events from other EventProfiles are added to the queue,
+ *          only one event from the queue is executed at the same time;
+ *      - if one of SYNCHRONIZED_BREAKING events fails with Exception, Flow is failed with that Exception;
+ *      - even if one of SYNCHRONIZED_BREAKING Events fails, we still run all of them,
+ *          and if more than one fails - we throw a combined Exception in the end.
+ * 5) Resume Flow execution, if no SYNCHRONIZED_BREAKING failed.
  */
 public enum Concurrency {
-  // |---------------|----------------------|
-  // |   Main flow   | Other Event Handlers |
-  // |---------------|----------------------|
-  // | Doesn't block |    Doesn't block     | - PARALLEL
-  // | Blocks        |    Doesn't block     | - BLOCKING
-  // | Blocks        |    Blocks            | - SYNCHRONIZED, SYNCHRONIZED_BREAKING
-  // |---------------|----------------------|
-  //TODO: Need to clarify above - `Other Event Handlers` vs `Event Handlers from other Event Profiles`
-
-  /** Doesn't block main flow. Doesn't block other event handlers. */
+  /** Doesn't block the Flow. Doesn't block other event handlers.
+   * EventProfile State update using @Out/@InOut is NOT allowed. */
   PARALLEL,
-  /** Blocks main flow. Doesn't block other event handlers. */
+  /** Blocks the Flow. Doesn't block other event handlers.
+   * EventProfile State using @Out/@InOut is NOT allowed.  */
   BLOCKING,
-  /** Blocks main flow. Blocks other event handlers. */
+  /** Blocks the Flow. Blocks other event handlers.
+   * EventProfile State update using @Out/@InOut is ALLOWED. */
   SYNCHRONIZED,
   /**
-   * Blocks main flow. Blocks other event handlers. Raised Exception will be considered a Flow
-   * Exception and fail the flow.
-   * This Exception can't be caught in a Transitioner, and wil fail the Flow immediately.
+   * Blocks the Flow. Blocks other event handlers. Any raised Exception will also fail the Flow (that's why `BREAKING`).
+   * Raised Exception can't be caught in a Transitioner, the Flow will fail!
+   * EventProfile State update using @Out/@InOut is ALLOWED.
    */
   SYNCHRONIZED_BREAKING
 
@@ -63,5 +67,9 @@ public enum Concurrency {
   //  - We can still indirectly update state in PARALLEL: for example by `@In AtomicInteger i`, `i.incrementAndGet()`.
 
   //TODO: Note:
-  //  Note that in order to enable state save we need
+  //  Note that in order to enable state save we need some final state on Flow and all stateful EventProfiles.
+  //  We consider EventProfiles stateful if they are serializable.
+  //  That's why we can't allow updating EventProfileState from PARALLEL, and that's why if we allow such update from BLOCKING
+  //  we must run all of BLOCKING on EventProfile sequentially, so that we don't get any issues with concurrent state updates.
+  //  Alternatively, we can only allow state update from SYNCHRONIZED.
 }
