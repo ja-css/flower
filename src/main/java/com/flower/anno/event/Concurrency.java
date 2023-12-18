@@ -1,7 +1,7 @@
 package com.flower.anno.event;
 
 /**
- * Defines Concurrency.
+ * Defines Concurrency for the Event handler.
  *
  * Execution order:
  * 1) Fire and forget all PARALLEL Events on all EventProfiles;
@@ -10,16 +10,8 @@ package com.flower.anno.event;
  * 3) For a given EventProfile, when all BLOCKING Events on that EventProfile are done, run SYNCHRONIZED Events sequentially for that EventProfile
  *      (i.e. different EventProfiles still run their SYNCHRONIZED Events in parallel,
  *      but for a particular EventProfile its SYNCHRONIZED Events are executed sequentially);
- * 4) Form a common queue for all EventProfiles for SYNCHRONIZED_BREAKING events:
- *      - add all SYNCHRONIZED_BREAKING Events for a EventProfile to the queue once all SYNCHRONIZED Events for that EventProfile are done
- *          (start ASAP, even if SYNCHRONIZED of even BLOCKING Events for other EventProfiles are still executing);
- *      - run SYNCHRONIZED_BREAKING sequentially across all EventProfiles,
- *          i.e. if more SYNCHRONIZED_BREAKING Events from other EventProfiles are added to the queue,
- *          only one event from the queue is executed at the same time;
- *      - if one of SYNCHRONIZED_BREAKING events fails with Exception, Flow is failed with that Exception;
- *      - even if one of SYNCHRONIZED_BREAKING Events fails, we still run all of them,
- *          and if more than one fails - we throw a combined Exception in the end.
- * 5) Resume Flow execution, if no SYNCHRONIZED_BREAKING failed.
+ * 4) After all events except PARALLEL and other FINALIZERs from all the Profiles have finished, run FINALIZERs.
+ * 5) Resume Flow execution, if no FINALIZER failed.
  */
 public enum Concurrency {
   /** Doesn't block the Flow. Doesn't block other event handlers.
@@ -28,17 +20,21 @@ public enum Concurrency {
   /** Blocks the Flow. Doesn't block other event handlers.
    * EventProfile State using @Out/@InOut is NOT allowed.  */
   BLOCKING,
-  /** Blocks the Flow. Blocks other event handlers.
+  /** Blocks the Flow. Blocks other event handlers in the same EvenProfile.
    * EventProfile State update using @Out/@InOut is ALLOWED. */
+  //TODO: Priority / Order
   SYNCHRONIZED,
   /**
-   * Blocks the Flow. Blocks other event handlers. Any raised Exception will also fail the Flow (that's why `BREAKING`).
+   * Runs after all events that are not FINALIZER or PARALLEL from all the EventProfiles have finished.
+   * Blocks the Flow. Blocks other event handlers on all EventProfiles related to the Flow.
+   * Any raised Exception will also fail the Flow.
    * Raised Exception can't be caught in a Transitioner, the Flow will fail!
    * EventProfile State update using @Out/@InOut is ALLOWED.
    */
-  SYNCHRONIZED_BREAKING
+  //TODO: Priority / Order
+  FINALIZER
 
-  // SYNCHRONIZED_BREAKING / Practical:
+  // FINALIZER / Practical:
   //  I'm thinking about something like, if we have Flow persistence implemented as
   //  EventProfile, we may want to fail Flow execution on this particular Runner in case
   //  we fail to persist at a certain checkpoint.
@@ -47,7 +43,7 @@ public enum Concurrency {
   //  But it seems kind of unclear.
   //  Need to make sure that this is the best way to enable such features in Events.
 
-  // SYNCHRONIZED_BREAKING / Philosophy:
+  // FINALIZER / Philosophy:
   //  It's possible to think about BREAKING as of a property independent of CONCURRENCY. They're
   //  somewhat connected though, for example BREAKING can't be used with PARALLEL, because BREAKING
   //  as a concept assumes that it can't be run in parallel with Flow functionality. Similarly,
@@ -58,7 +54,7 @@ public enum Concurrency {
 
   // TODO:
   //  Consideration for OUT parameters and EventProfile state change.
-  //  - everything is Nullable unless it's set by SYNCHRONIZED_BREAKING, because of possible exceptions;
+  //  - everything is Nullable unless it's set by FINALIZER, because of possible exceptions;
   //  - When we run PARALLEL, there is no guarantee about when and in what order it finishes, so we can't let
   //    OUT come from PARALLEL;
   //  - Do we allow multiple event handlers of the BLOCKING type on Event Profile? If we do, and they run in parallel,
