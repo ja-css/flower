@@ -162,7 +162,7 @@ class E2_TestEventProfile3 {
 
   @EventFunction(
       types = {EventType.BEFORE_FLOW},
-      concurrency = Concurrency.SYNCHRONIZED_BREAKING)
+      concurrency = Concurrency.FINALIZER)
   static void event(@FlowInfo FlowInfoPrm flowInfo, @EventInfo EventType event) {
     throw new RuntimeException("TestException");
   }

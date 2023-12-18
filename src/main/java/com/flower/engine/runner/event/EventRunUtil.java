@@ -41,7 +41,7 @@ public class EventRunUtil {
         case SYNCHRONIZED:
           synchronizedFunctions.add(function);
           break;
-        case SYNCHRONIZED_BREAKING:
+        case FINALIZER:
           synchronizedBreakingFunctions.add(function);
           break;
       }
