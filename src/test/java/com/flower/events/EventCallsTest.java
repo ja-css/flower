@@ -52,7 +52,7 @@ public class EventCallsTest {
 
 /** Test Flow */
 @FlowType(firstStep = "printStats")
-@EventProfiles({"TestEventProfileCall"})
+@EventProfiles({TestEventProfileCall.class})
 class TestFlow_C {
   private static final int MAX_DELAY_MS = 5000;
   private static final int FIRST_DELAY = 50;

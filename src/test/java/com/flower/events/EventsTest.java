@@ -59,7 +59,7 @@ public class EventsTest {
 
 /** Test Flow */
 @FlowType(firstStep = "printStats")
-@EventProfiles({"TestEventProfile"})
+@EventProfiles({TestEventProfile.class})
 class TestFlow {
   private static final int MAX_DELAY_MS = 5000;
   private static final int FIRST_DELAY = 50;
@@ -179,7 +179,7 @@ class TestEventProfile2 {
     System.out.println("TestEventProfile2: Profile Event BEFORE_FLOW2");
   }
 
-  @EventCall(globalFunctionName = "event", types = EventType.AFTER_FLOW)
+  @EventCall(globalFunctionContainer = TestGlobalFunctionContainer.class, globalFunctionName = "event", types = EventType.AFTER_FLOW)
   static void eventCall() {}
 
   @EventFunction(types = EventType.AFTER_FLOW)

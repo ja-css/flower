@@ -20,12 +20,4 @@ public @interface GlobalFunction {
    * @return Global function
    */
   String name() default "";
-
-  /**
-   * Mapping of Global Function's return value to a Flow field. If empty, return value is dropped.
-   *
-   * @return Parameter passing - return value output
-   */
-  // TODO: not needed?
-  //  String returnTo() default "";
 }

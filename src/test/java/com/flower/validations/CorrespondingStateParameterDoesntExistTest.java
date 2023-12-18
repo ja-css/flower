@@ -136,7 +136,7 @@ class C1_TestFlow_StepParameter {
 
 @FlowType(name = "Test", firstStep = "step1")
 class C1_TestFlow_StepCallParameter {
-  @StepCall(globalFunctionName = "glob1", transit = "transit")
+  @StepCall(globalFunctionContainer = C1_GlobalFunctionContainer1.class, globalFunctionName = "glob1", transit = "transit")
   static Transition step1(@Nullable @In int i5) {
     return null;
   }
@@ -149,13 +149,13 @@ class C1_TestFlow_StepCallParameter {
 
 @FlowType(name = "Test", firstStep = "step1")
 class C1_TestFlow_Step_GlobalTransitParameter {
-  @StepFunction(globalTransit = "glob1")
+  @StepFunction(globalTransitContainer = C1_GlobalFunctionContainer1.class, globalTransit = "glob1")
   static void step1() {}
 }
 
 @FlowType(name = "Test", firstStep = "step1")
 class C1_TestFlow_StepCall_GlobalTransitParameter {
-  @StepCall(globalFunctionName = "glob1", globalTransit = "glob1")
+  @StepCall(globalFunctionContainer = C1_GlobalFunctionContainer1.class, globalFunctionName = "glob1", globalTransitContainer = C1_GlobalFunctionContainer1.class, globalTransit = "glob1")
   static Transition step1(@Nullable @In int i5) {
     return null;
   }
@@ -177,7 +177,7 @@ class C1_TestFlow_TransitCallParameter {
   @StepFunction(transit = "transit")
   static void step1() {}
 
-  @TransitCall(globalFunctionName = "glob1")
+  @TransitCall(globalFunctionContainer = C1_GlobalFunctionContainer1.class, globalFunctionName = "glob1")
   static Transition transit(@Nullable @In int i5) {
     return null;
   }
@@ -190,7 +190,7 @@ class C1_TestEventProfile_EventProfileParameter {
 }
 
 @FlowType(name = "Test", firstStep = "step1")
-@EventProfiles("TestEventProfile")
+@EventProfiles(C1_TestEventProfile_EventProfileParameter.class)
 class C1_TestEventProfile_EventProfileParameter_Flow {
   @StepFunction(transit = "transit")
   static void step1() {}
@@ -208,7 +208,7 @@ class C1_TestEventProfile_EventProfileParameterFromFlow {
 }
 
 @FlowType(name = "Test", firstStep = "step1")
-@EventProfiles("TestEventProfile")
+@EventProfiles(C1_TestEventProfile_EventCallProfileParameter.class)
 class C1_TestEventProfile_EventProfileParameterFromFlow_Flow {
   @StepFunction(transit = "transit")
   static void step1() {}
@@ -221,14 +221,14 @@ class C1_TestEventProfile_EventProfileParameterFromFlow_Flow {
 
 @EventProfileContainer(name = "TestEventProfile")
 class C1_TestEventProfile_EventCallProfileParameter {
-  @EventCall(types = EventType.AFTER_EXEC, globalFunctionName = "glob1")
+  @EventCall(globalFunctionContainer = C1_GlobalFunctionContainer1.class, types = EventType.AFTER_EXEC, globalFunctionName = "glob1")
   static Transition event(@Nullable @In int i5) {
     return null;
   }
 }
 
 @FlowType(name = "Test", firstStep = "step1")
-@EventProfiles("TestEventProfile")
+@EventProfiles(C1_TestEventProfile_EventCallProfileParameter.class)
 class C1_TestEventProfile_EventCallProfileParameter_Flow {
   @StepFunction(transit = "transit")
   static void step1() {}
@@ -241,14 +241,14 @@ class C1_TestEventProfile_EventCallProfileParameter_Flow {
 
 @EventProfileContainer(name = "TestEventProfile")
 class C1_TestEventProfile_EventCallProfileParameterFromFlow {
-  @EventCall(types = EventType.AFTER_EXEC, globalFunctionName = "glob1")
+  @EventCall(globalFunctionContainer = C1_GlobalFunctionContainer1.class, types = EventType.AFTER_EXEC, globalFunctionName = "glob1")
   static Transition event(@Nullable @InFromFlow int i5) {
     return null;
   }
 }
 
 @FlowType(name = "Test", firstStep = "step1")
-@EventProfiles("TestEventProfile")
+@EventProfiles(C1_TestEventProfile_EventCallProfileParameterFromFlow.class)
 class C1_TestEventProfile_EventCallProfileParameterFromFlow_Flow {
   @StepFunction(transit = "transit")
   static void step1() {}

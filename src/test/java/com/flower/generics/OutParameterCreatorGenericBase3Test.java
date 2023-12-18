@@ -113,47 +113,32 @@ class OutParameterCreatorGenericBase3Test {
     IllegalStateException e = assertThrows(IllegalStateException.class, () -> flower.initialize());
     assertTrue(e.getMessage().contains("Global function parameter assumes conflicting types"));
   }
-  /*
-  @Test
-  void test_OUT_Flow_Base_Child3_1() throws ExecutionException, InterruptedException {
-      Flower flower = new Flower();
-      flower.registerGlobalFunctions(OUT_GlobalFunctionContainer3.class);
-      flower.registerFlow(OUT_Flow_Call_Base3_1.class);
-      flower.initialize();
-
-      FlowExec<OUT_Flow_Call_Base3_1> helloWorldExec = flower.getFlowExec(OUT_Flow_Call_Base3_1.class);
-      FlowFuture<OUT_Flow_Call_Base3_1> flowFuture = helloWorldExec.runFlow(new OUT_Flow_Call_Base3_1("Hello", " world!"));
-
-      OUT_Flow_Call_Base3_1 state = flowFuture.getFuture().get();
-      assertEquals("Hello", state.hello);
-      assertEquals(" world!", state.world);
-  }*/
 }
 
 // -----------------------------------------
 
-@FlowType(firstStep = "HELLO_STEP", name = "BASE2", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", name = "BASE2", extendz = OUT_Flow_Base.class)
 class OUT_Flow_Base_Child0 extends OUT_Flow_Base<List<String>> {
   public OUT_Flow_Base_Child0(Supplier<List<String>> supplier) {
     super(supplier);
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", name = "BASE3", extendz = "BASE2")
+@FlowType(firstStep = "HELLO_STEP", name = "BASE3", extendz = OUT_Flow_Base_Child0.class)
 class OUT_Flow_Base_Child1 extends OUT_Flow_Base_Child0 {
   public OUT_Flow_Base_Child1(Supplier<List<String>> supplier) {
     super(supplier);
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE3")
+@FlowType(firstStep = "HELLO_STEP", extendz = OUT_Flow_Base_Child1.class)
 class OUT_Flow_Base_Child2 extends OUT_Flow_Base_Child1 {
   public OUT_Flow_Base_Child2(Supplier<List<String>> supplier) {
     super(supplier);
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", extendz = OUT_Flow_Base.class)
 class OUT_Flow_Base_Child4 extends OUT_Flow_Base<String> {
   @State String hello;
   @State String world;
@@ -190,7 +175,7 @@ class OUT_Flow_Call_Base3<C extends String> {
     this.supplier = supplier;
   }
 
-  @SimpleStepCall(globalFunctionName = "HELLO_GLOBAL")
+  @SimpleStepCall(globalFunctionContainer = OUT_GlobalFunctionContainer3.class, globalFunctionName = "HELLO_GLOBAL")
   static <C extends String> Transition HELLO_STEP(
       @Out OutPrm<C> hello,
       @Out OutPrm<String> world,

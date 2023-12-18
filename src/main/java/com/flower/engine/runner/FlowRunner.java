@@ -6,8 +6,7 @@ import com.flower.conf.FlowExecCallback;
 import com.flower.conf.FlowId;
 import com.flower.conf.FlowRepoPrm;
 import com.flower.conf.InternalFlowExec;
-import com.flower.engine.FlowerId;
-import com.flower.engine.FlowerIdSerializer;
+import com.flower.conf.StateSerializer;
 import com.flower.engine.configuration.EventProfileContainerRecord;
 import com.flower.engine.configuration.FlowConfigurationRepo;
 import com.flower.engine.configuration.FlowTypeRecord;
@@ -68,10 +67,13 @@ public class FlowRunner implements FlowExecCallback, FlowRepoPrm {
 
   public void initialize() {
     // 1. Map global functions
-    final Map<String, GlobalFunctionRecord> globalFunctionsByName = new HashMap<>();
+    final Map<Class<?>, Map<String, GlobalFunctionRecord>> globalFunctionsByContainerAndName = new HashMap<>();
     for (GlobalFunctionContainerRecord container :
         flowConfigurationRepo.getGlobalFunctionContainers()) {
       for (GlobalFunctionRecord globalFunction : container.getGlobalFunctions()) {
+        Map<String, GlobalFunctionRecord> globalFunctionsByName =
+            globalFunctionsByContainerAndName.computeIfAbsent(container.getGlobalFunctionContainerType(), t -> new HashMap<>());
+
         String globalFunctionName = globalFunction.functionName;
         if (globalFunctionsByName.containsKey(globalFunctionName))
           throw new IllegalStateException(
@@ -87,24 +89,24 @@ public class FlowRunner implements FlowExecCallback, FlowRepoPrm {
     }
 
     // 2. Map event profiles
-    final Map<String, EventProfileContainerRecord> eventProfilesByName = new HashMap<>();
+    final Map<Class<?>, EventProfileContainerRecord> eventProfilesByType = new HashMap<>();
     for (EventProfileContainerRecord eventProfile :
         flowConfigurationRepo.getEventProfileContainers()) {
-      String eventProfileName = eventProfile.eventProfileName;
-      if (eventProfilesByName.containsKey(eventProfileName))
+      Class<?> eventProfileType = eventProfile.eventProfileContainerType;
+      if (eventProfilesByType.containsKey(eventProfileType))
         throw new IllegalStateException(
             "Duplicate EventProfile name. EventProfileName: ["
-                + eventProfileName
+                + eventProfileType
                 + "] EventProfileContainer class 1: ["
-                + eventProfilesByName.get(eventProfileName).eventProfileContainerType
+                + eventProfilesByType.get(eventProfileType).eventProfileContainerType
                 + "] EventProfileContainer class 2: ["
                 + eventProfile.eventProfileContainerType
                 + "]");
-      eventProfilesByName.put(eventProfileName, eventProfile);
+      eventProfilesByType.put(eventProfileType, eventProfile);
     }
 
     // 3. Get  default event profile names
-    final List<String> defaultEventProfiles = flowConfigurationRepo.getDefaultEventProfiles();
+    final List<Class<?>> defaultEventProfiles = flowConfigurationRepo.getDefaultEventProfiles();
 
     // 4. Create FlowCallContext for flow types
     flowTypeFactoriesList = new ArrayList<>();
@@ -113,9 +115,10 @@ public class FlowRunner implements FlowExecCallback, FlowRepoPrm {
     for (FlowTypeRecord flowTypeRecord : flowConfigurationRepo.getFlowTypes()) {
       FlowCallContext flowCallContext =
           flowCallContextCreator.createFlowCallContext(
-              scheduler, flowTypeRecord, globalFunctionsByName, eventProfilesByName, defaultEventProfiles);
+              scheduler, flowTypeRecord, globalFunctionsByContainerAndName, eventProfilesByType, defaultEventProfiles);
       Class<?> flowType = flowTypeRecord.flowType;
-      InternalFlowExec<?> flowExec = createExec(flowType, flowCallContext);
+      //TODO: implement StateSerializer
+      InternalFlowExec<?> flowExec = createExec(flowType, flowCallContext, null);
       flowExecByClass.put(flowTypeRecord.flowType, flowExec);
       flowExecByName.put(flowTypeRecord.flowTypeName, flowExec);
     }
@@ -127,8 +130,8 @@ public class FlowRunner implements FlowExecCallback, FlowRepoPrm {
     flowTypeFactoriesList.clear();
   }
 
-  private <T> InternalFlowExec<T> createExec(Class<T> flowType, FlowCallContext flowCallContext) {
-    return new FlowExecImpl<>(this, flowType, flowCallContext, this, scheduler);
+  private <T> InternalFlowExec<T> createExec(Class<T> flowType, FlowCallContext flowCallContext, @Nullable StateSerializer<T> stateSerializer) {
+    return new FlowExecImpl<>(this, flowType, flowCallContext, this, scheduler, stateSerializer);
   }
 
   // ------------------------------------------------------------------
@@ -190,16 +193,6 @@ public class FlowRunner implements FlowExecCallback, FlowRepoPrm {
     ListenableFuture<Object> flow = Preconditions.checkNotNull(activeFlows.get(flowId));
     flowsCache.put(flowId, flow);
     activeFlows.remove(flowId);
-  }
-
-  @Override
-  public String serializeFlowId(FlowId flowId) {
-    return FlowerIdSerializer.serialize((FlowerId) flowId);
-  }
-
-  @Override
-  public FlowId deserializeFlowId(String flowIdToken) {
-    return FlowerIdSerializer.deserialize(flowIdToken);
   }
 
   public void registerFactoryOfFlowTypeFactories(

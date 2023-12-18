@@ -70,38 +70,39 @@ public class TestEventProfileCall {
     System.out.println("TestEventProfileCall: constructor");
   }
 
-  @EventCall(globalFunctionName = "beforeFlowEvent", types = EventType.BEFORE_FLOW)
+  @EventCall(globalFunctionContainer = TestEventGlobalFunctionContainer.class, globalFunctionName = "beforeFlowEvent", types = EventType.BEFORE_FLOW)
   static void beforeFlowEvent() {}
 
-  @EventCall(globalFunctionName = "afterFlowEvent", types = EventType.AFTER_FLOW)
+  @EventCall(globalFunctionContainer = TestEventGlobalFunctionContainer.class, globalFunctionName = "afterFlowEvent", types = EventType.AFTER_FLOW)
   static void afterFlowEvent() {}
 
-  @EventCall(globalFunctionName = "beforeStepEvent", types = EventType.BEFORE_STEP)
+  @EventCall(globalFunctionContainer = TestEventGlobalFunctionContainer.class, globalFunctionName = "beforeStepEvent", types = EventType.BEFORE_STEP)
   static void beforeStepEvent() {}
 
-  @EventCall(globalFunctionName = "afterStepEvent", types = EventType.AFTER_STEP)
+  @EventCall(globalFunctionContainer = TestEventGlobalFunctionContainer.class, globalFunctionName = "afterStepEvent", types = EventType.AFTER_STEP)
   static void afterStepEvent() {}
 
   @EventCall(
+      globalFunctionContainer = TestEventGlobalFunctionContainer.class,
       globalFunctionName = "beforeStepIterationEvent",
       types = EventType.BEFORE_STEP_ITERATION)
   static void beforeStepIterationEvent() {}
 
-  @EventCall(globalFunctionName = "afterStepIterationEvent", types = EventType.AFTER_STEP_ITERATION)
+  @EventCall(globalFunctionContainer = TestEventGlobalFunctionContainer.class, globalFunctionName = "afterStepIterationEvent", types = EventType.AFTER_STEP_ITERATION)
   static void afterStepIterationEvent() {}
 
-  @EventCall(globalFunctionName = "beforeExecEvent", types = EventType.BEFORE_EXEC)
+  @EventCall(globalFunctionContainer = TestEventGlobalFunctionContainer.class, globalFunctionName = "beforeExecEvent", types = EventType.BEFORE_EXEC)
   static void beforeExecEvent() {}
 
-  @EventCall(globalFunctionName = "afterExecEvent", types = EventType.AFTER_EXEC)
+  @EventCall(globalFunctionContainer = TestEventGlobalFunctionContainer.class, globalFunctionName = "afterExecEvent", types = EventType.AFTER_EXEC)
   static void afterExecEvent() {}
 
-  @EventCall(globalFunctionName = "beforeTransitEvent", types = EventType.BEFORE_TRANSIT)
+  @EventCall(globalFunctionContainer = TestEventGlobalFunctionContainer.class, globalFunctionName = "beforeTransitEvent", types = EventType.BEFORE_TRANSIT)
   static void beforeTransitEvent() {}
 
-  @EventCall(globalFunctionName = "afterTransitEvent", types = EventType.AFTER_TRANSIT)
+  @EventCall(globalFunctionContainer = TestEventGlobalFunctionContainer.class, globalFunctionName = "afterTransitEvent", types = EventType.AFTER_TRANSIT)
   static void afterTransitEvent() {}
 
-  @EventCall(globalFunctionName = "flowExceptionEvent", types = EventType.FLOW_EXCEPTION)
+  @EventCall(globalFunctionContainer = TestEventGlobalFunctionContainer.class, globalFunctionName = "flowExceptionEvent", types = EventType.FLOW_EXCEPTION)
   static void flowExceptionEvent() {}
 }

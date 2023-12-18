@@ -131,7 +131,7 @@ class T2_TestFlow5 {
   @StepFunction(transit = "transit")
   static void step2() {}
 
-  @TransitCall(globalFunctionName = "global1")
+  @TransitCall(globalFunctionContainer = GlobalFunctions2.class, globalFunctionName = "global1")
   static Transition transit() {
     return null;
   }
@@ -142,7 +142,7 @@ class T2_TestFlow6 {
   @StepFunction(transit = "transit")
   static void step2() {}
 
-  @TransitCall(globalFunctionName = "global2")
+  @TransitCall(globalFunctionContainer = GlobalFunctions2.class, globalFunctionName = "global2")
   static Transition transit() {
     return null;
   }
@@ -150,12 +150,12 @@ class T2_TestFlow6 {
 
 @FlowType(name = "Test", firstStep = "step2")
 class T2_TestFlow7 {
-  @StepFunction(globalTransit = "global1")
+  @StepFunction(globalTransitContainer = GlobalFunctions2.class, globalTransit = "global1")
   static void step2() {}
 }
 
 @FlowType(name = "Test", firstStep = "step2")
 class T2_TestFlow8 {
-  @StepFunction(globalTransit = "global2")
+  @StepFunction(globalTransitContainer = GlobalFunctions2.class, globalTransit = "global2")
   static void step2() {}
 }

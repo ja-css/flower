@@ -96,7 +96,7 @@ public class EventParametersTest {
 }
 
 @FlowType(name = "Test", firstStep = "firstStep")
-@EventProfiles({"TestEventProfile1"})
+@EventProfiles({E2_TestEventProfile1.class})
 class E2_TestFlow1 {
   @SimpleStepFunction
   static Transition firstStep(@Terminal Transition end) {
@@ -127,7 +127,7 @@ class E2_TestEventProfile1 {
 }
 
 @FlowType(name = "Test", firstStep = "firstStep")
-@EventProfiles({"TestEventProfile2"})
+@EventProfiles({E2_TestEventProfile2.class})
 class E2_TestFlow2 {
   @SimpleStepFunction
   static Transition firstStep(@Terminal Transition end) {
@@ -147,7 +147,7 @@ class E2_TestEventProfile2 {
 }
 
 @FlowType(name = "Test", firstStep = "firstStep")
-@EventProfiles({"TestEventProfile3"})
+@EventProfiles({E2_TestEventProfile3.class})
 class E2_TestFlow3 {
   @SimpleStepFunction
   static Transition firstStep(@Terminal Transition end) {
@@ -169,7 +169,7 @@ class E2_TestEventProfile3 {
 }
 
 @FlowType(name = "Test", firstStep = "firstStep")
-@EventProfiles({"TestEventProfile4"})
+@EventProfiles({E2_TestEventProfile4.class})
 class E2_TestFlow4 {
   @SimpleStepFunction
   static Transition firstStep(@Terminal Transition end) {
@@ -189,7 +189,7 @@ class E2_TestEventProfile4 {
 }
 
 @FlowType(name = "Test", firstStep = "firstStep")
-@EventProfiles({"TestEventProfile5"})
+@EventProfiles({E2_TestEventProfile5.class})
 class E2_TestFlow5 {
   @SimpleStepFunction
   static Transition firstStep(@Terminal Transition end) {

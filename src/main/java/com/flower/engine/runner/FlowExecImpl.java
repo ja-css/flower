@@ -6,6 +6,7 @@ import com.flower.conf.FlowExecCallback;
 import com.flower.conf.FlowFuture;
 import com.flower.conf.FlowId;
 import com.flower.conf.InternalFlowExec;
+import com.flower.conf.StateSerializer;
 import com.flower.conf.StepInfoPrm;
 import com.flower.engine.FlowImpl;
 import com.flower.engine.FlowerId;
@@ -26,6 +27,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nullable;
+
 public class FlowExecImpl<T> implements InternalFlowExec<T> {
   static final String BEGIN = "BEGIN";
   static final String END = "END";
@@ -36,18 +39,21 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
   final FlowCallContext flowCallContext;
   final FlowExecCallback flowExecCallback;
   final ListeningScheduledExecutorService scheduler;
+  @Nullable final StateSerializer<T> stateSerializer;
 
   public FlowExecImpl(
       FlowRunner flowRunner,
       Class<T> flowType,
       FlowCallContext flowCallContext,
       FlowExecCallback flowExecCallback,
-      ListeningScheduledExecutorService scheduler) {
+      ListeningScheduledExecutorService scheduler,
+      @Nullable StateSerializer<T> stateSerializer) {
     this.flowRunner = flowRunner;
     this.flowType = flowType;
     this.flowCallContext = flowCallContext;
     this.flowExecCallback = flowExecCallback;
     this.scheduler = scheduler;
+    this.stateSerializer = stateSerializer;
   }
 
   @Override
@@ -267,5 +273,11 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
 
   public Class<T> getFlowType() {
     return flowType;
+  }
+
+  @Nullable
+  @Override
+  public StateSerializer<T> getStateSerializer() {
+    return stateSerializer;
   }
 }

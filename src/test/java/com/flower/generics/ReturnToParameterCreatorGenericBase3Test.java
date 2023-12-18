@@ -118,28 +118,28 @@ class ReturnToParameterCreatorGenericBase3Test {
 
 // -----------------------------------------
 
-@FlowType(firstStep = "HELLO_STEP", name = "BASE2", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", name = "BASE2", extendz = RETTO_Flow_Base.class)
 class RETTO_Flow_Base_Child0 extends RETTO_Flow_Base<List<String>> {
   public RETTO_Flow_Base_Child0(Supplier<List<String>> supplier) {
     super(supplier);
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", name = "BASE3", extendz = "BASE2")
+@FlowType(firstStep = "HELLO_STEP", name = "BASE3", extendz = RETTO_Flow_Base_Child0.class)
 class RETTO_Flow_Base_Child1 extends RETTO_Flow_Base_Child0 {
   public RETTO_Flow_Base_Child1(Supplier<List<String>> supplier) {
     super(supplier);
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE3")
+@FlowType(firstStep = "HELLO_STEP", extendz = RETTO_Flow_Base_Child1.class)
 class RETTO_Flow_Base_Child2 extends RETTO_Flow_Base_Child1 {
   public RETTO_Flow_Base_Child2(Supplier<List<String>> supplier) {
     super(supplier);
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", extendz = RETTO_Flow_Base.class)
 class RETTO_Flow_Base_Child4 extends RETTO_Flow_Base<String> {
   @State
   String hello;
@@ -170,7 +170,7 @@ class RETTO_Flow_Call_Base3<C extends String> {
     this.supplier = supplier;
   }
 
-  @StepCall(globalFunctionName = "HELLO_GLOBAL", transit = "TRANSIT1", returnTo = "hello")
+  @StepCall(globalFunctionContainer = RETTO_GlobalFunctionContainer3.class, globalFunctionName = "HELLO_GLOBAL", transit = "TRANSIT1", returnTo = "hello")
   static <C extends String> C HELLO_STEP1(@In Supplier<C> supplier) {
     return null;
   }
@@ -180,7 +180,7 @@ class RETTO_Flow_Call_Base3<C extends String> {
     return HELLO_STEP2;
   }
 
-  @StepCall(globalFunctionName = "HELLO_GLOBAL", transit = "TRANSIT2", returnTo = "world")
+  @StepCall(globalFunctionContainer = RETTO_GlobalFunctionContainer3.class, globalFunctionName = "HELLO_GLOBAL", transit = "TRANSIT2", returnTo = "world")
   static <C extends String> String HELLO_STEP2(@In Supplier<C> supplier) {
     return null;
   }

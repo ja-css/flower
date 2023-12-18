@@ -5,7 +5,7 @@ import java.util.Map;
 public interface EventContext {
   Object getFlowState();
 
-  Map<String, Object> getEventProfileStates();
+  Map<Class<?>, Object> getEventProfileStates();
 
   // Implement those for event parameter injection
   /*setFlowInfo

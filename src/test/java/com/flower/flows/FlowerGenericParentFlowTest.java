@@ -123,7 +123,7 @@ class SuperFlow {
     }
 }
 
-@FlowType(extendz="SuperFlow")
+@FlowType(extendz=SuperFlow.class)
 class InheritedFlow extends SuperFlow {
     @SimpleStepFunction
     public static Transition runAction(@Out OutPrm<String> result,
@@ -133,7 +133,7 @@ class InheritedFlow extends SuperFlow {
     }
 }
 
-@FlowType(extendz="SuperFlow")
+@FlowType(extendz=SuperFlow.class)
 class InheritedFlow2 extends SuperFlow {
     @SimpleStepFunction
     public static Transition runAction(@Out OutPrm<String> result,

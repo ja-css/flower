@@ -115,7 +115,7 @@ class U5_TestFlow3 {
   int i1;
   @State int i2;
 
-  @StepCall(globalFunctionName = "func1", transit = "transit")
+  @StepCall(globalFunctionContainer = U5_Container2.class, globalFunctionName = "func1", transit = "transit")
   static void step1(@In(name = "i", from = "i1") int i1, @In(name = "i", from = "i2") int i2) {}
 
   @TransitFunction()
@@ -132,6 +132,6 @@ class U5_TestFlow4 {
   @StepFunction(transit = "transit")
   static void step1() {}
 
-  @TransitCall(globalFunctionName = "func1")
+  @TransitCall(globalFunctionContainer = U5_Container2.class, globalFunctionName = "func1")
   static void transit(@In(name = "i", from = "i1") int i1, @In(name = "i", from = "i2") int i2) {}
 }

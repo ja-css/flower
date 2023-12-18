@@ -91,7 +91,7 @@ class U3_TestFlow2 {
   @GlobalFunction()
   static void glob(@In(name = "i1") int i1, @Out(name = "i2") OutPrm<Integer> i2) {}
 
-  @StepCall(globalFunctionName = "glob", transit = "transit")
+  @StepCall(globalFunctionContainer = U3_TestFlow3.class, globalFunctionName = "glob", transit = "transit")
   static void stepCall(@In(name = "i1") int i1, @Out(name = "i1") OutPrm<Integer> i2) {}
 
   @TransitFunction()
@@ -116,7 +116,7 @@ class U3_TestFlow4 {
   @StepFunction(transit = "transit")
   static void step() {}
 
-  @TransitCall(globalFunctionName = "glob")
+  @TransitCall(globalFunctionContainer = U3_TestFlow5.class, globalFunctionName = "glob")
   static Transition transit(@In(name = "i") int i1, @InOut(name = "i") InOutPrm<Integer> i2) {
     return null;
   }
@@ -133,7 +133,7 @@ class U3_TestFlow5 {
   @GlobalFunction()
   static void glob(@In(name = "i") int i1, @InOut(name = "i") InOutPrm<Integer> i2) {}
 
-  @StepCall(globalFunctionName = "glob", transit = "transit")
+  @StepCall(globalFunctionContainer = U3_TestFlow5.class, globalFunctionName = "glob", transit = "transit")
   static void step1(@In int i) {}
 
   @TransitFunction()

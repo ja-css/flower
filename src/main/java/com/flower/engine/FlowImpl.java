@@ -21,7 +21,7 @@ public class FlowImpl<T> implements Flow<T>, EventContext, EventParametersProvid
   final AtomicReference<Optional<String>> status;
   final AtomicReference<String> currentStep;
 
-  final Map<String, Object> eventProfileStates;
+  final Map<Class<?>, Object> eventProfileStates;
 
   @Nullable
   StepInfoPrm stepInfo = null;
@@ -33,7 +33,7 @@ public class FlowImpl<T> implements Flow<T>, EventContext, EventParametersProvid
       Optional<String> status,
       String currentStep,
       T state,
-      Map<String, Object> eventProfileStates) {
+      Map<Class<?>, Object> eventProfileStates) {
     this.id = id;
     this.flowInfo = new FlowInfo(id, flowName, flowType);
     this.status = new AtomicReference<>(status);
@@ -76,7 +76,7 @@ public class FlowImpl<T> implements Flow<T>, EventContext, EventParametersProvid
   }
 
   @Override
-  public Map<String, Object> getEventProfileStates() {
+  public Map<Class<?>, Object> getEventProfileStates() {
     return eventProfileStates;
   }
 

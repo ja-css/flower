@@ -103,7 +103,7 @@ class CheckNullFlow {
 }
 
 @FlowType(firstStep = "step")
-@EventProfiles({"CheckNullEventProfile", "CheckNullEventProfile2"})
+@EventProfiles({CheckNullEventProfile.class, CheckNullEventProfile2.class})
 class CheckNullFlow2 {
     @State final Integer i = 6;
 

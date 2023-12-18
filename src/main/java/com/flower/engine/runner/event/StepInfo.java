@@ -8,11 +8,13 @@ public class StepInfo implements StepInfoPrm {
   private final String stepName;
   private final String transitName;
   private final boolean isFirstStep;
+  private final boolean isSimpleStep;
 
-  public StepInfo(String stepName, String transitName, boolean isFirstStep) {
+  public StepInfo(String stepName, String transitName, boolean isFirstStep, boolean isSimpleStep) {
     this.stepName = stepName;
     this.transitName = transitName;
     this.isFirstStep = isFirstStep;
+    this.isSimpleStep = isSimpleStep;
   }
 
   @Override
@@ -29,6 +31,9 @@ public class StepInfo implements StepInfoPrm {
   public boolean isFirstStep() {
     return isFirstStep;
   }
+
+  @Override
+  public boolean isSimpleStep() { return isSimpleStep; }
 
   @Override
   public boolean equals(Object o) {
@@ -56,6 +61,9 @@ public class StepInfo implements StepInfoPrm {
         + '\''
         + ", isFirstStep="
         + isFirstStep
+        + '\''
+        + ", isSimpleStep="
+        + isSimpleStep
         + '}';
   }
 }

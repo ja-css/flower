@@ -38,7 +38,7 @@ public class StepAndTransitContext implements StepCallContext {
     this.stepAndTransitFunctionCall = stepAndTransitFunctionCall;
     this.flowStateAccessConfig = flowStateAccessConfig;
     // exec is the same as transit
-    this.stepInfo = new StepInfo(stepName, stepName, isFirstStep);
+    this.stepInfo = new StepInfo(stepName, stepName, isFirstStep, true);
     this.transitions = transitions;
 
     this.stepParameterInitProfile = new StepParameterInitProfile(stepAndTransitFunctionCall);

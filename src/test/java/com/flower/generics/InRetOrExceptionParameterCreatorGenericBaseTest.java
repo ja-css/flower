@@ -174,7 +174,7 @@ class INRETOREXC_Flow_Base<C> {
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", extendz = INRETOREXC_Flow_Base.class)
 class INRETOREXC_Flow_Base_Child<C extends List<String>> extends INRETOREXC_Flow_Base<C> {
   public INRETOREXC_Flow_Base_Child(C hello, C world) {
     super(hello, world);
@@ -204,7 +204,7 @@ class INRETOREXC_Flow_Base2<C> {
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", extendz = INRETOREXC_Flow_Base.class)
 class INRETOREXC_Flow_Base_Child2_Fails<G extends List<String>, Z extends String>
     extends INRETOREXC_Flow_Base<G> {
   @State Z hello;
@@ -284,12 +284,12 @@ class INRETOREXC_Flow_Call<C> {
     this.world = world;
   }
 
-  @StepCall(globalFunctionName = "HELLO_STEP", transit = "HELLO_TRANSIT")
+  @StepCall(globalFunctionContainer = INRETOREXC_GlobalFunctionContainer.class, globalFunctionName = "HELLO_STEP", transit = "HELLO_TRANSIT")
   static <C> C HELLO_STEP(@In C hello, @In C world) {
     return null;
   }
 
-  @TransitCall(globalFunctionName = "HELLO_GLOBAL")
+  @TransitCall(globalFunctionContainer = INRETOREXC_GlobalFunctionContainer.class, globalFunctionName = "HELLO_GLOBAL")
   static <C> Transition HELLO_TRANSIT(
       @InRetOrException ReturnValueOrException<C> helloRet, @In C world, @Terminal Transition END) {
     return null;
@@ -310,12 +310,12 @@ class INRETOREXC_Flow_Call2<C, D extends String> {
     this.world = world;
   }
 
-  @StepCall(globalFunctionName = "HELLO_STEP", transit = "HELLO_TRANSIT")
+  @StepCall(globalFunctionContainer = INRETOREXC_GlobalFunctionContainer.class, globalFunctionName = "HELLO_STEP", transit = "HELLO_TRANSIT")
   static <D extends String> D HELLO_STEP(@In D hello, @In D world) {
     return null;
   }
 
-  @TransitCall(globalFunctionName = "HELLO_GLOBAL")
+  @TransitCall(globalFunctionContainer = INRETOREXC_GlobalFunctionContainer.class, globalFunctionName = "HELLO_GLOBAL")
   static <D extends String> Transition HELLO_TRANSIT(
       @InRetOrException ReturnValueOrException<D> helloRet, @In D world, @Terminal Transition END) {
     return END;

@@ -19,6 +19,8 @@ public @interface StepFunction {
   /** @return TransitFunction name */
   String transit() default "";
 
+  /** @return Global function container for TransitFunction */
+  Class<?> globalTransitContainer() default void.class;
   /** @return TransitFunction reference to Global function */
   String globalTransit() default "";
 

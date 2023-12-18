@@ -90,21 +90,19 @@ public class FlowFactoryPrmTest {
 @FlowType(firstStep = "step1")
 class F_ParentFlow2 {
   @State
-  String childFlowId;
+  FlowId childFlowId;
 
   @SimpleStepFunction
   static Transition step1(
       @StepRef Transition waitStep,
       @FlowFactory(flowTypeName = "F_ChildFlow") FlowFactoryPrm<F_ChildFlow2> flowFactory,
-      @Out OutPrm<String> childFlowId) {
+      @Out OutPrm<FlowId> childFlowId) {
     System.out.println("F_ParentFlow2 step1 start");
 
     FlowId id = flowFactory.runChildFlow(new F_ChildFlow2()).getFlowId();
-    String flowIdToken = flowFactory.serializeFlowId(id);
+    System.out.printf("F_ParentFlow2 childFlow created %s%n", id.toString());
 
-    System.out.printf("F_ParentFlow2 childFlow created %s%n", flowIdToken);
-
-    childFlowId.setOutValue(flowIdToken);
+    childFlowId.setOutValue(id);
 
     System.out.println("F_ParentFlow2 step1 end");
 
@@ -113,13 +111,13 @@ class F_ParentFlow2 {
 
   @SimpleStepFunction
   static ListenableFuture<Transition> waitStep(
-          @Terminal Transition end, @FlowRepo FlowRepoPrm flowRepo, @In String childFlowId) {
+          @Terminal Transition end, @FlowRepo FlowRepoPrm flowRepo, @In FlowId childFlowId) {
     System.out.println("F_ParentFlow2 waitStep start");
     System.out.println("F_ParentFlow2 waiting for " + childFlowId);
 
     ListenableFuture<F_ChildFlow2> future =
         (ListenableFuture<F_ChildFlow2>)
-            flowRepo.getFlowFuture(flowRepo.deserializeFlowId(childFlowId));
+            flowRepo.getFlowFuture(childFlowId);
     return Futures.transform(
         future,
         flow2 -> {

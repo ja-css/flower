@@ -113,7 +113,7 @@ class TestFlowWithStepAndTransitCalls {
     currentDelay = 0;
   }
 
-  @SimpleStepCall(globalFunctionName = "printStats")
+  @SimpleStepCall(globalFunctionContainer = TestStepAndTransitCallsContainer.class, globalFunctionName = "printStats")
   static Transition printStats(
       @In int maxIterations,
       @Nullable @In int currentIteration,
@@ -122,7 +122,7 @@ class TestFlowWithStepAndTransitCalls {
     return null;
   }
 
-  @SimpleStepCall(globalFunctionName = "printGreeting")
+  @SimpleStepCall(globalFunctionContainer = TestStepAndTransitCallsContainer.class, globalFunctionName = "printGreeting")
   static Transition printGreeting(
       @In String username,
       @In(from = "maxIterations") int maxIterations,

@@ -218,7 +218,7 @@ class TestCallsFlowSimple {
   }
 
   @TransitStepRefPrm(paramName = "nextStep", stepName = "printGreeting")
-  @StepCall(globalFunctionName = "printStats", transit = "nextStepTransit")
+  @StepCall(globalFunctionContainer = GlobalTestFunctionsContainer.class, globalFunctionName = "printStats", transit = "nextStepTransit")
   static void printStats(
       @In int maxIterations,
       @Nullable @In int currentIteration,
@@ -227,15 +227,15 @@ class TestCallsFlowSimple {
   @TransitParametersOverride(
       stepRef = {@TransitStepRefPrm(paramName = "firstStep", stepName = "printStats")},
       in = @TransitInPrm(paramName = "maxIterations", from = "maxIterations"))
-  @StepCall(globalFunctionName = "printGreeting", transit = "nextIterationOrEnd")
+  @StepCall(globalFunctionContainer = GlobalTestFunctionsContainer.class, globalFunctionName = "printGreeting", transit = "nextIterationOrEnd")
   static void printGreeting(@In(from = "username0") String username) {}
 
-  @TransitCall(globalFunctionName = "nextStepTransit")
+  @TransitCall(globalFunctionContainer = GlobalTestFunctionsContainer.class, globalFunctionName = "nextStepTransit")
   static Transition nextStepTransit(@StepRef Transition nextStep) {
     return null;
   }
 
-  @TransitCall(globalFunctionName = "nextIterationOrEnd")
+  @TransitCall(globalFunctionContainer = GlobalTestFunctionsContainer.class, globalFunctionName = "nextIterationOrEnd")
   static Transition nextIterationOrEnd(
       @In int maxIterations,
       @InOut(out = Output.OPTIONAL) NullableInOutPrm<Integer> currentIteration,
@@ -260,7 +260,7 @@ class TestCallsGlobalParameterNotOverridden {
     currentDelay = 0;
   }
 
-  @StepCall(globalFunctionName = "printStats", transit = "transit")
+  @StepCall(globalFunctionContainer = GlobalTestFunctionsContainer.class, globalFunctionName = "printStats", transit = "transit")
   static void printStats() {}
 
   @TransitFunction
@@ -283,7 +283,7 @@ class TestCallsReturnValueMismatch {
     currentDelay = 0;
   }
 
-  @StepCall(globalFunctionName = "printStats", transit = "transit")
+  @StepCall(globalFunctionContainer = GlobalTestFunctionsContainer.class, globalFunctionName = "printStats", transit = "transit")
   static int printStats() {
     return 1;
   }
@@ -308,7 +308,7 @@ class TestCallsNullableReturnValueMismatch {
     currentDelay = 0;
   }
 
-  @StepCall(globalFunctionName = "printStats5", transit = "transit")
+  @StepCall(globalFunctionContainer = GlobalTestFunctionsContainer.class, globalFunctionName = "printStats5", transit = "transit")
   static @Nullable Integer printStats5() {
     return null;
   }
@@ -333,7 +333,7 @@ class TestCallsNonexistentParameter {
     currentDelay = 0;
   }
 
-  @StepCall(globalFunctionName = "printStats", transit = "transit")
+  @StepCall(globalFunctionContainer = GlobalTestFunctionsContainer.class, globalFunctionName = "printStats", transit = "transit")
   static void printStats(
       @In int maxIterations,
       @In int currentIteration,
@@ -360,7 +360,7 @@ class TestCallsNullableParameterMismatch {
     currentDelay = 0;
   }
 
-  @StepCall(globalFunctionName = "printStats5", transit = "transit")
+  @StepCall(globalFunctionContainer = GlobalTestFunctionsContainer.class, globalFunctionName = "printStats5", transit = "transit")
   static Integer printStats5(
       @In int maxIterations, @Nullable @In int currentIteration, @In String username) {
     return null;
@@ -386,7 +386,7 @@ class TestCallsInOutMismatch1 {
     currentDelay = 0;
   }
 
-  @StepCall(globalFunctionName = "printStats6", transit = "transit")
+  @StepCall(globalFunctionContainer = GlobalTestFunctionsContainer.class, globalFunctionName = "printStats6", transit = "transit")
   static void printStats6(@InOut NullableInOutPrm<Integer> i) {}
 
   @TransitFunction
@@ -409,7 +409,7 @@ class TestCallsInOutMismatch2 {
     currentDelay = 0;
   }
 
-  @StepCall(globalFunctionName = "printStats6", transit = "transit")
+  @StepCall(globalFunctionContainer = GlobalTestFunctionsContainer.class, globalFunctionName = "printStats6", transit = "transit")
   static void printStats6(@InOut(out = Output.OPTIONAL) InOutPrm<Integer> i) {}
 
   @TransitFunction

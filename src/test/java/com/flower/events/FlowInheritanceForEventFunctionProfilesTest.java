@@ -37,7 +37,7 @@ public class FlowInheritanceForEventFunctionProfilesTest {
 }
 
 @FlowType(name = "ParentFlow", firstStep = "transit")
-@EventProfiles({"TestEventProfile1"})
+@EventProfiles({E3_TestEventProfile1.class})
 class E3_TestFlow1 {
   @SimpleStepFunction
   static Transition transit(@Terminal Transition end) {
@@ -46,8 +46,8 @@ class E3_TestFlow1 {
   }
 }
 
-@FlowType(extendz = "ParentFlow", firstStep = "transit")
-@EventProfiles({"TestEventProfile2"})
+@FlowType(extendz = E3_TestFlow1.class, firstStep = "transit")
+@EventProfiles({E3_TestEventProfile2.class})
 class E3_TestChildFlow1_1 extends E3_TestFlow1 {}
 
 @EventProfileContainer(name = "TestEventProfile1")

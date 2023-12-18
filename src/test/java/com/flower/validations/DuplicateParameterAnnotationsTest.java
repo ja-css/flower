@@ -113,7 +113,7 @@ class D2_TestFlow3 {
   @State int i1;
   @State int i2;
 
-  @StepCall(globalFunctionName = "func1", transit = "transit")
+  @StepCall(globalFunctionContainer = D2_Container2.class, globalFunctionName = "func1", transit = "transit")
   static void step1(@In @Out int i1) {}
 
   @TransitFunction()
@@ -130,6 +130,6 @@ class D2_TestFlow4 {
   @StepFunction(transit = "transit")
   static void step1() {}
 
-  @TransitCall(globalFunctionName = "func1")
+  @TransitCall(globalFunctionContainer = D2_Container2.class, globalFunctionName = "func1")
   static void transit(@In @Out int i1) {}
 }

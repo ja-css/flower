@@ -22,9 +22,10 @@ public class FlowConfigurationRepo {
   private final Map<String, GlobalFunctionContainerRecord> globalFunctionContainerByName;
 
   private final Map<Class<?>, EventProfileContainerRecord> eventProfileContainerByClass;
+  private final Map<Class<?>, String> eventProfileContainerNameByClass;
   private final Map<String, EventProfileContainerRecord> eventProfileContainerByName;
 
-  private final List<String> defaultEventProfiles;
+  private final List<Class<?>> defaultEventProfiles;
 
   public FlowConfigurationRepo() {
     flowTypeByClass = new HashMap<>();
@@ -33,6 +34,7 @@ public class FlowConfigurationRepo {
     globalFunctionContainerByName = new HashMap<>();
     eventProfileContainerByClass = new HashMap<>();
     eventProfileContainerByName = new HashMap<>();
+    eventProfileContainerNameByClass = new HashMap<>();
     defaultEventProfiles = new ArrayList<>();
   }
 
@@ -53,10 +55,10 @@ public class FlowConfigurationRepo {
       globalFunctionContainerName = globalFunctionContainerType.getCanonicalName();
 
     if (globalFunctionContainerByClass.containsKey(globalFunctionContainerType))
-      throw new IllegalStateException("Duplicate Flow type: [" + globalFunctionContainerType + "]");
+      throw new IllegalStateException("Duplicate GlobalFunctionContainer type: [" + globalFunctionContainerType + "]");//???
     if (globalFunctionContainerByName.containsKey(globalFunctionContainerName))
       throw new IllegalStateException(
-          "Duplicate Flow name: ["
+          "Duplicate Global Function Container name: ["
               + globalFunctionContainerName
               + "] type1 ["
               + globalFunctionContainerByName.get(globalFunctionContainerName)
@@ -85,7 +87,7 @@ public class FlowConfigurationRepo {
     FlowType annotation = flowType.getAnnotation(FlowType.class);
     String flowTypeName = annotation.name();
     if (flowTypeName.trim().equals("")) flowTypeName = flowType.getCanonicalName();
-    String parentFlowTypeName = StringUtils.defaultIfBlank(annotation.extendz(), null);
+    Class<?> parentFlowType = annotation.extendz() == void.class ? null : annotation.extendz();
 
     if (flowTypeByClass.containsKey(flowType))
       throw new IllegalStateException("Duplicate Flow type: [" + flowType + "]");
@@ -100,7 +102,7 @@ public class FlowConfigurationRepo {
               + "]");
 
     FlowTypeRecord flowTypeRecord =
-        new FlowTypeRecord(flowType, annotation, flowTypeName, parentFlowTypeName);
+        new FlowTypeRecord(flowType, annotation, flowTypeName, parentFlowType, eventProfileContainerNameByClass);
 
     flowTypeByClass.put(flowType, flowTypeRecord);
     flowTypeByName.put(flowTypeName, flowTypeRecord);
@@ -152,8 +154,9 @@ public class FlowConfigurationRepo {
 
     eventProfileContainerByClass.put(eventProfileContainerType, eventProfileContainerRecord);
     eventProfileContainerByName.put(eventProfileName, eventProfileContainerRecord);
+    eventProfileContainerNameByClass.put(eventProfileContainerType, eventProfileName);
 
-    if (isDefault) defaultEventProfiles.add(eventProfileName);
+    if (isDefault) defaultEventProfiles.add(eventProfileContainerType);
   }
 
   public void initialize() {
@@ -166,18 +169,18 @@ public class FlowConfigurationRepo {
 
       for (FlowTypeRecord flowTypeRecord : flowTypes) {
         if (!flowTypeRecord.isInitialized()) {
-          Optional<String> parentFlowTypeNameOpt = flowTypeRecord.parentFlowTypeName;
+          Optional<Class<?>> parentFlowTypeOpt = flowTypeRecord.parentFlowType;
 
-          if (!parentFlowTypeNameOpt.isPresent()) {
+          if (!parentFlowTypeOpt.isPresent()) {
             flowTypeRecord.initialize(null);
           } else {
-            String parentFlowTypeName = parentFlowTypeNameOpt.get();
-            FlowTypeRecord parentFlow = flowTypeByName.get(parentFlowTypeName);
+            Class<?> parentFlowType = parentFlowTypeOpt.get();
+            FlowTypeRecord parentFlow = flowTypeByClass.get(parentFlowType);
             if (parentFlow == null) {
               throw new IllegalStateException(
                   String.format(
                       "Parent flow not found. Flow: %s; ParentFlow: %s.",
-                      flowTypeRecord.flowTypeName, parentFlowTypeName));
+                      flowTypeRecord.flowTypeName, parentFlowType));
             } else {
               if (parentFlow.isInitialized()) {
                 flowTypeRecord.initialize(parentFlow);
@@ -191,7 +194,7 @@ public class FlowConfigurationRepo {
     } while (numberUninitialized != 0);
 
     for (GlobalFunctionContainerRecord globalFunctionContainerRecord :
-        globalFunctionContainerByName.values()) {
+        globalFunctionContainerByClass.values()) {
       globalFunctionContainerRecord.initialize();
     }
 
@@ -211,14 +214,14 @@ public class FlowConfigurationRepo {
   }
 
   public Collection<GlobalFunctionContainerRecord> getGlobalFunctionContainers() {
-    return globalFunctionContainerByName.values();
+    return globalFunctionContainerByClass.values();
   }
 
   public Collection<EventProfileContainerRecord> getEventProfileContainers() {
     return eventProfileContainerByName.values();
   }
 
-  public List<String> getDefaultEventProfiles() {
+  public List<Class<?>> getDefaultEventProfiles() {
     return defaultEventProfiles;
   }
 }

@@ -258,7 +258,7 @@ class TransitExceptionCatchFlow {
 }
 
 @FlowType(firstStep="erroneousStep")
-@EventProfiles("OnErrorEventProfile")
+@EventProfiles(OnErrorEventProfile.class)
 class TestStateChange5 {
     @State String outStr;
 

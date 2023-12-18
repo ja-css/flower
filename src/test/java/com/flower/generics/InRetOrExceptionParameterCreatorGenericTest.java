@@ -372,7 +372,7 @@ class I1_Flow_Call_O_to_O_OK<C> {
     return world;
   }
 
-  @TransitCall(globalFunctionName = "TRANSIT")
+  @TransitCall(globalFunctionContainer = I1_GlobalFunctionContainer.class, globalFunctionName = "TRANSIT")
   static <C> Transition TRANSIT(
       @InRetOrException ReturnValueOrException<C> world, @Terminal Transition END) {
     return null;
@@ -395,7 +395,7 @@ class I1_Flow_Call_CS_to_O_OK<C extends CharSequence> {
     return world;
   }
 
-  @TransitCall(globalFunctionName = "TRANSIT")
+  @TransitCall(globalFunctionContainer = I1_GlobalFunctionContainer.class, globalFunctionName = "TRANSIT")
   static <C extends CharSequence> Transition TRANSIT(
       @InRetOrException ReturnValueOrException<C> world, @Terminal Transition END) {
     return null;
@@ -418,7 +418,7 @@ class I1_Flow_Call_Str_to_O_OK<C extends String> {
     return world;
   }
 
-  @TransitCall(globalFunctionName = "TRANSIT")
+  @TransitCall(globalFunctionContainer = I1_GlobalFunctionContainer.class, globalFunctionName = "TRANSIT")
   static <C extends String> Transition TRANSIT(
       @InRetOrException ReturnValueOrException<C> world, @Terminal Transition END) {
     return null;
@@ -441,7 +441,7 @@ class I1_Flow_Call_O_to_CS_Fail<C extends CharSequence> {
     return world;
   }
 
-  @TransitCall(globalFunctionName = "TRANSIT2")
+  @TransitCall(globalFunctionContainer = I1_GlobalFunctionContainer.class, globalFunctionName = "TRANSIT2")
   static <C extends CharSequence> Transition TRANSIT(
       @InRetOrException ReturnValueOrException<C> world, @Terminal Transition END) {
     return null;
@@ -464,7 +464,7 @@ class I1_Flow_Call_CS_to_CS_OK<C extends CharSequence> {
     return world;
   }
 
-  @TransitCall(globalFunctionName = "TRANSIT2")
+  @TransitCall(globalFunctionContainer = I1_GlobalFunctionContainer.class, globalFunctionName = "TRANSIT2")
   static <C extends CharSequence> Transition TRANSIT(
       @InRetOrException ReturnValueOrException<C> world, @Terminal Transition END) {
     return null;
@@ -487,7 +487,7 @@ class I1_Flow_Call_Str_to_CS_OK<C extends String> {
     return world;
   }
 
-  @TransitCall(globalFunctionName = "TRANSIT2")
+  @TransitCall(globalFunctionContainer = I1_GlobalFunctionContainer.class, globalFunctionName = "TRANSIT2")
   static <C extends String> Transition TRANSIT(
       @InRetOrException ReturnValueOrException<C> world, @Terminal Transition END) {
     return null;
@@ -510,7 +510,7 @@ class I1_Flow_Call_O_to_Str_Fail<C extends String> {
     return world;
   }
 
-  @TransitCall(globalFunctionName = "TRANSIT3")
+  @TransitCall(globalFunctionContainer = I1_GlobalFunctionContainer.class, globalFunctionName = "TRANSIT3")
   static <C extends String> Transition TRANSIT(
       @InRetOrException ReturnValueOrException<C> world, @Terminal Transition END) {
     return null;
@@ -534,7 +534,7 @@ class I1_Flow_Call_CS_to_Str_Fail<C extends String> {
     return world;
   }
 
-  @TransitCall(globalFunctionName = "TRANSIT3")
+  @TransitCall(globalFunctionContainer = I1_GlobalFunctionContainer.class, globalFunctionName = "TRANSIT3")
   static <C extends String> Transition TRANSIT(
           @InRetOrException ReturnValueOrException<C> world, @Terminal Transition END) {
     return null;
@@ -557,7 +557,7 @@ class I1_Flow_Call_Str_to_Str_OK<C extends String> {
     return world;
   }
 
-  @TransitCall(globalFunctionName = "TRANSIT3")
+  @TransitCall(globalFunctionContainer = I1_GlobalFunctionContainer.class, globalFunctionName = "TRANSIT3")
   static <C extends String> Transition TRANSIT(
       @InRetOrException ReturnValueOrException<C> world, @Terminal Transition END) {
     return null;
@@ -576,7 +576,7 @@ class I1_Flow_Global_O_to_O_OK<C> {
     this.world = world;
   }
 
-  @StepFunction(globalTransit = "TRANSIT")
+  @StepFunction(globalTransitContainer = I1_GlobalFunctionContainer.class, globalTransit = "TRANSIT")
   static <C> C HELLO_STEP(@In C hello, @In C world) {
     System.out.print(hello);
     return world;
@@ -593,7 +593,7 @@ class I1_Flow_Global_CS_to_O_OK<C extends CharSequence> {
     this.world = world;
   }
 
-  @StepFunction(globalTransit = "TRANSIT")
+  @StepFunction(globalTransitContainer = I1_GlobalFunctionContainer.class, globalTransit = "TRANSIT")
   static <C extends CharSequence> C HELLO_STEP(@In C hello, @In C world) {
     System.out.print(hello);
     return world;
@@ -610,7 +610,7 @@ class I1_Flow_Global_Str_to_O_OK<C extends String> {
     this.world = world;
   }
 
-  @StepFunction(globalTransit = "TRANSIT")
+  @StepFunction(globalTransitContainer = I1_GlobalFunctionContainer.class, globalTransit = "TRANSIT")
   static <C extends String> C HELLO_STEP(@In C hello, @In C world) {
     System.out.print(hello);
     return world;
@@ -627,7 +627,7 @@ class I1_Flow_Global_O_to_CS_Fail<C extends CharSequence> {
     this.world = world;
   }
 
-  @StepFunction(globalTransit = "TRANSIT2")
+  @StepFunction(globalTransitContainer = I1_GlobalFunctionContainer.class, globalTransit = "TRANSIT2")
   static <C extends CharSequence> C HELLO_STEP(@In C hello, @In C world) {
     System.out.print(hello);
     return world;
@@ -644,7 +644,7 @@ class I1_Flow_Global_CS_to_CS_OK<C extends CharSequence> {
     this.world = world;
   }
 
-  @StepFunction(globalTransit = "TRANSIT2")
+  @StepFunction(globalTransitContainer = I1_GlobalFunctionContainer.class, globalTransit = "TRANSIT2")
   static <C extends CharSequence> C HELLO_STEP(@In C hello, @In C world) {
     System.out.print(hello);
     return world;
@@ -661,7 +661,7 @@ class I1_Flow_Global_Str_to_CS_OK<C extends String> {
     this.world = world;
   }
 
-  @StepFunction(globalTransit = "TRANSIT2")
+  @StepFunction(globalTransitContainer = I1_GlobalFunctionContainer.class, globalTransit = "TRANSIT2")
   static <C extends String> C HELLO_STEP(@In C hello, @In C world) {
     System.out.print(hello);
     return world;
@@ -678,7 +678,7 @@ class I1_Flow_Global_O_to_Str_Fail<C extends String> {
     this.world = world;
   }
 
-  @StepFunction(globalTransit = "TRANSIT3")
+  @StepFunction(globalTransitContainer = I1_GlobalFunctionContainer.class, globalTransit = "TRANSIT3")
   static <C extends String> C HELLO_STEP(@In C hello, @In C world) {
     System.out.print(hello);
     return world;
@@ -695,7 +695,7 @@ class I1_Flow_Global_CS_to_Str_Fail<C extends String> {
     this.world = world;
   }
 
-  @StepFunction(globalTransit = "TRANSIT3")
+  @StepFunction(globalTransitContainer = I1_GlobalFunctionContainer.class, globalTransit = "TRANSIT3")
   static <C extends String> C HELLO_STEP(@In C hello, @In C world) {
     System.out.print(hello);
     return world;
@@ -712,7 +712,7 @@ class I1_Flow_Global_Str_to_Str_OK<C extends String> {
     this.world = world;
   }
 
-  @StepFunction(globalTransit = "TRANSIT3")
+  @StepFunction(globalTransitContainer = I1_GlobalFunctionContainer.class, globalTransit = "TRANSIT3")
   static <C extends String> C HELLO_STEP(@In C hello, @In C world) {
     System.out.print(hello);
     return world;

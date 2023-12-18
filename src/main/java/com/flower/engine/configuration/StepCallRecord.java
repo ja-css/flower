@@ -11,8 +11,10 @@ public class StepCallRecord extends StepFunctionRecord {
   public final Method method;
   final StepCall annotation;
   public final String stepName;
+  public final Class<?> globalFunctionContainer;
   public final String globalFunctionName;
   public final String transitionerName;
+  public final Class<?> globalTransitionerContainer;
   public final String globalTransitionerName;
   public final String returnTo;
   public final boolean isFirstStep;
@@ -27,9 +29,17 @@ public class StepCallRecord extends StepFunctionRecord {
     this.method = method;
     this.annotation = annotation;
     this.stepName = stepName;
+    this.globalFunctionContainer = annotation.globalFunctionContainer();
     this.globalFunctionName = annotation.globalFunctionName();
     this.transitionerName = annotation.transit();
+    this.globalTransitionerContainer = annotation.globalTransitContainer();
     this.globalTransitionerName = annotation.globalTransit();
+    if (!globalTransitionerName.equalsIgnoreCase("") && globalTransitionerContainer == void.class) {
+      throw new IllegalStateException(
+          String.format("GlobalTransitionerName must be accompanied by GlobalTransitionerContainer. " +
+              "Flow: %s, step: %s", flowType, stepName)
+      );
+    }
     this.returnTo = Strings.emptyToNull(annotation.returnTo());
     this.isFirstStep = isFirstStep;
 

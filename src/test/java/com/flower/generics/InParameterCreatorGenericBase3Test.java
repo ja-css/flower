@@ -120,28 +120,28 @@ class InParameterCreatorGenericBase3Test {
 
 // -----------------------------------------
 
-@FlowType(firstStep = "HELLO_STEP", name = "BASE2", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", name = "BASE2", extendz = IN_Flow_Base.class)
 class IN_Flow_Base_Child0 extends IN_Flow_Base<List<String>> {
   public IN_Flow_Base_Child0(List<String> hello, List<String> world) {
     super(hello, world);
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", name = "BASE3", extendz = "BASE2")
+@FlowType(firstStep = "HELLO_STEP", name = "BASE3", extendz = IN_Flow_Base_Child0.class)
 class IN_Flow_Base_Child1 extends IN_Flow_Base_Child0 {
   public IN_Flow_Base_Child1(List<String> hello, List<String> world) {
     super(hello, world);
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE3")
+@FlowType(firstStep = "HELLO_STEP", extendz = IN_Flow_Base_Child1.class)
 class IN_Flow_Base_Child2 extends IN_Flow_Base_Child1 {
   public IN_Flow_Base_Child2(List<String> hello, List<String> world) {
     super(hello, world);
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", extendz = IN_Flow_Base.class)
 class IN_Flow_Base_Child4 extends IN_Flow_Base<String> {
   @State
   final String hello;
@@ -174,7 +174,7 @@ class IN_Flow_Call_Base3<C extends String> {
     this.world = world;
   }
 
-  @SimpleStepCall(globalFunctionName = "HELLO_GLOBAL")
+  @SimpleStepCall(globalFunctionContainer = IN_GlobalFunctionContainer3.class, globalFunctionName = "HELLO_GLOBAL")
   static <C extends String> Transition HELLO_STEP(
       @In C hello, @In String world, @Terminal Transition END) {
     return null;
@@ -191,7 +191,7 @@ class IN_Flow_Call_Base3_1<C extends String> {
     this.world = world;
   }
 
-  @SimpleStepCall(globalFunctionName = "HELLO_GLOBAL")
+  @SimpleStepCall(globalFunctionContainer = IN_GlobalFunctionContainer3.class, globalFunctionName = "HELLO_GLOBAL")
   static <C extends String> Transition HELLO_STEP(
       @In C hello, @In C world, @Terminal Transition END) {
     return null;

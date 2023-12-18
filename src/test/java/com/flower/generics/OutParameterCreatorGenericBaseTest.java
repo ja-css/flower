@@ -227,14 +227,14 @@ class OUT_Flow_Base<C> {
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", extendz = OUT_Flow_Base.class)
 class OUT_Flow_Base_Child<C extends List<String>> extends OUT_Flow_Base<C> {
   public OUT_Flow_Base_Child(Supplier<C> supplier) {
     super(supplier);
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", extendz = OUT_Flow_Base.class)
 class OUT_Flow_Base_Child2_Fails<G extends List<String>, Z extends String>
     extends OUT_Flow_Base<G> {
   @State Supplier<Z> supplier;
@@ -310,7 +310,7 @@ class OUT_Flow_Call<C> {
     this.supplier = supplier;
   }
 
-  @SimpleStepCall(globalFunctionName = "HELLO_GLOBAL")
+  @SimpleStepCall(globalFunctionContainer = OUT_GlobalFunctionContainer.class, globalFunctionName = "HELLO_GLOBAL")
   static <C> Transition HELLO_STEP(
       @Out OutPrm<C> hello,
       @Out OutPrm<C> world,
@@ -334,7 +334,7 @@ class OUT_Flow_Call2<C, D extends String> {
     this.supplier = supplier;
   }
 
-  @SimpleStepCall(globalFunctionName = "HELLO_GLOBAL")
+  @SimpleStepCall(globalFunctionContainer = OUT_GlobalFunctionContainer.class, globalFunctionName = "HELLO_GLOBAL")
   static <D extends String> Transition HELLO_STEP(
       @Out OutPrm<D> hello,
       @Out OutPrm<D> world,
@@ -367,7 +367,7 @@ class OUT_Flow_Reference<C extends String, Z extends String> {
         @TransitOutPrm(paramName = "hello", to = "hello1"),
         @TransitOutPrm(paramName = "world", to = "world1")
       })
-  @StepFunction(globalTransit = "HELLO_GLOBAL")
+  @StepFunction(globalTransitContainer = OUT_GlobalFunctionContainer.class, globalTransit = "HELLO_GLOBAL")
   static <Z extends String, C extends String> void HELLO_STEP() {
     return;
   }
@@ -396,7 +396,7 @@ class OUT_Flow_Reference2<C extends String, Z extends String> {
   @StepFunction(transit = "TRANSIT")
   static void HELLO_STEP() {}
 
-  @TransitCall(globalFunctionName = "HELLO_GLOBAL")
+  @TransitCall(globalFunctionContainer = OUT_GlobalFunctionContainer.class, globalFunctionName = "HELLO_GLOBAL")
   static <C extends String> Transition TRANSIT(
       @Out OutPrm<C> hello,
       @Out OutPrm<C> world,

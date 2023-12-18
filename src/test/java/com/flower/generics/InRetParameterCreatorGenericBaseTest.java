@@ -206,7 +206,7 @@ class INRET_Flow_Base<C> {
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", extendz = INRET_Flow_Base.class)
 class INRET_Flow_Base_Child<C extends List<String>> extends INRET_Flow_Base<C> {
   public INRET_Flow_Base_Child(C hello, C world) {
     super(hello, world);
@@ -236,7 +236,7 @@ class INRET_Flow_Base2<C> {
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", extendz = INRET_Flow_Base.class)
 class INRET_Flow_Base_Child2_Fails<G extends List<String>, Z extends String>
     extends INRET_Flow_Base<G> {
   @State Z hello;
@@ -338,12 +338,12 @@ class INRET_Flow_Call<C> {
     this.world = world;
   }
 
-  @StepCall(globalFunctionName = "HELLO_STEP", transit = "HELLO_TRANSIT")
+  @StepCall(globalFunctionContainer = INRET_GlobalFunctionContainer.class, globalFunctionName = "HELLO_STEP", transit = "HELLO_TRANSIT")
   static <C> C HELLO_STEP(@In C hello, @In C world) {
     return null;
   }
 
-  @TransitCall(globalFunctionName = "HELLO_GLOBAL")
+  @TransitCall(globalFunctionContainer = INRET_GlobalFunctionContainer.class, globalFunctionName = "HELLO_GLOBAL")
   static <C> Transition HELLO_TRANSIT(@InRet C hello, @In C world, @Terminal Transition END) {
     return null;
   }
@@ -363,12 +363,12 @@ class INRET_Flow_Call2<C, D extends String> {
     this.world = world;
   }
 
-  @StepCall(globalFunctionName = "HELLO_STEP", transit = "HELLO_TRANSIT")
+  @StepCall(globalFunctionContainer = INRET_GlobalFunctionContainer.class, globalFunctionName = "HELLO_STEP", transit = "HELLO_TRANSIT")
   static <D extends String> D HELLO_STEP(@In D hello, @In D world) {
     return null;
   }
 
-  @TransitCall(globalFunctionName = "HELLO_GLOBAL")
+  @TransitCall(globalFunctionContainer = INRET_GlobalFunctionContainer.class, globalFunctionName = "HELLO_GLOBAL")
   static <D extends String> Transition HELLO_TRANSIT(
       @InRet D hello, @In D world, @Terminal Transition END) {
     return END;
@@ -394,38 +394,12 @@ class INRET_Flow_Reference<C extends String, Z extends String> {
   @TransitParametersOverride(
       inRet = {@TransitInRetPrm(paramName = "hello")},
       in = {@TransitInPrm(paramName = "world", from = "world1")})
-  @StepFunction(globalTransit = "HELLO_GLOBAL")
+  @StepFunction(globalTransitContainer = INRET_GlobalFunctionContainer.class, globalTransit = "HELLO_GLOBAL")
   static <Z extends String, C extends String> Z HELLO_STEP() {
     return null;
   }
 }
 
-/*
-@FlowType(firstStep = "HELLO_STEP")
-class IN_Flow_Reference2<C extends String, Z extends String> {
-    @State final Z hello;
-    @State final Z world;
-    @State final C hello1;
-    @State final C world1;
-
-    public IN_Flow_Reference2(Z hello, Z world, C hello1, C world1) {
-        this.hello = hello;
-        this.world = world;
-        this.hello1 = hello1;
-        this.world1 = world1;
-    }
-
-    @TransitParametersOverride(in={
-            @TransitInPrm(paramName = "hello", from = "hello1"),
-            @TransitInPrm(paramName = "world", from = "world1")
-    })
-    @StepFunction(transit = "TRANSIT")
-    static void HELLO_STEP() { return; }
-
-    @TransitCall(globalFunctionName = "HELLO_GLOBAL")
-    static <C extends String> void TRANSIT(@In C hello, @In C world, @Terminal Transition END) { }
-}
-*/
 @FlowType(firstStep = "HELLO_STEP")
 class INRET_Flow_Reference3<C extends String, Z extends String> {
   @State final Z hello;

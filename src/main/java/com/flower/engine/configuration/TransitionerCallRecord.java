@@ -10,6 +10,7 @@ public class TransitionerCallRecord extends FunctionRecord {
   public final Class<?> flowType;
   public final Method method;
   final TransitCall annotation;
+  public final Class<?> globalFunctionContainer;
   public final String globalFunctionName;
   public final String transitionerName;
 
@@ -21,6 +22,7 @@ public class TransitionerCallRecord extends FunctionRecord {
     this.flowType = flowType;
     this.method = method;
     this.annotation = annotation;
+    this.globalFunctionContainer = annotation.globalFunctionContainer();
     this.globalFunctionName = annotation.globalFunctionName();
     this.transitionerName = transitionerName;
 

@@ -147,7 +147,7 @@ class ENAC_TestEventProfile1 {
 
   public ENAC_TestEventProfile1() {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer_1.class,
       globalFunctionName = "BEFORE_FLOW",
       types = {EventType.BEFORE_FLOW})
   static void BEFORE_FLOW(@In Integer i1) {}
@@ -165,7 +165,7 @@ class ENAC_TestEventProfile2 {
 
   public ENAC_TestEventProfile2() {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer_2.class,
       globalFunctionName = "BEFORE_FLOW",
       types = {EventType.BEFORE_FLOW})
   static void BEFORE_FLOW(@Nullable @In Integer i1) {}
@@ -183,7 +183,7 @@ class ENAC_TestEventProfile3 {
 
   public ENAC_TestEventProfile3() {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer_3.class,
       globalFunctionName = "BEFORE_FLOW",
       types = {EventType.BEFORE_FLOW})
   static void BEFORE_FLOW(@InOut InOutPrm<Integer> i1) {}
@@ -202,7 +202,7 @@ class ENAC_TestEventProfile4 {
 
   public ENAC_TestEventProfile4() {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer_4.class,
       globalFunctionName = "BEFORE_FLOW",
       types = {EventType.BEFORE_FLOW})
   static void BEFORE_FLOW(@InOut NullableInOutPrm<Integer> i1) {}
@@ -223,12 +223,12 @@ class ENAC_TestEventProfile5 {
 
   public ENAC_TestEventProfile5() {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer_5.class,
       globalFunctionName = "BEFORE_FLOW",
       types = {EventType.BEFORE_FLOW})
   static void BEFORE_FLOW(@InOut(out = Output.OPTIONAL) NullableInOutPrm<Integer> i1) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer_5.class,
       globalFunctionName = "BEFORE_STEP",
       types = {EventType.BEFORE_STEP})
   static void BEFORE_STEP(@In Integer i1) {}
@@ -249,12 +249,12 @@ class ENAC_TestEventProfile6 {
 
   public ENAC_TestEventProfile6() {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer_6.class,
       globalFunctionName = "BEFORE_FLOW",
       types = {EventType.BEFORE_FLOW})
   static void BEFORE_FLOW(@InOut NullableInOutPrm<Integer> i1) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer_6.class,
       globalFunctionName = "BEFORE_STEP",
       types = {EventType.BEFORE_STEP})
   static void BEFORE_STEP(@In Integer i1) {}
@@ -275,12 +275,12 @@ class ENAC_TestEventProfile7 {
 
   public ENAC_TestEventProfile7() {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer_7.class,
       globalFunctionName = "BEFORE_FLOW",
       types = {EventType.BEFORE_FLOW})
   static void BEFORE_FLOW(@Out(out = Output.OPTIONAL) OutPrm<Integer> i1) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer_7.class,
       globalFunctionName = "BEFORE_STEP",
       types = {EventType.BEFORE_STEP})
   static void BEFORE_STEP(@InOut InOutPrm<Integer> i1) {}
@@ -301,12 +301,12 @@ class ENAC_TestEventProfile8 {
 
   public ENAC_TestEventProfile8() {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer_8.class,
       globalFunctionName = "BEFORE_FLOW",
       types = {EventType.BEFORE_FLOW})
   static void BEFORE_FLOW(@Out OutPrm<Integer> i1) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer_8.class,
       globalFunctionName = "BEFORE_STEP",
       types = {EventType.BEFORE_STEP})
   static void BEFORE_STEP(@InOut InOutPrm<Integer> i1) {}
@@ -331,17 +331,17 @@ class ENAC_TestEventProfile9 {
 
   public ENAC_TestEventProfile9() {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer_9.class,
       globalFunctionName = "BEFORE_FLOW",
       types = {EventType.BEFORE_FLOW})
   static void BEFORE_FLOW(@Out OutPrm<Integer> i1) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer_9.class,
       globalFunctionName = "AFTER_EXEC",
       types = {EventType.AFTER_EXEC})
   static void AFTER_EXEC(@Out OutPrm<Integer> i2) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer_9.class,
       globalFunctionName = "FLOW_EXCEPTION",
       types = {EventType.FLOW_EXCEPTION})
   static void FLOW_EXCEPTION(@InOut InOutPrm<Integer> i1, @In Integer i2) {}
@@ -366,17 +366,17 @@ class ENAC_TestEventProfile10 {
 
   public ENAC_TestEventProfile10() {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer_10.class,
       globalFunctionName = "BEFORE_FLOW",
       types = {EventType.BEFORE_FLOW})
   static void BEFORE_FLOW(@Out OutPrm<Integer> i1) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer_10.class,
       globalFunctionName = "BEFORE_STEP",
       types = {EventType.BEFORE_STEP})
   static void BEFORE_STEP(@Out OutPrm<Integer> i2) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer_10.class,
       globalFunctionName = "FLOW_EXCEPTION",
       types = {EventType.FLOW_EXCEPTION})
   static void FLOW_EXCEPTION(@InOut InOutPrm<Integer> i1, @In Integer i2) {}
@@ -430,52 +430,52 @@ class ENAC_TestEventProfile {
 
   public ENAC_TestEventProfile() {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer.class,
       globalFunctionName = "BEFORE_FLOW",
       types = {EventType.BEFORE_FLOW})
   static void BEFORE_FLOW(@Out OutPrm<Integer> i1) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer.class,
       globalFunctionName = "BEFORE_STEP",
       types = {EventType.BEFORE_STEP})
   static void BEFORE_STEP(@In Integer i1, @InOut NullableInOutPrm<Integer> i2) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer.class,
       globalFunctionName = "BEFORE_STEP_ITERATION",
       types = {EventType.BEFORE_STEP_ITERATION})
   static void BEFORE_STEP_ITERATION(@InOut InOutPrm<Integer> i2, @Out OutPrm<Integer> i3) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer.class,
       globalFunctionName = "BEFORE_EXEC",
       types = {EventType.BEFORE_EXEC})
   static void BEFORE_EXEC(@In Integer i3, @InOut NullableInOutPrm<Integer> i4) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer.class,
       globalFunctionName = "AFTER_EXEC",
       types = {EventType.AFTER_EXEC})
   static void AFTER_EXEC(@InOut InOutPrm<Integer> i4, @Out OutPrm<Integer> i5) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer.class,
       globalFunctionName = "BEFORE_TRANSIT",
       types = {EventType.BEFORE_TRANSIT})
   static void BEFORE_TRANSIT(@In Integer i5, @InOut NullableInOutPrm<Integer> i6) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer.class,
       globalFunctionName = "AFTER_TRANSIT",
       types = {EventType.AFTER_TRANSIT})
   static void AFTER_TRANSIT(@InOut InOutPrm<Integer> i6, @Out OutPrm<Integer> i7) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer.class,
       globalFunctionName = "AFTER_STEP_ITERATION",
       types = {EventType.AFTER_STEP_ITERATION})
   static void AFTER_STEP_ITERATION(@In Integer i7, @InOut NullableInOutPrm<Integer> i8) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer.class,
       globalFunctionName = "AFTER_STEP",
       types = {EventType.AFTER_STEP})
   static void AFTER_STEP(@InOut InOutPrm<Integer> i8, @Out OutPrm<Integer> i9) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_GlobalFunctionContainer.class,
       globalFunctionName = "AFTER_FLOW",
       types = {EventType.AFTER_FLOW})
   static void AFTER_FLOW(@In Integer i9, @InOut NullableInOutPrm<Integer> i10) {}
@@ -529,52 +529,52 @@ class ENAC_TestEventProfileBIG {
 
   public ENAC_TestEventProfileBIG() {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_TestEventProfileBIG.class,
       globalFunctionName = "BEFORE_FLOW",
       types = {EventType.BEFORE_FLOW})
   static void BEFORE_FLOW(@Nullable @In Integer i1) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_TestEventProfileBIG.class,
       globalFunctionName = "BEFORE_STEP",
       types = {EventType.BEFORE_STEP})
   static void BEFORE_STEP(@InOut NullableInOutPrm<Integer> i2) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_TestEventProfileBIG.class,
       globalFunctionName = "BEFORE_STEP_ITERATION",
       types = {EventType.BEFORE_STEP_ITERATION})
   static void BEFORE_STEP_ITERATION(@Nullable @In Integer i3) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_TestEventProfileBIG.class,
       globalFunctionName = "BEFORE_EXEC",
       types = {EventType.BEFORE_EXEC})
   static void BEFORE_EXEC(@InOut NullableInOutPrm<Integer> i4) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_TestEventProfileBIG.class,
       globalFunctionName = "AFTER_EXEC",
       types = {EventType.AFTER_EXEC})
   static void AFTER_EXEC(@Nullable @In Integer i5) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_TestEventProfileBIG.class,
       globalFunctionName = "BEFORE_TRANSIT",
       types = {EventType.BEFORE_TRANSIT})
   static void BEFORE_TRANSIT(@InOut NullableInOutPrm<Integer> i6) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_TestEventProfileBIG.class,
       globalFunctionName = "AFTER_TRANSIT",
       types = {EventType.AFTER_TRANSIT})
   static void AFTER_TRANSIT(@Nullable @In Integer i7) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_TestEventProfileBIG.class,
       globalFunctionName = "AFTER_STEP_ITERATION",
       types = {EventType.AFTER_STEP_ITERATION})
   static void AFTER_STEP_ITERATION(@InOut NullableInOutPrm<Integer> i8) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_TestEventProfileBIG.class,
       globalFunctionName = "AFTER_STEP",
       types = {EventType.AFTER_STEP})
   static void AFTER_STEP(@Nullable @In Integer i9) {}
 
-  @EventCall(
+  @EventCall(globalFunctionContainer = ENAC_TestEventProfileBIG.class,
       globalFunctionName = "AFTER_FLOW",
       types = {EventType.AFTER_FLOW})
   static void AFTER_FLOW(@InOut NullableInOutPrm<Integer> i10) {}

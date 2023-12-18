@@ -1,6 +1,7 @@
 package com.flower.engine;
 
 import com.flower.conf.FlowExec;
+import com.flower.conf.StateSerializer;
 import com.flower.conf.FlowerEngine;
 import com.flower.engine.configuration.FlowConfigurationRepo;
 import com.flower.engine.runner.FlowRunner;
@@ -44,6 +45,14 @@ public class Flower implements FlowerEngine {
     }
   }
 
+  public <T> void overrideFlowStateSerializer(final Class<T> flowType, StateSerializer<T> stateSerializer) {
+    //TODO: implement
+  }
+
+  public <T> void overrideEventProfileStateSerializer(final Class<T> eventProfileType, StateSerializer<T> stateSerializer) {
+    //TODO: implement
+  }
+
   // TODO: Global function containers can't be generic, but global functions CAN be generic
   public void registerGlobalFunctions(final Class<?> globalFunctionContainer) {
     if (globalFunctionContainer.getTypeParameters().length > 0)
@@ -55,8 +64,8 @@ public class Flower implements FlowerEngine {
   }
 
   // TODO: Event Profile CAN'T be generic, because it's flow-agnostic and can't have different
-  // generics for different flows to support @InFromFlow, @OutFromFlow, @InOutFromFlow
-  // TODO: Therefore, Event functions also CAN'T be generic
+  //  generics for different flows to support @InFromFlow, @OutFromFlow, @InOutFromFlow
+  //  Therefore, Event functions also CAN'T be generic
   public void registerEventProfile(final Class<?> eventProfileContainer) {
     if (eventProfileContainer.getTypeParameters().length > 0)
       throw new IllegalStateException(
@@ -66,8 +75,8 @@ public class Flower implements FlowerEngine {
   }
 
   // TODO: Event Profile CAN'T be generic, because it's flow-agnostic and can't have different
-  // generics for different flows to support @InFromFlow, @OutFromFlow, @InOutFromFlow
-  // TODO: Therefore, Event functions also CAN'T be generic
+  //  generics for different flows to support @InFromFlow, @OutFromFlow, @InOutFromFlow
+  //  Therefore, Event functions also CAN'T be generic
   public void registerEventProfile(final Class<?> eventProfileContainer, boolean isDefault) {
     if (eventProfileContainer.getTypeParameters().length > 0)
       throw new IllegalStateException(

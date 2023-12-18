@@ -104,14 +104,14 @@ class G2_Flow_O_to_O_OK<C> {
   }
 }
 
-@FlowType(extendz = "G2_FLOW", name = "G2_CHILD_FLOW")
+@FlowType(extendz = G2_Flow_O_to_O_OK.class, name = "G2_CHILD_FLOW")
 class G2_ChildFlow_O_to_O_OK<Z extends CharSequence> extends G2_Flow_O_to_O_OK<Z> {
   public G2_ChildFlow_O_to_O_OK(Z hello, Z world) {
     super(hello, world);
   }
 }
 
-@FlowType(extendz = "G2_FLOW", name = "G2_1_CHILD_FLOW")
+@FlowType(extendz = G2_Flow_O_to_O_OK.class, name = "G2_1_CHILD_FLOW")
 class G2_1_ChildFlow_O_to_O_OK<Z extends CharSequence> extends G2_Flow_O_to_O_OK<Z> {
   public G2_1_ChildFlow_O_to_O_OK(Z hello, Z world) {
     super(hello, world);
@@ -126,7 +126,7 @@ class G2_1_ChildFlow_O_to_O_OK<Z extends CharSequence> extends G2_Flow_O_to_O_OK
   }
 }
 
-@FlowType(extendz = "G2_CHILD_FLOW")
+@FlowType(extendz = G2_ChildFlow_O_to_O_OK.class)
 class G2_ChildFlow2_O_to_O_OK<X, Y extends String & List> extends G2_ChildFlow_O_to_O_OK<Y> {
   final X field1;
 

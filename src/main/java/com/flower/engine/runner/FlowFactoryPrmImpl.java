@@ -32,16 +32,6 @@ public class FlowFactoryPrmImpl<T> implements FlowFactoryPrm<T> {
     return new SimpleFlowFuture(flowFuture.getFlowId(), flowFuture.getFuture());
   }
 
-  @Override
-  public String serializeFlowId(FlowId flowId) {
-    return flowRepoPrm.serializeFlowId(flowId);
-  }
-
-  @Override
-  public FlowId deserializeFlowId(String flowIdToken) {
-    return flowRepoPrm.deserializeFlowId(flowIdToken);
-  }
-
   @Nullable
   @Override
   public ListenableFuture<?> getFlowFuture(FlowId flowId) {

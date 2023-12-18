@@ -246,13 +246,13 @@ class ParentFlow {
   }
 }
 
-@FlowType(extendz = "ParentFlow")
+@FlowType(extendz = ParentFlow.class)
 class BadChild {}
 
-@FlowType(extendz = "ParentFlow")
+@FlowType(extendz = ParentFlow.class)
 class Child extends ParentFlow {}
 
-@FlowType(extendz = "ParentFlow")
+@FlowType(extendz = ParentFlow.class)
 class ChildStateFieldOverride extends ParentFlow {
   @State private int iteration;
 
@@ -262,7 +262,7 @@ class ChildStateFieldOverride extends ParentFlow {
 }
 
 // Override existing step
-@FlowType(name = "ChildStepOverride", extendz = "ParentFlow")
+@FlowType(name = "ChildStepOverride", extendz = ParentFlow.class)
 class ChildStepOverride extends ParentFlow {
   @StepFunction(transit = "transit")
   static void step(@Nullable @In String message, @Nullable @In int iteration) {
@@ -271,7 +271,7 @@ class ChildStepOverride extends ParentFlow {
 }
 
 // Override existing transit
-@FlowType(name = "ChildTransitOverride", extendz = "ParentFlow")
+@FlowType(name = "ChildTransitOverride", extendz = ParentFlow.class)
 class ChildTransitOverride extends ParentFlow {
   private static final int MAX_ATTEMPTS = 10;
 
@@ -288,7 +288,7 @@ class ChildTransitOverride extends ParentFlow {
 }
 
 // Override existing transit
-@FlowType(name = "ChildTransitOverride", extendz = "ParentFlow")
+@FlowType(name = "ChildTransitOverride", extendz = ParentFlow.class)
 class ChildTransitOverrideDifferentType extends ParentFlow {
   private static final int MAX_ATTEMPTS = 8;
 
@@ -317,7 +317,7 @@ class ChildTransitOverrideDifferentType extends ParentFlow {
 }
 
 // Override existing transit
-@FlowType(name = "ChildTransitOverride", extendz = "ParentFlow")
+@FlowType(name = "ChildTransitOverride", extendz = ParentFlow.class)
 class ChildTransitOverrideAndAdd extends ParentFlow {
   private static final int MAX_ATTEMPTS = 2;
 
@@ -353,7 +353,7 @@ class ChildTransitOverrideAndAdd extends ParentFlow {
 }
 
 // Reuse static parameter
-@FlowType(name = "ReuseChildStep", extendz = "ParentFlow")
+@FlowType(name = "ReuseChildStep", extendz = ParentFlow.class)
 class ReuseStaticParameters extends ParentFlow {
   @StepFunction(transit = "transit")
   static void step(
@@ -365,7 +365,7 @@ class ReuseStaticParameters extends ParentFlow {
 }
 
 // Override static parameter
-@FlowType(name = "OverrideStaticParameters", extendz = "ParentFlow")
+@FlowType(name = "OverrideStaticParameters", extendz = ParentFlow.class)
 class OverrideStaticParameters extends ParentFlow {
   @State private static final int MAX_ATTEMPTS = 2;
 
@@ -407,7 +407,7 @@ class ParentFlowNoFirstStep {
   }
 }
 
-@FlowType(name = "ChildTransitOverride", extendz = "ParentFlow", firstStep = "step2")
+@FlowType(name = "ChildTransitOverride", extendz = ParentFlow.class, firstStep = "step2")
 class ChildTransitOverrideAndAdd2 extends ParentFlow {
   private static final int MAX_ATTEMPTS = 2;
 

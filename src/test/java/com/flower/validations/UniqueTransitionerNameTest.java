@@ -75,10 +75,10 @@ class U6_TestFlow2 {
   @GlobalFunction()
   static void glob() {}
 
-  @StepCall(name = "step2", globalFunctionName = "glob", transit = "transit")
+  @StepCall(globalFunctionContainer = U6_TestFlow2.class, name = "step2", globalFunctionName = "glob", transit = "transit")
   static void step1() {}
 
-  @StepCall(globalFunctionName = "glob", transit = "transit")
+  @StepCall(globalFunctionContainer = U6_TestFlow2.class, globalFunctionName = "glob", transit = "transit")
   static void step2() {}
 
   @TransitFunction()
@@ -95,7 +95,7 @@ class U6_TestFlow3 {
   @StepFunction(transit = "transit")
   static void step1() {}
 
-  @StepCall(name = "step1", globalFunctionName = "glob", transit = "transit")
+  @StepCall(globalFunctionContainer = U6_TestFlow3.class, name = "step1", globalFunctionName = "glob", transit = "transit")
   static void step2() {}
 
   @TransitFunction()
@@ -112,7 +112,7 @@ class U6_TestFlow4 {
   @StepFunction(transit = "transit")
   static void step1() {}
 
-  @StepCall(name = "transit", globalFunctionName = "glob", transit = "transit2")
+  @StepCall(globalFunctionContainer = U6_TestFlow4.class, name = "transit", globalFunctionName = "glob", transit = "transit2")
   static void step2() {}
 
   @TransitFunction()

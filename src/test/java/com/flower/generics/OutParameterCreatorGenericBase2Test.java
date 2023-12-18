@@ -233,7 +233,7 @@ class OUT_Flow_Gen1<C extends X, X extends String> {
   }
 }
 
-@FlowType(firstStep = "STEP1", extendz = "BASE")
+@FlowType(firstStep = "STEP1", extendz = OUT_Flow_Gen1.class)
 class OUT_Flow_Gen1_2<C2 extends X2, X2 extends String> extends OUT_Flow_Gen1<C2, X2> {
   @State
   C2 hello;
@@ -293,7 +293,7 @@ class OUT_Flow_Gen2<C extends List<X>, X extends String> {
   }
 }
 
-@FlowType(firstStep = "STEP1", extendz = "BASE")
+@FlowType(firstStep = "STEP1", extendz = OUT_Flow_Gen2.class)
 class OUT_Flow_Gen2_2<C2 extends List<X2>, X2 extends String> extends OUT_Flow_Gen2<C2, X2> {
   @State C2 hello;
   @State X2 world;
@@ -303,32 +303,7 @@ class OUT_Flow_Gen2_2<C2 extends List<X2>, X2 extends String> extends OUT_Flow_G
   }
 }
 
-/*
-@FlowType(firstStep = "STEP1", name = "BASE")
-class IN_Flow_Gen1_1<C extends X, X extends String> {
-    @State final C hello;
-    @State final X world;
-
-    public IN_Flow_Gen1_1(C hello, X world) {
-        this.hello = hello;
-        this.world = world;
-    }
-
-    @SimpleStepFunction
-    static Transition STEP1(@In String world, @StepRef Transition STEP2) { return STEP2; }
-
-    @SimpleStepFunction
-    static Transition STEP2(@In String hello, @StepRef Transition STEP3) { return STEP3; }
-
-    @SimpleStepFunction
-    static <X extends String> Transition STEP3(@In X hello, @StepRef Transition STEP4) { return STEP4; }
-
-    @SimpleStepFunction
-    static <C extends X, X extends String> Transition STEP4(@In C hello, @In X world, @Terminal Transition END) { return END; }
-}
-
 // --------------------------------------------------------------------------
-*/
 @GlobalFunctionContainer
 class OUT_GlobalFunctionContainer2_1 {
   @GlobalFunction
@@ -387,19 +362,19 @@ class OUT_Flow_Gen_GlobalTransitionerCall1<C extends X, X extends String> {
   }
 
   @TransitInPrm(paramName = "supplier", from = "supplierX")
-  @StepFunction(globalTransit = "STEP1")
+  @StepFunction(globalTransitContainer = OUT_GlobalFunctionContainer2_1.class, globalTransit = "STEP1")
   static <X extends String> void STEP1() {}
 
   @TransitInPrm(paramName = "supplier", from = "supplierC")
-  @StepFunction(globalTransit = "STEP2")
+  @StepFunction(globalTransitContainer = OUT_GlobalFunctionContainer2_1.class, globalTransit = "STEP2")
   static <C extends X, X extends String> void STEP2() {}
 
   @TransitInPrm(paramName = "supplier", from = "supplierC")
-  @StepFunction(globalTransit = "STEP3")
+  @StepFunction(globalTransitContainer = OUT_GlobalFunctionContainer2_1.class, globalTransit = "STEP3")
   static <C extends X, X extends String> void STEP3() {}
 
   @TransitInPrm(paramName = "supplier", from = "supplierC")
-  @StepFunction(globalTransit = "STEP3")
+  @StepFunction(globalTransitContainer = OUT_GlobalFunctionContainer2_1.class, globalTransit = "STEP3")
   static <C extends X, X extends String> void STEP31() {}
 
   @TransitParametersOverride(
@@ -407,11 +382,11 @@ class OUT_Flow_Gen_GlobalTransitionerCall1<C extends X, X extends String> {
         @TransitInPrm(paramName = "supplierB", from = "supplierC"),
         @TransitInPrm(paramName = "supplierG", from = "supplierX")
       })
-  @StepFunction(globalTransit = "STEP4")
+  @StepFunction(globalTransitContainer = OUT_GlobalFunctionContainer2_1.class, globalTransit = "STEP4")
   static <C extends X, X extends String> void STEP4() {}
 }
 
-@FlowType(firstStep = "STEP1", extendz = "BASE")
+@FlowType(firstStep = "STEP1", extendz = OUT_Flow_Gen_GlobalTransitionerCall1.class)
 class OUT_Flow_Gen_GlobalTransitionerCall2<C2 extends X2, X2 extends String>
     extends OUT_Flow_Gen_GlobalTransitionerCall1<C2, X2> {
   @State C2 hello;
@@ -436,7 +411,7 @@ class OUT_Flow_Gen_GlobalFunctionCall1<C extends X, X extends String> {
     this.supplierX = supplierX;
   }
 
-  @SimpleStepCall(globalFunctionName = "STEP1")
+  @SimpleStepCall(globalFunctionContainer = OUT_GlobalFunctionContainer2_1.class, globalFunctionName = "STEP1")
   static Transition STEP1(
       @Out OutPrm<String> str,
       @In(name = "supplier", from = "supplierC") Supplier<String> supplierC,
@@ -444,7 +419,7 @@ class OUT_Flow_Gen_GlobalFunctionCall1<C extends X, X extends String> {
     return null;
   }
 
-  @SimpleStepCall(globalFunctionName = "STEP2")
+  @SimpleStepCall(globalFunctionContainer = OUT_GlobalFunctionContainer2_1.class, globalFunctionName = "STEP2")
   static Transition STEP2(
       @Out OutPrm<String> str,
       @In(name = "supplier", from = "supplierX") Supplier<String> supplierX,
@@ -452,7 +427,7 @@ class OUT_Flow_Gen_GlobalFunctionCall1<C extends X, X extends String> {
     return null;
   }
 
-  @SimpleStepCall(globalFunctionName = "STEP3_1")
+  @SimpleStepCall(globalFunctionContainer = OUT_GlobalFunctionContainer2_1.class, globalFunctionName = "STEP3_1")
   static <C extends X, X extends String> Transition STEP3(
       @Out OutPrm<X> world,
       @In(name = "supplier", from = "supplierC") Supplier<C> supplierC,
@@ -460,7 +435,7 @@ class OUT_Flow_Gen_GlobalFunctionCall1<C extends X, X extends String> {
     return null;
   }
 
-  @SimpleStepCall(globalFunctionName = "STEP4")
+  @SimpleStepCall(globalFunctionContainer = OUT_GlobalFunctionContainer2_1.class, globalFunctionName = "STEP4")
   static <C extends X, X extends String> Transition STEP4(
       @Out OutPrm<C> hello,
       @Out OutPrm<X> world,
@@ -523,7 +498,7 @@ class OUT_Flow_Gen_GlobalFunctionCall2<C extends List<X>, X extends String> {
     this.supplierX = supplierX;
   }
 
-  @SimpleStepCall(globalFunctionName = "STEP1")
+  @SimpleStepCall(globalFunctionContainer = OUT_GlobalFunctionContainer2_2.class, globalFunctionName = "STEP1")
   static Transition STEP1(
       @Out OutPrm<String> str,
       @In(name = "supplier", from = "supplierX") Supplier<String> supplierX,
@@ -531,7 +506,7 @@ class OUT_Flow_Gen_GlobalFunctionCall2<C extends List<X>, X extends String> {
     return null;
   }
 
-  @SimpleStepCall(globalFunctionName = "STEP2")
+  @SimpleStepCall(globalFunctionContainer = OUT_GlobalFunctionContainer2_2.class, globalFunctionName = "STEP2")
   static Transition STEP2(
       @Out OutPrm<List<String>> list,
       @In(name = "supplier", from = "supplierC") Supplier<List<String>> supplierC,
@@ -539,7 +514,7 @@ class OUT_Flow_Gen_GlobalFunctionCall2<C extends List<X>, X extends String> {
     return null;
   }
 
-  @SimpleStepCall(globalFunctionName = "STEP3")
+  @SimpleStepCall(globalFunctionContainer = OUT_GlobalFunctionContainer2_2.class, globalFunctionName = "STEP3")
   static <X extends String> Transition STEP3(
       @Out(name = "hello", to = "listX") OutPrm<List<X>> listX,
       @In(name = "supplier", from = "supplierC") Supplier<List<X>> supplierC,
@@ -547,7 +522,7 @@ class OUT_Flow_Gen_GlobalFunctionCall2<C extends List<X>, X extends String> {
     return null;
   }
 
-  @SimpleStepCall(globalFunctionName = "STEP4")
+  @SimpleStepCall(globalFunctionContainer = OUT_GlobalFunctionContainer2_2.class, globalFunctionName = "STEP4")
   static <C extends List<X>, X extends String> Transition STEP4(
       @Out OutPrm<C> hello,
       @Out OutPrm<X> world,

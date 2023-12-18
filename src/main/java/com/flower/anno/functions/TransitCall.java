@@ -21,6 +21,9 @@ public @interface TransitCall {
    */
   String name() default "";
 
+  /** @return GlobalFunction container */
+  Class<?> globalFunctionContainer();
+
   /** @return GlobalFunction name */
   String globalFunctionName();
 }

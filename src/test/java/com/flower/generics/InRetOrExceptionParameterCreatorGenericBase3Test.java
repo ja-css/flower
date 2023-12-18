@@ -132,28 +132,28 @@ class InRetOrExceptionParameterCreatorGenericBase3Test {
 
 // -----------------------------------------
 
-@FlowType(firstStep = "HELLO_STEP", name = "BASE2", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", name = "BASE2", extendz = INRETOREXC_Flow_Base.class)
 class INRETOREXC_Flow_Base_Child0 extends INRETOREXC_Flow_Base<List<String>> {
   public INRETOREXC_Flow_Base_Child0(List<String> hello, List<String> world) {
     super(hello, world);
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", name = "BASE3", extendz = "BASE2")
+@FlowType(firstStep = "HELLO_STEP", name = "BASE3", extendz = INRETOREXC_Flow_Base_Child0.class)
 class INRETOREXC_Flow_Base_Child1 extends INRETOREXC_Flow_Base_Child0 {
   public INRETOREXC_Flow_Base_Child1(List<String> hello, List<String> world) {
     super(hello, world);
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE3")
+@FlowType(firstStep = "HELLO_STEP", extendz = INRETOREXC_Flow_Base_Child1.class)
 class INRETOREXC_Flow_Base_Child2 extends INRETOREXC_Flow_Base_Child1 {
   public INRETOREXC_Flow_Base_Child2(List<String> hello, List<String> world) {
     super(hello, world);
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", extendz = INRETOREXC_Flow_Base.class)
 class INRETOREXC_Flow_Base_Child4 extends INRETOREXC_Flow_Base<String> {
   @State final String hello;
   @State final String world;
@@ -192,12 +192,12 @@ class INRETOREXC_Flow_Call_Base3<C extends String> {
     this.world = world;
   }
 
-  @StepCall(globalFunctionName = "HELLO_GLOBAL", transit = "HELLO_TRANSIT")
+  @StepCall(globalFunctionContainer = INRETOREXC_GlobalFunctionContainer3.class, globalFunctionName = "HELLO_GLOBAL", transit = "HELLO_TRANSIT")
   static <C extends String> C HELLO_STEP(@In C hello, @In String world) {
     return null;
   }
 
-  @TransitCall(globalFunctionName = "HELLO_TRANSIT")
+  @TransitCall(globalFunctionContainer = INRETOREXC_GlobalFunctionContainer3.class, globalFunctionName = "HELLO_TRANSIT")
   static <C extends String> Transition HELLO_TRANSIT(
       @InRetOrException ReturnValueOrException<C> helloRet,
       @In String world,
@@ -216,12 +216,12 @@ class INRETOREXC_Flow_Call_Base3_1<C extends String> {
     this.world = world;
   }
 
-  @StepCall(globalFunctionName = "HELLO_GLOBAL", transit = "HELLO_TRANSIT")
+  @StepCall(globalFunctionContainer = INRETOREXC_GlobalFunctionContainer3.class, globalFunctionName = "HELLO_GLOBAL", transit = "HELLO_TRANSIT")
   static <C extends String> C HELLO_STEP(@In C hello, @In C world) {
     return hello;
   }
 
-  @TransitCall(globalFunctionName = "HELLO_TRANSIT")
+  @TransitCall(globalFunctionContainer = INRETOREXC_GlobalFunctionContainer3.class, globalFunctionName = "HELLO_TRANSIT")
   static <C extends String> Transition HELLO_TRANSIT(
       @InRetOrException ReturnValueOrException<C> helloRet, @In C world, @Terminal Transition END) {
     return null;

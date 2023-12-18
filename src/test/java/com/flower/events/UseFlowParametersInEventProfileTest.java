@@ -46,7 +46,7 @@ public class UseFlowParametersInEventProfileTest {
 }
 
 @FlowType(firstStep = "testStep")
-@EventProfiles({"TestEventProfileFlowParameters"})
+@EventProfiles({TestEventProfileFlowParameters.class})
 class TestFlowParametersInEventProfile {
     @State private final String username;
 

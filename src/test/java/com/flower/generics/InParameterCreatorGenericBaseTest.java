@@ -196,14 +196,14 @@ class IN_Flow_Base<C> {
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", extendz = IN_Flow_Base.class)
 class IN_Flow_Base_Child<C extends List<String>> extends IN_Flow_Base<C> {
   public IN_Flow_Base_Child(C hello, C world) {
     super(hello, world);
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", extendz = IN_Flow_Base.class)
 class IN_Flow_Base_Child2_Fails<G extends List<String>, Z extends String> extends IN_Flow_Base<G> {
   @State Z hello;
   @State Z world;
@@ -288,7 +288,7 @@ class IN_Flow_Call<C> {
     this.world = world;
   }
 
-  @SimpleStepCall(globalFunctionName = "HELLO_GLOBAL")
+  @SimpleStepCall(globalFunctionContainer = IN_GlobalFunctionContainer.class, globalFunctionName = "HELLO_GLOBAL")
   static <C> Transition HELLO_STEP(@In C hello, @In C world, @Terminal Transition END) {
     return null;
   }
@@ -308,7 +308,7 @@ class IN_Flow_Call2<C, D extends String> {
     this.world = world;
   }
 
-  @SimpleStepCall(globalFunctionName = "HELLO_GLOBAL")
+  @SimpleStepCall(globalFunctionContainer = IN_GlobalFunctionContainer.class, globalFunctionName = "HELLO_GLOBAL")
   static <D extends String> Transition HELLO_STEP(
       @In D hello, @In D world, @Terminal Transition END) {
     return END;
@@ -336,7 +336,7 @@ class IN_Flow_Reference<C extends String, Z extends String> {
         @TransitInPrm(paramName = "hello", from = "hello1"),
         @TransitInPrm(paramName = "world", from = "world1")
       })
-  @StepFunction(globalTransit = "HELLO_GLOBAL")
+  @StepFunction(globalTransitContainer = IN_GlobalFunctionContainer.class, globalTransit = "HELLO_GLOBAL")
   static <Z extends String, C extends String> void HELLO_STEP() {
     return;
   }
@@ -366,7 +366,7 @@ class IN_Flow_Reference2<C extends String, Z extends String> {
     return;
   }
 
-  @TransitCall(globalFunctionName = "HELLO_GLOBAL")
+  @TransitCall(globalFunctionContainer = IN_GlobalFunctionContainer.class, globalFunctionName = "HELLO_GLOBAL")
   static <C extends String> Transition TRANSIT(@In C hello, @In C world, @Terminal Transition END) {
     return null;
   }

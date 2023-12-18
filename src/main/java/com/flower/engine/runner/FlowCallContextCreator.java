@@ -33,6 +33,8 @@ import java.util.Set;
 import com.google.common.util.concurrent.ListeningScheduledExecutorService;
 import org.apache.commons.lang3.StringUtils;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class FlowCallContextCreator {
   final FunctionCallParameterCreator functionCallParameterCreator;
   final StepCallContextCreator stepCallContextCreator;
@@ -47,9 +49,9 @@ public class FlowCallContextCreator {
   public FlowCallContext createFlowCallContext(
       ListeningScheduledExecutorService scheduler,
       FlowTypeRecord flowTypeRecord,
-      Map<String, GlobalFunctionRecord> globalFunctionByName,
-      Map<String, EventProfileContainerRecord> eventProfilesByName,
-      List<String> defaultEventProfiles) {
+      Map<Class<?>, Map<String, GlobalFunctionRecord>> globalFunctionsByContainerAndName,
+      Map<Class<?>, EventProfileContainerRecord> eventProfilesByType,
+      List<Class<?>> defaultEventProfiles) {
     Map<String, StepCallContext> stepCalls = new HashMap<>();
     StateAccessConfig flowStateAccessConfig = createStateAccess(flowTypeRecord.state);
 
@@ -57,7 +59,7 @@ public class FlowCallContextCreator {
     for (StepRecord stepRecord : flowTypeRecord.steps.values()) {
       StepCallContext stepCallContext =
           createStepContext(
-              flowTypeRecord, flowStateAccessConfig, stepRecord, globalFunctionByName);
+              flowTypeRecord, flowStateAccessConfig, stepRecord, globalFunctionsByContainerAndName);
       stepCalls.put(stepRecord.stepName, stepCallContext);
     }
 
@@ -65,7 +67,7 @@ public class FlowCallContextCreator {
     for (StepCallRecord stepCallRecord : flowTypeRecord.stepCalls.values()) {
       StepCallContext stepCallContext =
           createStepCallContext(
-              flowTypeRecord, flowStateAccessConfig, stepCallRecord, globalFunctionByName);
+              flowTypeRecord, flowStateAccessConfig, stepCallRecord, globalFunctionsByContainerAndName);
       stepCalls.put(stepCallRecord.stepName, stepCallContext);
     }
 
@@ -84,7 +86,7 @@ public class FlowCallContextCreator {
               flowTypeRecord,
               flowStateAccessConfig,
               stepAndTransitCallRecord,
-              globalFunctionByName);
+              globalFunctionsByContainerAndName);
       stepCalls.put(stepAndTransitCallRecord.stepName, stepCallContext);
     }
 
@@ -107,34 +109,34 @@ public class FlowCallContextCreator {
     // TODO: validate existence and types of flow parameters in EventFunctions
     // TODO: get EventProfiles for the FlowType
 
-    Set<String> eventProfileNames = new HashSet<>();
+    Set<Class<?>> eventProfileTypes = new HashSet<>();
     boolean disableAllExternalProfiles =
         (flowTypeRecord.disableEventProfiles != null) && flowTypeRecord.disableAllExternal;
     if (!disableAllExternalProfiles) {
-      eventProfileNames.addAll(defaultEventProfiles);
+      eventProfileTypes.addAll(defaultEventProfiles);
     }
     if (flowTypeRecord.eventProfiles != null) {
-      eventProfileNames.addAll(flowTypeRecord.eventProfiles);
+      eventProfileTypes.addAll(flowTypeRecord.eventProfiles);
     }
     if (flowTypeRecord.disableEventProfiles != null) {
-      for (String eventProfileToDisable : flowTypeRecord.disableEventProfiles) {
-        eventProfileNames.remove(eventProfileToDisable);
+      for (Class<?> eventProfileToDisable : flowTypeRecord.disableEventProfiles) {
+        eventProfileTypes.remove(eventProfileToDisable);
       }
     }
 
-    Map<String, EventProfileForFlowTypeCallContext> eventContexts = new HashMap<>();
-    for (String eventProfileName : eventProfileNames) {
-      EventProfileContainerRecord eventProfile = eventProfilesByName.get(eventProfileName);
+    Map<Class<?>, EventProfileForFlowTypeCallContext> eventContexts = new HashMap<>();
+    for (Class<?> eventProfileType : eventProfileTypes) {
+      EventProfileContainerRecord eventProfile = eventProfilesByType.get(eventProfileType);
       if (eventProfile == null)
         throw new IllegalStateException(
             String.format(
                 "Flow refers to non-existent EventProfile: Flow [%s] EventProfile [%s]",
-                flowTypeRecord.flowTypeName, eventProfileName));
+                flowTypeRecord.flowTypeName, eventProfileType));
 
       EventProfileForFlowTypeCallContext eventContext =
           createEventProfileContext(
-              flowTypeRecord, eventProfile, flowStateAccessConfig, globalFunctionByName);
-      eventContexts.put(eventProfileName, eventContext);
+              flowTypeRecord, eventProfile, flowStateAccessConfig, globalFunctionsByContainerAndName);
+      eventContexts.put(eventProfileType, eventContext);
     }
 
     String firstStepName = getFirstStepName(flowTypeRecord);
@@ -197,7 +199,7 @@ public class FlowCallContextCreator {
     populateInitializedPaths(
         constructorInitializedFields,
         flow,
-        Preconditions.checkNotNull(stepCalls.get(firstStepName)),
+        checkNotNull(stepCalls.get(firstStepName)),
         stepCalls,
         stepsInitializationEntries,
         "*");
@@ -243,7 +245,7 @@ public class FlowCallContextCreator {
           populateInitializedPaths(
               parametersInitializedByStep,
               flow,
-              Preconditions.checkNotNull(stepCalls.get(transition.getStepName())),
+              checkNotNull(stepCalls.get(transition.getStepName())),
               stepCalls,
               stepsInitializationEntries,
               path + " -> " + stepName);
@@ -286,7 +288,7 @@ public class FlowCallContextCreator {
       FlowTypeRecord flowTypeRecord,
       EventProfileContainerRecord eventProfile,
       StateAccessConfig flowStateAccessConfig,
-      Map<String, GlobalFunctionRecord> globalFunctionByName) {
+      Map<Class<?>, Map<String, GlobalFunctionRecord>> globalFunctionsByContainerAndName) {
     StateAccessConfig eventProfileStateAccessConfig = createStateAccess(eventProfile.state);
 
     Map<EventType, List<EventFunction>> eventFunctionsByType = new HashMap<>();
@@ -300,13 +302,16 @@ public class FlowCallContextCreator {
     }
 
     for (EventCallRecord eventCallRecord : eventProfile.eventCalls.values()) {
-      GlobalFunctionRecord globalFunction =
-          globalFunctionByName.get(eventCallRecord.globalFunctionName);
+      GlobalFunctionRecord globalFunction = null;
+      Map<String, GlobalFunctionRecord> containerFunctions = globalFunctionsByContainerAndName.get(eventCallRecord.globalFunctionContainer);
+      if (containerFunctions != null) {
+        globalFunction = containerFunctions.get(eventCallRecord.globalFunctionName);
+      }
       if (globalFunction == null)
         throw new IllegalStateException(
             String.format(
-                "EventCall refers to non-existent GlobalFunction: EventProfile [%s] GlobalFunction [%s]",
-                eventProfile.eventProfileName, eventCallRecord.globalFunctionName));
+                "EventCall refers to non-existent GlobalFunction: EventProfile [%s] GlobalFunctionContainer [%s] GlobalFunction [%s]",
+                eventProfile.eventProfileName, eventCallRecord.globalFunctionContainer, eventCallRecord.globalFunctionName));
 
       EventFunction eventFunction =
           stepCallContextCreator.createEventCallContext(
@@ -332,11 +337,12 @@ public class FlowCallContextCreator {
       FlowTypeRecord flowTypeRecord,
       StateAccessConfig flowStateAccess,
       StepRecord stepRecord,
-      Map<String, GlobalFunctionRecord> globalFunctionByName) {
+      Map<Class<?>, Map<String, GlobalFunctionRecord>> globalFunctionsByContainerAndName) {
     String flowName = flowTypeRecord.flowTypeName;
 
     String stepName = stepRecord.stepName;
     String transitionerName = stepRecord.transitionerName;
+    Class<?> globalTransitionerContainer = stepRecord.globalTransitionerContainer;
     String globalTransitionerName = stepRecord.globalTransitionerName;
 
     if (StringUtils.isEmpty(transitionerName) && StringUtils.isEmpty(globalTransitionerName))
@@ -359,14 +365,17 @@ public class FlowCallContextCreator {
             flowTypeRecord, stepRecord, transitionerRecord, flowStateAccess);
       } else {
         TransitionerCallRecord transitionerCallRecord =
-            Preconditions.checkNotNull(flowTypeRecord.transitionerCalls.get(transitionerName));
-        GlobalFunctionRecord transitGlobalFunction =
-            globalFunctionByName.get(transitionerCallRecord.globalFunctionName);
+            checkNotNull(flowTypeRecord.transitionerCalls.get(transitionerName));
+        GlobalFunctionRecord transitGlobalFunction = null;
+        Map<String, GlobalFunctionRecord> containerFunctions = globalFunctionsByContainerAndName.get(transitionerCallRecord.globalFunctionContainer);
+        if (containerFunctions != null) {
+          transitGlobalFunction = containerFunctions.get(transitionerCallRecord.globalFunctionName);
+        }
         if (transitGlobalFunction == null)
           throw new IllegalStateException(
               String.format(
-                  "TransitionerCall refers to non-existent GlobalFunction: Flow [%s] Transitioner [%s] GlobalFunction [%s]",
-                  flowName, transitionerName, transitionerCallRecord.globalFunctionName));
+                  "TransitionerCall refers to non-existent GlobalFunction: Flow [%s] Transitioner [%s] GlobalFunctionContainer [%s] GlobalFunction [%s]",
+                  flowName, transitionerName, transitionerCallRecord.globalFunctionContainer, transitionerCallRecord.globalFunctionName));
 
         return stepCallContextCreator.createStepContext(
             flowTypeRecord,
@@ -376,10 +385,21 @@ public class FlowCallContextCreator {
             flowStateAccess);
       }
     } else {
+      GlobalFunctionRecord transitGlobalFunction = null;
+      Map<String, GlobalFunctionRecord> containerFunctions = globalFunctionsByContainerAndName.get(globalTransitionerContainer);
+      if (containerFunctions != null) {
+        transitGlobalFunction = containerFunctions.get(globalTransitionerName);
+      }
+      if (transitGlobalFunction == null) {
+        throw new IllegalStateException(
+            String.format(
+                "TransitionerCall refers to non-existent GlobalFunction: Flow [%s] Transitioner [%s] GlobalFunctionContainer [%s] GlobalFunction [%s]",
+                flowName, transitionerName, globalTransitionerContainer, globalTransitionerName));
+      }
       return stepCallContextCreator.createStepContext(
           flowTypeRecord,
           stepRecord,
-          Preconditions.checkNotNull(globalFunctionByName.get(globalTransitionerName)),
+          transitGlobalFunction,
           flowStateAccess);
     }
   }
@@ -388,20 +408,25 @@ public class FlowCallContextCreator {
       FlowTypeRecord flowTypeRecord,
       StateAccessConfig flowStateAccess,
       StepCallRecord stepCallRecord,
-      Map<String, GlobalFunctionRecord> globalFunctionByName) {
+      Map<Class<?>, Map<String, GlobalFunctionRecord>> globalFunctionsByContainerAndName) {
     String flowName = flowTypeRecord.flowTypeName;
 
     String stepCallName = stepCallRecord.stepName;
     String transitionerName = stepCallRecord.transitionerName;
+    Class<?> globalTransitionerContainer = stepCallRecord.globalTransitionerContainer;
     String globalTransitionerName = stepCallRecord.globalTransitionerName;
-
-    GlobalFunctionRecord globalFunction =
-        globalFunctionByName.get(stepCallRecord.globalFunctionName);
+    GlobalFunctionRecord globalFunction = null;
+    {
+      Map<String, GlobalFunctionRecord> containerFunctions = globalFunctionsByContainerAndName.get(stepCallRecord.globalFunctionContainer);
+      if (containerFunctions != null) {
+        globalFunction = containerFunctions.get(stepCallRecord.globalFunctionName);
+      }
+    }
     if (globalFunction == null)
       throw new IllegalStateException(
           String.format(
-              "StepCall refers to non-existent GlobalFunction: Flow [%s] Step [%s] GlobalFunction [%s]",
-              flowName, stepCallName, stepCallRecord.globalFunctionName));
+              "StepCall refers to non-existent GlobalFunction: Flow [%s] Step [%s] GlobalFunctionContainer [%s] GlobalFunction [%s]",
+              flowName, stepCallName, stepCallRecord.globalFunctionContainer, stepCallRecord.globalFunctionName));
 
     if (StringUtils.isEmpty(transitionerName) && StringUtils.isEmpty(globalTransitionerName))
       throw new IllegalStateException(
@@ -423,14 +448,19 @@ public class FlowCallContextCreator {
             flowTypeRecord, stepCallRecord, globalFunction, transitionerRecord, flowStateAccess);
       } else {
         TransitionerCallRecord transitionerCallRecord =
-            Preconditions.checkNotNull(flowTypeRecord.transitionerCalls.get(transitionerName));
-        GlobalFunctionRecord transitGlobalFunction =
-            globalFunctionByName.get(transitionerCallRecord.globalFunctionName);
+            checkNotNull(flowTypeRecord.transitionerCalls.get(transitionerName));
+        GlobalFunctionRecord transitGlobalFunction = null;
+        {
+          Map<String, GlobalFunctionRecord> containerFunctions = globalFunctionsByContainerAndName.get(transitionerCallRecord.globalFunctionContainer);
+          if (containerFunctions != null) {
+            transitGlobalFunction = containerFunctions.get(transitionerCallRecord.globalFunctionName);
+          }
+        }
         if (transitGlobalFunction == null)
           throw new IllegalStateException(
               String.format(
-                  "TransitionerCall refers to non-existent GlobalFunction: Flow [%s] Transitioner [%s] GlobalFunction [%s]",
-                  flowName, transitionerName, transitionerCallRecord.globalFunctionName));
+                  "TransitionerCall refers to non-existent GlobalFunction: Flow [%s] Transitioner [%s] GlobalFunctionContainer [%s] GlobalFunction [%s]",
+                  flowName, transitionerName, transitionerCallRecord.globalFunctionContainer, transitionerCallRecord.globalFunctionName));
 
         return stepCallContextCreator.createStepCallContext(
             flowTypeRecord,
@@ -441,11 +471,22 @@ public class FlowCallContextCreator {
             flowStateAccess);
       }
     } else {
+      GlobalFunctionRecord transitGlobalFunction = null;
+      Map<String, GlobalFunctionRecord> containerFunctions = globalFunctionsByContainerAndName.get(globalTransitionerContainer);
+      if (containerFunctions != null) {
+        transitGlobalFunction = containerFunctions.get(globalTransitionerName);
+      }
+      if (transitGlobalFunction == null) {
+        throw new IllegalStateException(
+            String.format(
+                "TransitionerCall refers to non-existent GlobalFunction: Flow [%s] Transitioner [%s] GlobalFunctionContainer [%s] GlobalFunction [%s]",
+                flowName, transitionerName, globalTransitionerContainer, globalTransitionerName));
+      }
       return stepCallContextCreator.createStepCallContext(
           flowTypeRecord,
           stepCallRecord,
           globalFunction,
-          Preconditions.checkNotNull(globalFunctionByName.get(globalTransitionerName)),
+          transitGlobalFunction,
           flowStateAccess);
     }
   }
@@ -463,18 +504,21 @@ public class FlowCallContextCreator {
       FlowTypeRecord flowTypeRecord,
       StateAccessConfig flowStateAccess,
       StepAndTransitCallRecord stepAndTransitCallRecord,
-      Map<String, GlobalFunctionRecord> globalFunctionByName) {
+      Map<Class<?>, Map<String, GlobalFunctionRecord>> globalFunctionsByContainerAndName) {
     String flowName = flowTypeRecord.flowTypeName;
 
     String stepAndTransitName = stepAndTransitCallRecord.stepName;
 
-    GlobalFunctionRecord globalFunction =
-        globalFunctionByName.get(stepAndTransitCallRecord.globalFunctionName);
+    GlobalFunctionRecord globalFunction = null;
+    Map<String, GlobalFunctionRecord> containerFunctions = globalFunctionsByContainerAndName.get(stepAndTransitCallRecord.globalFunctionContainer);
+    if (containerFunctions != null) {
+      globalFunction = containerFunctions.get(stepAndTransitCallRecord.globalFunctionName);
+    }
     if (globalFunction == null)
       throw new IllegalStateException(
           String.format(
-              "StepCall refers to non-existent GlobalFunction: Flow [%s] Step [%s] GlobalFunction [%s]",
-              flowName, stepAndTransitName, stepAndTransitCallRecord.globalFunctionName));
+              "StepCall refers to non-existent GlobalFunction: Flow [%s] Step [%s] GlobalFunctionContainer [%s] GlobalFunction [%s]",
+              flowName, stepAndTransitName, stepAndTransitCallRecord.globalFunctionContainer, stepAndTransitCallRecord.globalFunctionName));
 
     return stepCallContextCreator.createStepAndTransitCallContext(
         flowTypeRecord, stepAndTransitCallRecord, globalFunction, flowStateAccess);

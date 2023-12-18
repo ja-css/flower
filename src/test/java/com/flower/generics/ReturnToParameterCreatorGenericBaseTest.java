@@ -217,14 +217,14 @@ class RETTO_Flow_Base<C> {
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", extendz = RETTO_Flow_Base.class)
 class RETTO_Flow_Base_Child<C extends List<String>> extends RETTO_Flow_Base<C> {
   public RETTO_Flow_Base_Child(Supplier<C> supplier) {
     super(supplier);
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", extendz = RETTO_Flow_Base.class)
 class RETTO_Flow_Base_Child2_Fails<G extends List<String>, Z extends String>
     extends RETTO_Flow_Base<G> {
   @State Supplier<Z> supplier;
@@ -298,12 +298,12 @@ class RETTO_Flow_Call<C> {
     this.supplier = supplier;
   }
 
-  @StepCall(transit = "TRANSIT", globalFunctionName = "HELLO_GLOBAL")
+  @StepCall(transit = "TRANSIT", globalFunctionContainer = RETTO_GlobalFunctionContainer.class, globalFunctionName = "HELLO_GLOBAL")
   static <C> C HELLO_STEP(@In Supplier<C> supplier) {
     return null;
   }
 
-  @TransitCall(globalFunctionName = "HELLO_TRANSIT")
+  @TransitCall(globalFunctionContainer = RETTO_GlobalFunctionContainer.class, globalFunctionName = "HELLO_TRANSIT")
   static Transition TRANSIT(@Terminal Transition END) {
     return null;
   }
@@ -323,12 +323,12 @@ class RETTO_Flow_Call2<C, D extends String> {
     this.supplier = supplier;
   }
 
-  @StepCall(transit = "HELLO_TRANSIT", globalFunctionName = "HELLO_GLOBAL", returnTo = "hello")
+  @StepCall(transit = "HELLO_TRANSIT", globalFunctionContainer = RETTO_GlobalFunctionContainer.class, globalFunctionName = "HELLO_GLOBAL", returnTo = "hello")
   static <D extends String> D HELLO_STEP(@In Supplier<D> supplier) {
     return null;
   }
 
-  @TransitCall(globalFunctionName = "HELLO_TRANSIT")
+  @TransitCall(globalFunctionContainer = RETTO_GlobalFunctionContainer.class, globalFunctionName = "HELLO_TRANSIT")
   static Transition HELLO_TRANSIT(@Terminal Transition END) {
     return END;
   }
@@ -351,7 +351,7 @@ class RETTO_Flow_Reference<C extends String, Z extends String> {
     this.supplier = supplier;
   }
 
-  @StepFunction(globalTransit = "HELLO_TRANSIT", returnTo = "hello1")
+  @StepFunction(globalTransitContainer = RETTO_GlobalFunctionContainer.class, globalTransit = "HELLO_TRANSIT", returnTo = "hello1")
   static <Z extends String, C extends String> Z HELLO_STEP(@In Supplier<Z> supplier) {
     return supplier.get();
   }
@@ -377,7 +377,7 @@ class RETTO_Flow_Reference2<C extends String, Z extends String> {
     return supplier.get();
   }
 
-  @TransitCall(globalFunctionName = "HELLO_TRANSIT")
+  @TransitCall(globalFunctionContainer = RETTO_GlobalFunctionContainer.class, globalFunctionName = "HELLO_TRANSIT")
   static <C extends String> Transition TRANSIT(@Terminal Transition END) {
     return null;
   }

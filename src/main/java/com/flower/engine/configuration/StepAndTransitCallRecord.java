@@ -11,6 +11,7 @@ public class StepAndTransitCallRecord extends FunctionRecord {
   public final Method method;
   final SimpleStepCall annotation;
   public final String stepName;
+  public final Class<?> globalFunctionContainer;
   public final String globalFunctionName;
   public final boolean isFirstStep;
 
@@ -27,6 +28,7 @@ public class StepAndTransitCallRecord extends FunctionRecord {
     this.method = method;
     this.annotation = annotation;
     this.stepName = stepName;
+    this.globalFunctionContainer = annotation.globalFunctionContainer();
     this.globalFunctionName = annotation.globalFunctionName();
     this.isFirstStep = isFirstStep;
 

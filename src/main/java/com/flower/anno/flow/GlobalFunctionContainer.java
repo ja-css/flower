@@ -12,7 +12,7 @@ public @interface GlobalFunctionContainer {
    * Global Function Container name. If not specified, reflection will be used to get a
    * corresponding full class name.
    *
-   * @return Flow name
+   * @return Global Function Container name
    */
   String name() default "";
 }

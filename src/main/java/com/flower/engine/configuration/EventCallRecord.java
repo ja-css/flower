@@ -10,6 +10,7 @@ public class EventCallRecord extends FunctionRecord {
   public final Method method;
   public final EventCall annotation;
   public final String eventCallName;
+  public final Class<?> globalFunctionContainer;
   public final String globalFunctionName;
 
   public FunctionReturnValueRecord returnValueOverride;
@@ -19,6 +20,7 @@ public class EventCallRecord extends FunctionRecord {
     this.method = method;
     this.annotation = annotation;
     this.eventCallName = eventCallName;
+    this.globalFunctionContainer = annotation.globalFunctionContainer();
     this.globalFunctionName = annotation.globalFunctionName();
 
     returnValueOverride = loadFunctionReturnValue(null, method);

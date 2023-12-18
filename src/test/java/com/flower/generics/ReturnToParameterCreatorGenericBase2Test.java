@@ -215,7 +215,7 @@ class RETTO_Flow_Gen1<C extends X, X extends String> {
   }
 }
 
-@FlowType(firstStep = "STEP1", extendz = "BASE")
+@FlowType(firstStep = "STEP1", extendz = RETTO_Flow_Gen1.class)
 class RETTO_Flow_Gen1_2<C2 extends X2, X2 extends String> extends RETTO_Flow_Gen1<C2, X2> {
   @State C2 hello;
   @State X2 world;
@@ -281,7 +281,7 @@ class RETTO_Flow_Gen2<C extends List<X>, X extends String> {
   }
 }
 
-@FlowType(firstStep = "STEP1", extendz = "BASE")
+@FlowType(firstStep = "STEP1", extendz = RETTO_Flow_Gen2.class)
 class RETTO_Flow_Gen2_2<C2 extends List<X2>, X2 extends String> extends RETTO_Flow_Gen2<C2, X2> {
   @State C2 hello;
   @State X2 world;
@@ -333,7 +333,7 @@ class RETTO_Flow_Gen_GlobalFunctionCall1<C extends X, X extends String> {
     this.supplierX = supplierX;
   }
 
-  @StepCall(globalFunctionName = "STEP1", transit = "TRANSIT1", returnTo = "str")
+  @StepCall(globalFunctionContainer = RETTO_GlobalFunctionContainer2_1.class, globalFunctionName = "STEP1", transit = "TRANSIT1", returnTo = "str")
   static String STEP1(@In(name = "supplier", from = "supplierC") Supplier<String> supplierC) {
     return null;
   }
@@ -343,7 +343,7 @@ class RETTO_Flow_Gen_GlobalFunctionCall1<C extends X, X extends String> {
     return STEP2;
   }
 
-  @StepCall(globalFunctionName = "STEP2", transit = "TRANSIT2", returnTo = "str")
+  @StepCall(globalFunctionContainer = RETTO_GlobalFunctionContainer2_1.class, globalFunctionName = "STEP2", transit = "TRANSIT2", returnTo = "str")
   static String STEP2(@In(name = "supplier", from = "supplierX") Supplier<String> supplierX) {
     return null;
   }
@@ -353,7 +353,7 @@ class RETTO_Flow_Gen_GlobalFunctionCall1<C extends X, X extends String> {
     return STEP3;
   }
 
-  @StepCall(globalFunctionName = "STEP3_1", transit = "TRANSIT3", returnTo = "world")
+  @StepCall(globalFunctionContainer = RETTO_GlobalFunctionContainer2_1.class, globalFunctionName = "STEP3_1", transit = "TRANSIT3", returnTo = "world")
   static <C extends X, X extends String> C STEP3(
       @In(name = "supplier", from = "supplierC") Supplier<C> supplierC) {
     return null;
@@ -364,7 +364,7 @@ class RETTO_Flow_Gen_GlobalFunctionCall1<C extends X, X extends String> {
     return STEP4;
   }
 
-  @StepCall(globalFunctionName = "STEP4", transit = "TRANSIT4", returnTo = "hello")
+  @StepCall(globalFunctionContainer = RETTO_GlobalFunctionContainer2_1.class, globalFunctionName = "STEP4", transit = "TRANSIT4", returnTo = "hello")
   static <C extends X, X extends String> C STEP4(
       @In(name = "supplierB", from = "supplierC") Supplier<C> supplierC) {
     return null;
@@ -376,7 +376,7 @@ class RETTO_Flow_Gen_GlobalFunctionCall1<C extends X, X extends String> {
   }
 }
 
-@FlowType(firstStep = "STEP1", extendz = "BASE")
+@FlowType(firstStep = "STEP1", extendz = RETTO_Flow_Gen_GlobalFunctionCall1.class)
 class RETTO_Flow_Gen_GlobalTransitionerCall2<C2 extends X2, X2 extends String>
     extends RETTO_Flow_Gen_GlobalFunctionCall1<C2, X2> {
   @State C2 hello;
@@ -426,7 +426,7 @@ class RETTO_Flow_Gen_GlobalFunctionCall2<C extends List<X>, X extends String> {
     this.supplierX = supplierX;
   }
 
-  @StepCall(globalFunctionName = "STEP1", transit = "TRANSIT1", returnTo = "str")
+  @StepCall(globalFunctionContainer = RETTO_GlobalFunctionContainer2_2.class, globalFunctionName = "STEP1", transit = "TRANSIT1", returnTo = "str")
   static String STEP1(@In(name = "supplier", from = "supplierX") Supplier<String> supplierX) {
     return null;
   }
@@ -436,7 +436,7 @@ class RETTO_Flow_Gen_GlobalFunctionCall2<C extends List<X>, X extends String> {
     return STEP2;
   }
 
-  @StepCall(globalFunctionName = "STEP2", transit = "TRANSIT2", returnTo = "list")
+  @StepCall(globalFunctionContainer = RETTO_GlobalFunctionContainer2_2.class, globalFunctionName = "STEP2", transit = "TRANSIT2", returnTo = "list")
   static List<String> STEP2(
       @In(name = "supplier", from = "supplierC") Supplier<List<String>> supplierC) {
     return null;
@@ -447,7 +447,7 @@ class RETTO_Flow_Gen_GlobalFunctionCall2<C extends List<X>, X extends String> {
     return STEP3;
   }
 
-  @StepCall(globalFunctionName = "STEP3", transit = "TRANSIT3", returnTo = "listX")
+  @StepCall(globalFunctionContainer = RETTO_GlobalFunctionContainer2_2.class, globalFunctionName = "STEP3", transit = "TRANSIT3", returnTo = "listX")
   static <X extends String> List<X> STEP3(
       @In(name = "supplier", from = "supplierC") Supplier<List<X>> supplierC) {
     return null;
@@ -458,7 +458,7 @@ class RETTO_Flow_Gen_GlobalFunctionCall2<C extends List<X>, X extends String> {
     return STEP4;
   }
 
-  @StepCall(globalFunctionName = "STEP4", transit = "TRANSIT4", returnTo = "hello")
+  @StepCall(globalFunctionContainer = RETTO_GlobalFunctionContainer2_2.class, globalFunctionName = "STEP4", transit = "TRANSIT4", returnTo = "hello")
   static <C extends List<X>, X extends String> C STEP4(
       @In(name = "supplierK", from = "supplierC") Supplier<C> supplierC) {
     return null;

@@ -57,7 +57,7 @@ public class StepContext implements StepCallContext {
     this.stepReturnValueToFlowParameterName = stepReturnValueToFlowParameterName;
     this.flowStateAccessConfig = flowStateAccessConfig;
     this.isTransitionerCatching = isTransitionerCatching(transitFunctionCall);
-    this.stepInfo = new StepInfo(stepName, transitName, isFirstStep);
+    this.stepInfo = new StepInfo(stepName, transitName, isFirstStep, false);
     this.transitions = transitions;
     this.stepParameterInitProfile =
         new StepParameterInitProfile(

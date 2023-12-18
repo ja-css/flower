@@ -32,7 +32,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 public class FlowCallContext implements EventRunner {
   final Map<String, StepCallContext> stepCalls;
-  final Map<String, EventProfileForFlowTypeCallContext> eventContexts;
+  final Map<Class<?>, EventProfileForFlowTypeCallContext> eventContexts;
   // final
   final String firstStepName;
 
@@ -45,7 +45,7 @@ public class FlowCallContext implements EventRunner {
       Class<?> flowType,
       Map<String, StepCallContext> stepCalls,
       String firstStepName,
-      Map<String, EventProfileForFlowTypeCallContext> eventContexts,
+      Map<Class<?>, EventProfileForFlowTypeCallContext> eventContexts,
       ListeningScheduledExecutorService scheduler) {
     this.flowName = flowName;
     this.flowType = flowType;
@@ -62,7 +62,7 @@ public class FlowCallContext implements EventRunner {
 
   <T> FlowImpl<T> createFlow(FlowId id, T flowState)
       throws IllegalAccessException, InstantiationException, InvocationTargetException {
-    Map<String, Object> eventProfileStates = new HashMap<>();
+    Map<Class<?>, Object> eventProfileStates = new HashMap<>();
     for (EventProfileForFlowTypeCallContext eventContext : eventContexts.values()) {
       String eventProfileName = eventContext.getEventProfileName();
       Class<?> eventProfileContainerType = eventContext.getEventProfileContainerType();
@@ -70,10 +70,10 @@ public class FlowCallContext implements EventRunner {
       try {
         Constructor<?> constructor = eventProfileContainerType.getConstructor();
         constructor.setAccessible(true);
-        eventProfileStates.put(eventProfileName, constructor.newInstance());
+        eventProfileStates.put(eventProfileContainerType, constructor.newInstance());
       } catch (NoSuchMethodException nsme) {
         try {
-          eventProfileStates.put(eventProfileName, eventProfileContainerType.newInstance());
+          eventProfileStates.put(eventProfileContainerType, eventProfileContainerType.newInstance());
         } catch(IllegalAccessException iae) {
           //TODO: figure why this is happening and fix. Reproducible in StateUpdateOnErrorTest.partialStateUpdate5Test() / OnErrorEventProfile.
           throw new IllegalStateException("This error happens when EventProfile class doesn't have a default constructor, please add default constructor.", iae);
@@ -94,11 +94,11 @@ public class FlowCallContext implements EventRunner {
       @Nullable Throwable flowException) {
     List<EventFunctionContext> eventFunctionList = new ArrayList<>();
 
-    for (Map.Entry<String, EventProfileForFlowTypeCallContext> entry : eventContexts.entrySet()) {
-      String profileName = entry.getKey();
+    for (Map.Entry<Class<?>, EventProfileForFlowTypeCallContext> entry : eventContexts.entrySet()) {
+      Class<?> profileNameType = entry.getKey();
       EventProfileForFlowTypeCallContext callContext = entry.getValue();
       Object eventProfileState =
-          Preconditions.checkNotNull(eventContext.getEventProfileStates().get(profileName));
+          Preconditions.checkNotNull(eventContext.getEventProfileStates().get(profileNameType));
 
       EventFunctions eventFunctions = callContext.getFunctionsForEventType(eventType);
       if (eventFunctions != null)

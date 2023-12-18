@@ -20,12 +20,17 @@ public @interface StepCall {
    */
   String name() default "";
 
+  /** @return GlobalFunction container */
+  Class<?> globalFunctionContainer();
+
   /** @return GlobalFunction name */
   String globalFunctionName();
 
   /** @return TransitFunction or GlobalFunction name */
   String transit() default "";
 
+  /** @return GlobalFunctionContainer reference for Global transitioner function */
+  Class<?> globalTransitContainer() default void.class;
   /** @return TransitFunction reference to Global function */
   String globalTransit() default "";
 

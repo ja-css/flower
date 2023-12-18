@@ -213,7 +213,7 @@ class INRET_Flow_Gen1<C extends X, X extends String> {
   }
 }
 
-@FlowType(firstStep = "STEP1", extendz = "BASE")
+@FlowType(firstStep = "STEP1", extendz = INRET_Flow_Gen1.class)
 class INRET_Flow_Gen1_2<C2 extends X2, X2 extends String> extends INRET_Flow_Gen1<C2, X2> {
   @State final C2 hello;
   @State final X2 world;
@@ -277,7 +277,7 @@ class INRET_Flow_Gen2<C extends List<X>, X extends String> {
   }
 }
 
-@FlowType(firstStep = "STEP1", extendz = "BASE")
+@FlowType(firstStep = "STEP1", extendz = INRET_Flow_Gen2.class)
 class INRET_Flow_Gen2_2<C2 extends List<X2>, X2 extends String> extends INRET_Flow_Gen2<C2, X2> {
   @State final C2 hello;
   @State final X2 world;
@@ -368,33 +368,33 @@ class INRET_Flow_Gen_GlobalTransitionerCall1<C extends X, X extends String> {
     this.world = world;
   }
 
-  @StepFunction(globalTransit = "STEP1")
+  @StepFunction(globalTransitContainer = INRET_GlobalFunctionContainer2_1.class, globalTransit = "STEP1")
   static String STEP1_SF(@In String world) {
     return world;
   }
 
-  @StepFunction(globalTransit = "STEP2")
+  @StepFunction(globalTransitContainer = INRET_GlobalFunctionContainer2_1.class, globalTransit = "STEP2")
   static String STEP2_SF(@In String hello) {
     return hello;
   }
 
-  @StepFunction(globalTransit = "STEP3")
+  @StepFunction(globalTransitContainer = INRET_GlobalFunctionContainer2_1.class, globalTransit = "STEP3")
   static <X extends String> X STEP3_SF(@In X hello) {
     return hello;
   }
 
-  @StepFunction(globalTransit = "STEP3")
+  @StepFunction(globalTransitContainer = INRET_GlobalFunctionContainer2_1.class, globalTransit = "STEP3")
   static <C extends X, X extends String> C STEP31_SF(@In C hello) {
     return hello;
   }
 
-  @StepFunction(globalTransit = "STEP4")
+  @StepFunction(globalTransitContainer = INRET_GlobalFunctionContainer2_1.class, globalTransit = "STEP4")
   static <C extends X, X extends String> C STEP4_SF(@In C hello, @In X world) {
     return hello;
   }
 }
 
-@FlowType(firstStep = "STEP4_SF", extendz = "BASE")
+@FlowType(firstStep = "STEP4_SF", extendz = INRET_Flow_Gen_GlobalTransitionerCall1.class)
 class INRET_Flow_Gen_GlobalTransitionerCall2<C2 extends X2, X2 extends String>
     extends INRET_Flow_Gen_GlobalTransitionerCall1<C2, X2> {
   @State final C2 hello;
@@ -418,42 +418,42 @@ class INRET_Flow_Gen_GlobalFunctionCall1<C extends X, X extends String> {
     this.world = world;
   }
 
-  @StepCall(globalFunctionName = "STEP1_SF", transit = "STEP1")
+  @StepCall(globalFunctionContainer = INRET_GlobalFunctionContainer2_1.class, globalFunctionName = "STEP1_SF", transit = "STEP1")
   static String STEP1_SF(@In String world) {
     return null;
   }
 
-  @TransitCall(globalFunctionName = "STEP1")
+  @TransitCall(globalFunctionContainer = INRET_GlobalFunctionContainer2_1.class, globalFunctionName = "STEP1")
   static Transition STEP1(@InRet String worldRet, @StepRef Transition STEP2_SF) {
     return null;
   }
 
-  @StepCall(globalFunctionName = "STEP2_SF", transit = "STEP2")
+  @StepCall(globalFunctionContainer = INRET_GlobalFunctionContainer2_1.class, globalFunctionName = "STEP2_SF", transit = "STEP2")
   static String STEP2_SF(@In String hello) {
     return null;
   }
 
-  @TransitCall(globalFunctionName = "STEP2")
+  @TransitCall(globalFunctionContainer = INRET_GlobalFunctionContainer2_1.class, globalFunctionName = "STEP2")
   static Transition STEP2(@InRet String helloRet, @StepRef Transition STEP3_SF) {
     return null;
   }
 
-  @StepCall(globalFunctionName = "STEP3_SF", transit = "STEP3")
+  @StepCall(globalFunctionContainer = INRET_GlobalFunctionContainer2_1.class, globalFunctionName = "STEP3_SF", transit = "STEP3")
   static <X extends String> X STEP3_SF(@In X hello) {
     return null;
   }
 
-  @TransitCall(globalFunctionName = "STEP3")
+  @TransitCall(globalFunctionContainer = INRET_GlobalFunctionContainer2_1.class, globalFunctionName = "STEP3")
   static <X extends String> Transition STEP3(@InRet X helloRet, @Terminal Transition STEP4_SF) {
     return null;
   }
 
-  @StepCall(globalFunctionName = "STEP4_SF", transit = "STEP4")
+  @StepCall(globalFunctionContainer = INRET_GlobalFunctionContainer2_1.class, globalFunctionName = "STEP4_SF", transit = "STEP4")
   static <C extends X, X extends String> C STEP4_SF(@In C hello, @In X world) {
     return null;
   }
 
-  @TransitCall(globalFunctionName = "STEP4")
+  @TransitCall(globalFunctionContainer = INRET_GlobalFunctionContainer2_1.class, globalFunctionName = "STEP4")
   static <C extends X, X extends String> Transition STEP4(
       @InRet C helloRet, @In X world, @Terminal Transition END) {
     return null;
@@ -522,43 +522,43 @@ class INRET_Flow_Gen_GlobalFunctionCall2<C extends List<X>, X extends String> {
     this.world = world;
   }
 
-  @StepCall(globalFunctionName = "STEP1_SF", transit = "STEP1")
+  @StepCall(globalFunctionContainer = INRET_GlobalFunctionContainer2_2.class, globalFunctionName = "STEP1_SF", transit = "STEP1")
   static String STEP1_SF(@In String world) {
     return null;
   }
 
-  @TransitCall(globalFunctionName = "STEP1")
+  @TransitCall(globalFunctionContainer = INRET_GlobalFunctionContainer2_2.class, globalFunctionName = "STEP1")
   static Transition STEP1(@InRet String worldRet, @StepRef Transition STEP2_SF) {
     return null;
   }
 
-  @StepCall(globalFunctionName = "STEP2_SF", transit = "STEP2")
+  @StepCall(globalFunctionContainer = INRET_GlobalFunctionContainer2_2.class, globalFunctionName = "STEP2_SF", transit = "STEP2")
   static List<String> STEP2_SF(@In List<String> hello) {
     return null;
   }
 
-  @TransitCall(globalFunctionName = "STEP2")
+  @TransitCall(globalFunctionContainer = INRET_GlobalFunctionContainer2_2.class, globalFunctionName = "STEP2")
   static Transition STEP2(@InRet List<String> helloRet, @StepRef Transition STEP3_SF) {
     return null;
   }
 
-  @StepCall(globalFunctionName = "STEP3_SF", transit = "STEP3")
+  @StepCall(globalFunctionContainer = INRET_GlobalFunctionContainer2_2.class, globalFunctionName = "STEP3_SF", transit = "STEP3")
   static <X extends String> List<X> STEP3_SF(@In List<X> hello) {
     return null;
   }
 
-  @TransitCall(globalFunctionName = "STEP3")
+  @TransitCall(globalFunctionContainer = INRET_GlobalFunctionContainer2_2.class, globalFunctionName = "STEP3")
   static <X extends String> Transition STEP3(
       @InRet List<X> helloRet, @StepRef Transition STEP4_SF) {
     return null;
   }
 
-  @StepCall(globalFunctionName = "STEP4_SF", transit = "STEP4")
+  @StepCall(globalFunctionContainer = INRET_GlobalFunctionContainer2_2.class, globalFunctionName = "STEP4_SF", transit = "STEP4")
   static <C extends List<X>, X extends String> C STEP4_SF(@In C hello, @In X world) {
     return null;
   }
 
-  @TransitCall(globalFunctionName = "STEP4")
+  @TransitCall(globalFunctionContainer = INRET_GlobalFunctionContainer2_2.class, globalFunctionName = "STEP4")
   static <C extends List<X>, X extends String> Transition STEP4(
       @InRet C helloRet, @In X world, @Terminal Transition END) {
     return null;

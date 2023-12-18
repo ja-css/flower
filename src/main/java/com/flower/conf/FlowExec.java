@@ -1,5 +1,6 @@
 package com.flower.conf;
 
+import javax.annotation.Nullable;
 import java.time.Duration;
 
 /**
@@ -26,4 +27,6 @@ public interface FlowExec<T> {
   String buildMermaidGraph();
 
   Class<T> getFlowType();
+
+  @Nullable StateSerializer<T> getStateSerializer();
 }

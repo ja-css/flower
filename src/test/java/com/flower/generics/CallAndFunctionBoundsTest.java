@@ -440,7 +440,7 @@ class GenericBoundMatchFlow3<C extends List<String>> {
   }
 }
 
-@FlowType(firstStep = "STEP", extendz = "FLOW3")
+@FlowType(firstStep = "STEP", extendz = GenericBoundMatchFlow3.class)
 class GenericBoundMismatchChildFlow<C extends ArrayList<String>> extends GenericBoundMatchFlow3<C> {
   @State C in;
 
@@ -450,7 +450,7 @@ class GenericBoundMismatchChildFlow<C extends ArrayList<String>> extends Generic
   }
 }
 
-@FlowType(firstStep = "STEP", extendz = "FLOW3")
+@FlowType(firstStep = "STEP", extendz = GenericBoundMatchFlow3.class)
 class GenericBoundMatchChildFlow<C2 extends ArrayList<String>> extends GenericBoundMatchFlow3<C2> {
   @State C2 in;
 
@@ -511,7 +511,7 @@ class GenericBoundMatchFlow5<C extends X, X> {
   }
 }
 
-@FlowType(firstStep = "STEP", extendz = "BASE")
+@FlowType(firstStep = "STEP", extendz = GenericBoundMatchFlow5.class)
 class GenericBoundMatchFlow6<C2 extends X2, X2 extends String>
     extends GenericBoundMatchFlow5<C2, X2> {
   @SimpleStepFunction
@@ -541,7 +541,7 @@ class GenericBoundMatchFlow7<C extends List<X>, X> {
   }
 }
 
-@FlowType(firstStep = "STEP", extendz = "BASE")
+@FlowType(firstStep = "STEP", extendz = GenericBoundMatchFlow7.class)
 class GenericBoundMatchFlow8<C2 extends List<X2>, X2 extends String>
     extends GenericBoundMatchFlow7<C2, X2> {
   @SimpleStepFunction
@@ -605,7 +605,7 @@ class GenericBoundMismatchFlow14<C extends X, X extends String> {
   }
 }
 
-@FlowType(firstStep = "STEP", extendz = "BASE")
+@FlowType(firstStep = "STEP", extendz = GenericBoundMatchFlow5.class)
 class GenericBoundMismatchFlow15<C2 extends X2, X2 extends String>
     extends GenericBoundMatchFlow5<C2, X2> {
   @SimpleStepFunction
@@ -614,7 +614,7 @@ class GenericBoundMismatchFlow15<C2 extends X2, X2 extends String>
   }
 }
 
-@FlowType(firstStep = "STEP", extendz = "BASE")
+@FlowType(firstStep = "STEP", extendz = GenericBoundMatchFlow7.class)
 class GenericBoundMismatchFlow16<C2 extends List<X2>, X2 extends String>
     extends GenericBoundMatchFlow7<C2, X2> {
   @SimpleStepFunction

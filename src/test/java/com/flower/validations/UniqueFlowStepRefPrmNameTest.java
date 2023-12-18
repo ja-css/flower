@@ -57,10 +57,10 @@ class U2_TestFlow2 {
   @GlobalFunction()
   static void glob() {}
 
-  @StepCall(name = "step2", globalFunctionName = "glob", transit = "transit")
+  @StepCall(globalFunctionContainer = U2_TestFlow2.class, name = "step2", globalFunctionName = "glob", transit = "transit")
   static void step1() {}
 
-  @StepCall(globalFunctionName = "glob", transit = "transit")
+  @StepCall(globalFunctionContainer = U2_TestFlow2.class, globalFunctionName = "glob", transit = "transit")
   static void step2() {}
 
   @TransitFunction()

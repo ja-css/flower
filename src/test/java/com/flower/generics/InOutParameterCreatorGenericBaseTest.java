@@ -233,14 +233,14 @@ class INOUT_Flow_Base<C> {
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", extendz = INOUT_Flow_Base.class)
 class INOUT_Flow_Base_Child<C extends List<String>> extends INOUT_Flow_Base<C> {
   public INOUT_Flow_Base_Child(Supplier<C> supplier) {
     super(supplier);
   }
 }
 
-@FlowType(firstStep = "HELLO_STEP", extendz = "BASE")
+@FlowType(firstStep = "HELLO_STEP", extendz = INOUT_Flow_Base.class)
 class INOUT_Flow_Base_Child2_Fails<G extends List<String>, Z extends String>
     extends INOUT_Flow_Base<G> {
   @State Supplier<Z> supplier;
@@ -316,7 +316,7 @@ class INOUT_Flow_Call<C> {
     this.supplier = supplier;
   }
 
-  @SimpleStepCall(globalFunctionName = "HELLO_GLOBAL")
+  @SimpleStepCall(globalFunctionContainer = INOUT_GlobalFunctionContainer.class, globalFunctionName = "HELLO_GLOBAL")
   static <C> Transition HELLO_STEP(
       @InOut NullableInOutPrm<C> hello,
       @InOut NullableInOutPrm<C> world,
@@ -340,7 +340,7 @@ class INOUT_Flow_Call2<C, D extends String> {
     this.supplier = supplier;
   }
 
-  @SimpleStepCall(globalFunctionName = "HELLO_GLOBAL")
+  @SimpleStepCall(globalFunctionContainer = INOUT_GlobalFunctionContainer.class, globalFunctionName = "HELLO_GLOBAL")
   static <D extends String> Transition HELLO_STEP(
       @InOut NullableInOutPrm<D> hello,
       @InOut NullableInOutPrm<D> world,
@@ -372,7 +372,7 @@ class INOUT_Flow_Reference<C extends String, Z extends String> {
         @TransitInOutPrm(paramName = "hello", fromAndTo = "hello1"),
         @TransitInOutPrm(paramName = "world", fromAndTo = "world1")
       })
-  @StepFunction(globalTransit = "HELLO_GLOBAL")
+  @StepFunction(globalTransitContainer = INOUT_GlobalFunctionContainer.class, globalTransit = "HELLO_GLOBAL")
   static <Z extends String, C extends String> void HELLO_STEP() {
     return;
   }
@@ -403,7 +403,7 @@ class INOUT_Flow_Reference2<C extends String, Z extends String> {
     return;
   }
 
-  @TransitCall(globalFunctionName = "HELLO_GLOBAL")
+  @TransitCall(globalFunctionContainer = INOUT_GlobalFunctionContainer.class, globalFunctionName = "HELLO_GLOBAL")
   static <C extends String> Transition TRANSIT(
       @InOut NullableInOutPrm<C> hello,
       @InOut NullableInOutPrm<C> world,

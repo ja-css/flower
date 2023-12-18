@@ -4,9 +4,17 @@ import com.flower.conf.FlowExec;
 import com.flower.conf.FlowFuture;
 import com.flower.conf.FlowId;
 import com.flower.conf.InternalFlowExec;
+import com.flower.conf.StateSerializer;
 
+import javax.annotation.Nullable;
 import java.time.Duration;
 
+/**
+ * Don't use DynamicFlowExec if you can avoid it.
+ * Creating FlowExec explicitly on startup allows to fail fast in case you're trying to execute a flow of type
+ * not registered/configured in Flower Engine.
+ * This one will only fail in runtime.
+ */
 public class DynamicFlowExec implements InternalFlowExec {
     final FlowRunner flowRunner;
 
@@ -39,13 +47,30 @@ public class DynamicFlowExec implements InternalFlowExec {
         return flowExec.runFlow(flow, startupDelay);
     }
 
+    public String buildMermaidGraph(Class<?> flowType) {
+        FlowExec flowExec = flowRunner.getFlowExec(flowType);
+        return flowExec.buildMermaidGraph();
+    }
+
     @Override
     public String buildMermaidGraph() {
-        return "~~~~~ Method buildMermaidGraph() is NOT supported by DynamicFlowExec ~~~~~";
+        throw new UnsupportedOperationException("Method buildMermaidGraph() can't be implemented in DynamicFlowExec, use buildMermaidGraph(Class<?>)");
     }
 
     @Override
     public Class getFlowType() {
         return void.class;
+    }
+
+    @Nullable
+    public StateSerializer getStateSerializer(Class<?> flowType) {
+        FlowExec flowExec = flowRunner.getFlowExec(flowType);
+        return flowExec.getStateSerializer();
+    }
+
+    @Nullable
+    @Override
+    public StateSerializer getStateSerializer() {
+        throw new UnsupportedOperationException("Method getStateSerializer() can't be implemented in DynamicFlowExec, use getStateSerializer(Class<?>)");
     }
 }

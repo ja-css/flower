@@ -41,7 +41,7 @@ public class ActionFlowWithRetriesTest {
     }
 }
 
-@FlowType(extendz="ActionFlowWithRetries", firstStep="init")
+@FlowType(extendz=ActionFlowWithRetries.class, firstStep="init")
 class TestActionFlowWithRetries extends ActionFlowWithRetries<String, String> {
     public TestActionFlowWithRetries(String actionId,
                                      Integer maxRetryAttempts,

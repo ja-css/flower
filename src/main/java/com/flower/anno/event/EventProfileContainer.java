@@ -10,10 +10,13 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 public @interface EventProfileContainer {
   /**
-   * Event Profile name. If not specified, reflection will be used to get a corresponding full class
-   * name.
+   * Event Profile name. If not specified, reflection will be used to get a corresponding full class name.
+   * This name is used for serialization and shows in logs, to keep the context in case obfuscation is used.
    *
    * @return Event Profile name
    */
   String name() default "";
+
+  /** State Serializer */
+  Class<?> serializer() default void.class;
 }

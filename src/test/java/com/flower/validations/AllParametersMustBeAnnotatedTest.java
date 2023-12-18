@@ -129,7 +129,7 @@ class A1_TestFlow3 {
   int i1;
   @State int i2;
 
-  @StepCall(globalFunctionName = "func1", transit = "transit")
+  @StepCall(globalFunctionContainer = A1_Container2.class, globalFunctionName = "func1", transit = "transit")
   static void step1(
       @In(name = "i1", from = "i1") int i1, @In(name = "i2", from = "i2") int i2, int i3) {}
 
@@ -147,7 +147,7 @@ class A1_TestFlow4 {
   @StepFunction(transit = "transit")
   static void step1() {}
 
-  @TransitCall(globalFunctionName = "func1")
+  @TransitCall(globalFunctionContainer = A1_Container2.class, globalFunctionName = "func1")
   static void transit(
       @In(name = "i1", from = "i1") int i1, @In(name = "i2", from = "i2") int i2, int i3) {}
 }
@@ -169,7 +169,7 @@ class A1_TestFlow5 {
   @StepFunction(transit = "transit")
   static void step1() {}
 
-  @TransitCall(globalFunctionName = "func1")
+  @TransitCall(globalFunctionContainer = A1_Container3.class, globalFunctionName = "func1")
   static Transition transit(@Nullable @In int i1, @Nullable @In int i2, @Nullable @In int i3) {
     return null;
   }

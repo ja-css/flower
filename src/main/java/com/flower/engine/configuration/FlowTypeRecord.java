@@ -39,7 +39,7 @@ public class FlowTypeRecord extends ContainerRecord {
   final FlowType annotation;
   public final String flowTypeName;
   String firstStepName;
-  public final Optional<String> parentFlowTypeName;
+  public final Optional<Class<?>> parentFlowType;
 
   public Map<String, StateFieldRecord> state;
 
@@ -56,22 +56,25 @@ public class FlowTypeRecord extends ContainerRecord {
   DisableEventProfiles disableEventProfilesAnno;
   public @Nullable
   EventProfiles eventProfilesAnno;
-  public Set<String> eventProfiles;
-  public Set<String> disableEventProfiles;
+  public Set<Class<?>> eventProfiles;
+  public Set<Class<?>> disableEventProfiles;
   public boolean disableAllExternal;
 
   public FlowGenericParametersRecord genericParameters;
+  final Map<Class<?>, String> eventProfileContainerNameByClass;
 
   public FlowTypeRecord(
       Class<?> flowType,
       FlowType annotation,
       String flowTypeName,
-      @Nullable String parentFlowTypeName) {
+      @Nullable Class<?> parentFlowType,
+      final Map<Class<?>, String> eventProfileContainerNameByClass) {
     this.flowType = flowType;
+    this.eventProfileContainerNameByClass = eventProfileContainerNameByClass;
 
     genericParameters = new FlowGenericParametersRecord(flowType);
 
-    this.parentFlowTypeName = Optional.ofNullable(parentFlowTypeName);
+    this.parentFlowType = Optional.ofNullable(parentFlowType);
     this.annotation = annotation;
     firstStepName = annotation.firstStep();
 
@@ -229,7 +232,7 @@ public class FlowTypeRecord extends ContainerRecord {
       throw new IllegalStateException(
           String.format(
               "ParentFlow must be an immediate superclass of a Flow. Flow: %s; ParentFlow: %s.",
-              flowTypeName, parentFlowTypeName));
+              flowTypeName, parentFlowType));
 
     genericParameters.mergeWithParentGenericParametersRecord(parent.genericParameters);
 
@@ -301,7 +304,7 @@ public class FlowTypeRecord extends ContainerRecord {
       disableEventProfiles.addAll(parent.disableEventProfiles);
       // In case parent disables a profile but a child has it in its bindings, child bindings take
       // precedence and a profile is enabled, so we remove it from disableEventProfiles
-      for (String eventProfile : eventProfiles)
+      for (Class<?> eventProfile : eventProfiles)
         if (parent.disableEventProfiles.contains(eventProfile))
           disableEventProfiles.remove(eventProfile);
       // Merge event profiles

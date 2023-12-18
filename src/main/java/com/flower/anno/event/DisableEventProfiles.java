@@ -9,8 +9,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface DisableEventProfiles {
-  /** @return External EventProfile name to disable. */
-  String[] value() default {};
+  /** @return External EventProfiles to disable. */
+  Class<?>[] value() default {};
 
   /** @return true to disable all external Event Profiles */
   boolean disableAllExternal() default false;

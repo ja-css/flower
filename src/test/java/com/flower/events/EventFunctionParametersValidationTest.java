@@ -202,7 +202,7 @@ public class EventFunctionParametersValidationTest {
 }
 
 @FlowType(name = "Test", firstStep = "transit")
-@EventProfiles({"TestEventProfile1"})
+@EventProfiles({E1_TestEventProfile1.class})
 class E1_TestFlow1 {
   @SimpleStepFunction
   static Transition transit() {
@@ -246,7 +246,7 @@ class E1_TestEventProfile1 {
 }
 
 @FlowType(name = "Test", firstStep = "transit")
-@EventProfiles({"TestEventProfile2"})
+@EventProfiles({E1_TestEventProfile2.class})
 class E1_TestFlow2 {
   @SimpleStepFunction
   static Transition transit() {
@@ -261,7 +261,7 @@ class E1_TestEventProfile2 {
 }
 
 @FlowType(name = "Test", firstStep = "transit")
-@EventProfiles({"TestEventProfile3"})
+@EventProfiles({E1_TestEventProfile3.class})
 class E1_TestFlow3 {
   @SimpleStepFunction
   static Transition transit() {
@@ -276,7 +276,7 @@ class E1_TestEventProfile3 {
 }
 
 @FlowType(name = "Test", firstStep = "transit")
-@EventProfiles({"TestEventProfile4"})
+@EventProfiles({E1_TestEventProfile4.class})
 class E1_TestFlow4 {
   @SimpleStepFunction
   static Transition transit() {
@@ -291,7 +291,7 @@ class E1_TestEventProfile4 {
 }
 
 @FlowType(name = "Test", firstStep = "transit")
-@EventProfiles({"TestEventProfile5"})
+@EventProfiles({E1_TestEventProfile5.class})
 class E1_TestFlow5 {
   @SimpleStepFunction
   static Transition transit() {
@@ -306,7 +306,7 @@ class E1_TestEventProfile5 {
 }
 
 @FlowType(name = "Test", firstStep = "transit")
-@EventProfiles({"TestEventProfile6"})
+@EventProfiles({E1_TestEventProfile6.class})
 class E1_TestFlow6 {
   @SimpleStepFunction
   static Transition transit() {
@@ -321,7 +321,7 @@ class E1_TestEventProfile6 {
 }
 
 @FlowType(name = "Test", firstStep = "transit")
-@EventProfiles({"TestEventProfile7"})
+@EventProfiles({E1_TestEventProfile7.class})
 class E1_TestFlow7 {
   @SimpleStepFunction
   static Transition transit() {
@@ -336,7 +336,7 @@ class E1_TestEventProfile7 {
 }
 
 @FlowType(name = "Test", firstStep = "transit")
-@EventProfiles({"TestEventProfile8"})
+@EventProfiles({E1_TestEventProfile8.class})
 class E1_TestFlow8 {
   @SimpleStepFunction
   static Transition transit() {
@@ -351,7 +351,7 @@ class E1_TestEventProfile8 {
 }
 
 @FlowType(name = "Test", firstStep = "transit")
-@EventProfiles({"TestEventProfile9"})
+@EventProfiles({E1_TestEventProfile9.class})
 class E1_TestFlow9 {
   @SimpleStepFunction
   static Transition transit() {
@@ -366,7 +366,7 @@ class E1_TestEventProfile9 {
 }
 
 @FlowType(name = "Test", firstStep = "transit")
-@EventProfiles({"TestEventProfile10"})
+@EventProfiles({E1_TestEventProfile10.class})
 class E1_TestFlow10 {
   @SimpleStepFunction
   static Transition transit() {
@@ -381,7 +381,7 @@ class E1_TestEventProfile10 {
 }
 
 @FlowType(name = "Test", firstStep = "transit")
-@EventProfiles({"TestEventProfile11"})
+@EventProfiles({E1_TestEventProfile11.class})
 class E1_TestFlow11 {
   @SimpleStepFunction
   static Transition transit() {
@@ -396,7 +396,7 @@ class E1_TestEventProfile11 {
 }
 
 @FlowType(name = "Test", firstStep = "transit")
-@EventProfiles({"TestEventProfile12"})
+@EventProfiles({E1_TestEventProfile12.class})
 class E1_TestFlow12 {
   @SimpleStepFunction
   static Transition transit() {
@@ -411,7 +411,7 @@ class E1_TestEventProfile12 {
 }
 
 @FlowType(name = "Test", firstStep = "transit")
-@EventProfiles({"TestEventProfile13"})
+@EventProfiles({E1_TestEventProfile13.class})
 class E1_TestFlow13 {
   @SimpleStepFunction
   static Transition transit() {
@@ -426,7 +426,7 @@ class E1_TestEventProfile13 {
 }
 
 @FlowType(name = "Test", firstStep = "transit")
-@EventProfiles({"TestEventProfile14"})
+@EventProfiles({E1_TestEventProfile14.class})
 class E1_TestFlow14 {
   @SimpleStepFunction
   static Transition transit() {

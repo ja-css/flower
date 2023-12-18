@@ -16,7 +16,6 @@ public class UniqueGlobalFunctionNameTest {
   public void testUniqueFlowName() {
     Flower flower = new Flower();
     flower.registerGlobalFunctions(U4_TestFlow1.class);
-    flower.registerGlobalFunctions(U4_TestFlow2.class);
 
     IllegalStateException e =
         Assertions.assertThrows(IllegalStateException.class, flower::initialize);
@@ -29,10 +28,7 @@ public class UniqueGlobalFunctionNameTest {
 class U4_TestFlow1 {
   @GlobalFunction(name = "func")
   static void func1() {}
-}
 
-@GlobalFunctionContainer
-class U4_TestFlow2 {
   @GlobalFunction(name = "func")
   static void func2() {}
 }
