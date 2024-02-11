@@ -24,7 +24,6 @@ public class ActionFlowWithRetriesTest {
         FlowExec<TestActionFlowWithRetries> flowExec = flower.getFlowExec(TestActionFlowWithRetries.class);
         TestActionFlowWithRetries flowFails2RetryAttempts = new TestActionFlowWithRetries("dummyActionId",
             2,
-            "dummyOperationType",
             (isFinal, msg, exception) -> {
                 System.out.println(exception);
             });
@@ -32,7 +31,6 @@ public class ActionFlowWithRetriesTest {
 
         TestActionFlowWithRetries flowSucceeds3RetryAttempts = new TestActionFlowWithRetries("dummyActionId",
             3,
-            "dummyOperationType",
             (isFinal, msg, exception) -> {
                 System.out.println(exception);
             });
@@ -45,9 +43,8 @@ public class ActionFlowWithRetriesTest {
 class TestActionFlowWithRetries extends ActionFlowWithRetries<String, String> {
     public TestActionFlowWithRetries(String actionId,
                                      Integer maxRetryAttempts,
-                                     String operationType,
                                      BatchActionProgressCallback<String> actionCallback) {
-        super(actionId, maxRetryAttempts, operationType, actionCallback);
+        super(actionId, maxRetryAttempts, actionCallback);
     }
 
     @StepFunction(transit = "retry")

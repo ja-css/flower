@@ -322,6 +322,7 @@ public class FlowTypeRecord extends ContainerRecord {
       if (parent != null) {
         firstStepName = parent.firstStepName;
       } else {
+        //TODO: what's this?
         throw new IllegalStateException(
             "Root level flow (parent in inheritance) must have firstStep defined");
       }

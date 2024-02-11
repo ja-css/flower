@@ -21,22 +21,22 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import javax.annotation.Nullable;
 
+/**
+ * Abstract standalone Action flow for `BatchFlow` with "retry" TransitFunction for convenience.
+ */
 @FlowType(name="ActionFlowWithRetries", firstStep = "init")
-public class ActionFlowWithRetries<ID, MSG> {
+public class ActionFlowWithRetries<ID, PROGRESS_MSG> {
     @State final ID actionId;
     @State final Integer maxRetryAttempts;
-    @State final String operationType;
-    @State final BatchActionProgressCallback<MSG> actionCallback;
+    @State final BatchActionProgressCallback<PROGRESS_MSG> actionCallback;
 
     @State @Nullable Integer currentAttempt;
 
     public ActionFlowWithRetries(ID actionId,
                                  Integer maxRetryAttempts,
-                                 String operationType,
-                                 BatchActionProgressCallback<MSG> actionCallback) {
+                                 BatchActionProgressCallback<PROGRESS_MSG> actionCallback) {
         this.actionId = actionId;
         this.maxRetryAttempts = maxRetryAttempts;
-        this.operationType = operationType;
         this.actionCallback = actionCallback;
     }
 
@@ -53,12 +53,12 @@ public class ActionFlowWithRetries<ID, MSG> {
     }
 
     @TransitFunction
-    public static <MSG> ListenableFuture<Transition> retry(@InRetOrException ReturnValueOrException<Void> retValOrExc,
-                                                          @InOut(out=Output.OPTIONAL) InOutPrm<Integer> currentAttempt,
-                                                          @In Integer maxRetryAttempts,
-                                                          @In BatchActionProgressCallback<MSG> actionCallback,
-                                                          @StepRef(stepName="action") Transition retry,
-                                                          @Terminal Transition next) {
+    public static <PROGRESS_MSG> ListenableFuture<Transition> retry(@InRetOrException ReturnValueOrException<Void> retValOrExc,
+                                                                    @InOut(out=Output.OPTIONAL) InOutPrm<Integer> currentAttempt,
+                                                                    @In Integer maxRetryAttempts,
+                                                                    @In BatchActionProgressCallback<PROGRESS_MSG> actionCallback,
+                                                                    @StepRef(stepName="action") Transition retry,
+                                                                    @Terminal Transition next) {
         int currentAttemptVal = currentAttempt.getInValue();
         currentAttempt.setOutValue(currentAttemptVal);
 

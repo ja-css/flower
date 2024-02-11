@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Flow factory parameter. For use in StepFunction ONLY!
  *
- * <p>Represents a reference to a FlowType.
+ * <p>Represents a reference to a Factory for a FlowType.
  *
  * <p>Parameter must be of type conf.FlowFactoryPrm
  */

@@ -86,7 +86,7 @@ public class FlowTypeFactoryParameterCreator extends ParameterCreator {
       if (StringUtils.isBlank(childFlowName) && flowType.equals(void.class)) {
         throw new IllegalStateException(
             String.format(
-                "Function parameter of type [%s] should refer to a ChildFlow by name or type. Flow: [%s] Function/Call: [%s] Parameter: [%s]",
+                "Function parameter of type [%s] should refer to a ChildFlow by name or type. Set @FlowFactory(name=) or @FlowFactory(flowTypeName=). Flow: [%s] Function/Call: [%s] Parameter: [%s]",
                 ParameterType.CHILD_FLOW_FACTORY_REF,
                 flowTypeRecord.flowTypeName,
                 functionOrCallName,

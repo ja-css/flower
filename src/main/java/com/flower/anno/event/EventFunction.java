@@ -26,6 +26,7 @@ public @interface EventFunction {
   /** @return Concurrency level */
   Concurrency concurrency() default Concurrency.PARALLEL;
 
-  /** Execution priority -INFINITY first; +INFINITY last*/
+  /** Execution priority -INFINITY first; +INFINITY last.
+   * Only relevant to Concurrency.SYNCHRONIZED and Concurrency.FINALIZER */
   int priority() default 0;
 }

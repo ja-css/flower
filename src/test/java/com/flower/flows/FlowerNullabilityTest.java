@@ -18,6 +18,7 @@ import com.flower.anno.params.common.Output;
 import com.flower.anno.params.events.InFromFlow;
 import com.flower.anno.params.transit.InRet;
 import com.flower.anno.params.transit.InRetOrException;
+import com.flower.anno.params.transit.StepRef;
 import com.flower.anno.params.transit.Terminal;
 import com.flower.conf.FlowExec;
 import com.flower.conf.FlowFuture;
@@ -220,6 +221,14 @@ public class FlowerNullabilityTest {
         e.getMessage()
             .contains("Function can't have both IN_RET and IN_RET_OR_EXCEPTION parameters"));
   }
+
+  @Test
+  public void testInOutIsInitializing() {
+    Flower flower = new Flower();
+    flower.registerFlow(InOutIsInitializing.class);
+
+    flower.initialize();
+  }
 }
 
 @FlowType(firstStep = "STEP")
@@ -409,5 +418,25 @@ class InRetAndInRetOrExceptionFails {
     System.out.printf("TRANSIT returnValue %s \n", inRet.returnValue());
     System.out.printf("TRANSIT exception %s \n", inRet.exception());
     return END;
+  }
+}
+
+@FlowType(firstStep = "STEP")
+class InOutIsInitializing {
+  @State @Nullable Integer in;
+
+  @SimpleStepFunction
+  static Transition STEP(@InOut NullableInOutPrm<Integer> in,
+                         @StepRef Transition STEP2) {
+    System.out.printf("STEP %s \n", in.getInValue());
+    in.setOutValue(123);
+    return STEP2;
+  }
+
+  @SimpleStepFunction
+  static Transition STEP2(@In Integer in,
+                          @Terminal Transition end) {
+    System.out.printf("STEP %s \n", in);
+    return end;
   }
 }

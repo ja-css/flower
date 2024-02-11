@@ -2,6 +2,8 @@ package com.flower.conf;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
+import javax.annotation.Nonnull;
+
 /** Must be injected by FlowerEngine via @Out annotation. Do NOT implement. */
 public interface OutPrm<T> {
   /**
@@ -10,7 +12,7 @@ public interface OutPrm<T> {
    *
    * @param value Value to update Flow state with
    */
-  void setOutValue(T value);
+  void setOutValue(@Nonnull T value);
 
   /**
    * Set Future for the value to update Flow state with ATTENTION! Setting this Future will not
@@ -18,5 +20,5 @@ public interface OutPrm<T> {
    *
    * @param value Future for the value to update Flow state with
    */
-  void setOutFuture(ListenableFuture<T> value);
+  void setOutFuture(@Nonnull ListenableFuture<T> value);
 }

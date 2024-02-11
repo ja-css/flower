@@ -10,14 +10,14 @@ public class FlowerOutPrm<T> implements OutPrm<T> {
 
   @Override
   public void setOutValue(T value) {
-    this.value = Optional.of(value);
+    this.value = Optional.ofNullable(value);
     this.valueFuture = Optional.empty();
   }
 
   @Override
   public void setOutFuture(ListenableFuture<T> valueFuture) {
     this.value = Optional.empty();
-    this.valueFuture = Optional.of(valueFuture);
+    this.valueFuture = Optional.ofNullable(valueFuture);
   }
 
   public Optional<T> getOpt() {

@@ -28,19 +28,19 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 
 @FlowType(firstStep = "init")
-public class BatchFlow<ID, MSG, FLOW> {
-    @State final Collection<ID> ids;
-    @State final BiFunction<ID, BatchActionProgressCallback<MSG>, FLOW> createActionFlow;
-    @State final BatchProgressCallback<ID, MSG> batchProgressCallback;
+public class BatchFlow<CHILD_ID, PROGRESS_MSG, FLOW> {
+    @State final Collection<CHILD_ID> ids;
+    @State final BiFunction<CHILD_ID, BatchActionProgressCallback<PROGRESS_MSG>, FLOW> createActionFlow;
+    @State final BatchProgressCallback<CHILD_ID, PROGRESS_MSG> batchProgressCallback;
     @State final Integer maximumSimultaneousExecutions;
     @State final Boolean throwOnChildException;
 
-    @State final Map<ID, FlowFuture<FLOW>> inProgressMap = new ConcurrentHashMap<>();
-    @State @Nullable Iterator<ID> idsIterator;
+    @State final Map<CHILD_ID, FlowFuture<FLOW>> inProgressMap = new ConcurrentHashMap<>();
+    @State @Nullable Iterator<CHILD_ID> idsIterator;
 
-    public BatchFlow(Collection<ID> ids,
-                     BiFunction<ID, BatchActionProgressCallback<MSG>, FLOW> createActionFlow,
-                     BatchProgressCallback<ID, MSG> batchProgressCallback,
+    public BatchFlow(Collection<CHILD_ID> ids,
+                     BiFunction<CHILD_ID, BatchActionProgressCallback<PROGRESS_MSG>, FLOW> createActionFlow,
+                     BatchProgressCallback<CHILD_ID, PROGRESS_MSG> batchProgressCallback,
                      Integer maximumSimultaneousExecutions) {
         this(ids,
             createActionFlow,
@@ -49,9 +49,9 @@ public class BatchFlow<ID, MSG, FLOW> {
             true);
     }
 
-    public BatchFlow(Collection<ID> ids,
-                     BiFunction<ID, BatchActionProgressCallback<MSG>, FLOW> createActionFlow,
-                     BatchProgressCallback<ID, MSG> batchProgressCallback,
+    public BatchFlow(Collection<CHILD_ID> ids,
+                     BiFunction<CHILD_ID, BatchActionProgressCallback<PROGRESS_MSG>, FLOW> createActionFlow,
+                     BatchProgressCallback<CHILD_ID, PROGRESS_MSG> batchProgressCallback,
                      Integer maximumSimultaneousExecutions,
                      Boolean throwOnChildException) {
         this.ids = ids;
@@ -62,27 +62,27 @@ public class BatchFlow<ID, MSG, FLOW> {
     }
 
     @SimpleStepFunction
-    public static <ID> Transition init(@In Collection<ID> ids,
-                                  @Out OutPrm<Iterator<ID>> idsIterator,
+    public static <CHILD_ID> Transition init(@In Collection<CHILD_ID> ids,
+                                  @Out OutPrm<Iterator<CHILD_ID>> idsIterator,
                                   @StepRef Transition runBatch) {
         idsIterator.setOutValue(ids.iterator());
         return runBatch;
     }
 
     @SimpleStepFunction
-    public static <ID, MSG, FLOW> ListenableFuture<Transition> runBatch(@In Iterator<ID> idsIterator,
-                                                        @In BatchProgressCallback<ID, MSG> batchProgressCallback,
-                                                        @In Integer maximumSimultaneousExecutions,
-                                                        @In BiFunction<ID, BatchActionProgressCallback<MSG>, FLOW> createActionFlow,
-                                                        @In Map<ID, FlowFuture<FLOW>> inProgressMap,
-                                                        @In Boolean throwOnChildException,
-                                                        @FlowFactory(dynamic=true) FlowFactoryPrm<FLOW> flowFactory,
-                                                        @StepRef Transition runBatch,
-                                                        @Terminal Transition end) throws ExecutionException, InterruptedException {
+    public static <CHILD_ID, PROGRESS_MSG, FLOW> ListenableFuture<Transition> runBatch(@In Iterator<CHILD_ID> idsIterator,
+                                                                                       @In BatchProgressCallback<CHILD_ID, PROGRESS_MSG> batchProgressCallback,
+                                                                                       @In Integer maximumSimultaneousExecutions,
+                                                                                       @In BiFunction<CHILD_ID, BatchActionProgressCallback<PROGRESS_MSG>, FLOW> createActionFlow,
+                                                                                       @In Map<CHILD_ID, FlowFuture<FLOW>> inProgressMap,
+                                                                                       @In Boolean throwOnChildException,
+                                                                                       @FlowFactory(dynamic=true) FlowFactoryPrm<FLOW> flowFactory,
+                                                                                       @StepRef Transition runBatch,
+                                                                                       @Terminal Transition end) throws ExecutionException, InterruptedException {
         //Cleanup finished flows, if any
-        List<ID> doneIds = new ArrayList<>();
-        for (Map.Entry<ID, FlowFuture<FLOW>> entry : inProgressMap.entrySet()) {
-            ID actionId = entry.getKey();
+        List<CHILD_ID> doneIds = new ArrayList<>();
+        for (Map.Entry<CHILD_ID, FlowFuture<FLOW>> entry : inProgressMap.entrySet()) {
+            CHILD_ID actionId = entry.getKey();
             FlowFuture<FLOW> flowFuture = entry.getValue();
             if (flowFuture.getFuture().isDone()) {
                 if (throwOnChildException) {
@@ -91,7 +91,8 @@ public class BatchFlow<ID, MSG, FLOW> {
                 doneIds.add(actionId);
             }
         }
-        for (ID doneId : doneIds) {
+        for (CHILD_ID doneId : doneIds) {
+            //TODO: Is it correct to have this here, apart from proxying callbacks from child flows?
             batchProgressCallback.progressCallback(doneId, true, null, null);
             inProgressMap.remove(doneId);
         }
@@ -101,9 +102,9 @@ public class BatchFlow<ID, MSG, FLOW> {
             //Start more flows, if possible
             int flowsToAdd = maximumSimultaneousExecutions - activeFlows;
             for (int i = 0; idsIterator.hasNext() && i < flowsToAdd; i++) {
-                ID nextId = idsIterator.next();
+                CHILD_ID nextId = idsIterator.next();
                 FLOW nextActionFlow = createActionFlow.apply(nextId,
-                    (isFinal, message, exception) -> batchProgressCallback.progressCallback(nextId, isFinal, null, exception));
+                    (isFinal, message, exception) -> batchProgressCallback.progressCallback(nextId, isFinal, message, exception));
                 FlowFuture<FLOW> flowFuture = flowFactory.runChildFlow(nextActionFlow);
                 inProgressMap.put(nextId, flowFuture);
             }
