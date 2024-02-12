@@ -1,9 +1,7 @@
 package com.flower.executor;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 public class TaskCheckingThread extends Thread {
-    protected final AtomicLong startTimeNanos = new AtomicLong(0);
+    protected long startTimeNanos = 0;
 
     public TaskCheckingThread() {
     }
@@ -40,9 +38,9 @@ public class TaskCheckingThread extends Thread {
         super(group, task, name, stackSize, inheritInheritableThreadLocals);
     }
 
-    protected void taskExecuteStart() { startTimeNanos.set(System.nanoTime()); }
+    protected void taskExecuteStart() { startTimeNanos = System.nanoTime(); }
 
-    protected void taskExecuteEnd() { startTimeNanos.set(0); }
+    protected void taskExecuteEnd() { startTimeNanos = 0; }
 
-    protected long startTimeNanos() { return startTimeNanos.get(); }
+    protected long startTimeNanos() { return startTimeNanos; }
 }

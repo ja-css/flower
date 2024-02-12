@@ -14,9 +14,9 @@ public class TaskCheckingExecutorTest {
         AtomicInteger reportCount = new AtomicInteger(0);
         TaskCheckHandler checkHandler = new DefaultTaskCheckHandler() {
             @Override
-            public void checkTask(TaskCheckingThread thread, Runnable task, long taskDurationNanos, @Nullable Long taskTimeLimitNanos) {
+            public void checkTask(TaskCheckingThread thread, long taskDurationNanos, @Nullable Long taskTimeLimitNanos) {
                 reportCount.incrementAndGet();
-                super.checkTask(thread, task, taskDurationNanos, taskTimeLimitNanos);
+                super.checkTask(thread, taskDurationNanos, taskTimeLimitNanos);
             }
         };
 
@@ -34,6 +34,10 @@ public class TaskCheckingExecutorTest {
         Thread.sleep(10000);
         executor.shutdown();
 
+        // Cast to ThreadPoolExecutor to access its methods
+        int numThreads = executor.getPoolSize();
+        System.out.println("Number of threads in the executor: " + numThreads);
+
         //First report at 1 sec, 9 reports over 9.5 seconds
         assertEquals(9, reportCount.get());
     }
@@ -44,9 +48,9 @@ public class TaskCheckingExecutorTest {
         //Since there will be no reports, handler will never get called
         TaskCheckHandler checkHandler = new KillerTaskCheckHandler() {
             @Override
-            public void checkTask(TaskCheckingThread thread, Runnable task, long taskDurationNanos, @Nullable Long taskTimeLimitNanos) {
+            public void checkTask(TaskCheckingThread thread, long taskDurationNanos, @Nullable Long taskTimeLimitNanos) {
                 reportCount.incrementAndGet();
-                super.checkTask(thread, task, taskDurationNanos, taskTimeLimitNanos);
+                super.checkTask(thread, taskDurationNanos, taskTimeLimitNanos);
             }
         };
 
@@ -63,6 +67,10 @@ public class TaskCheckingExecutorTest {
         Thread.sleep(10000);
         executor.shutdown();
 
+        // Cast to ThreadPoolExecutor to access its methods
+        int numThreads = executor.getPoolSize();
+        System.out.println("Number of threads in the executor: " + numThreads);
+
         assertEquals(0, reportCount.get());
     }
 
@@ -73,9 +81,9 @@ public class TaskCheckingExecutorTest {
 
         TaskCheckHandler checkHandler = new DefaultTaskCheckHandler(e -> customReportCount.incrementAndGet()) {
             @Override
-            public void checkTask(TaskCheckingThread thread, Runnable task, long taskDurationNanos, @Nullable Long taskTimeLimitNanos) {
+            public void checkTask(TaskCheckingThread thread, long taskDurationNanos, @Nullable Long taskTimeLimitNanos) {
                 reportCount.incrementAndGet();
-                super.checkTask(thread, task, taskDurationNanos, taskTimeLimitNanos);
+                super.checkTask(thread, taskDurationNanos, taskTimeLimitNanos);
             }
         };
 
@@ -97,6 +105,10 @@ public class TaskCheckingExecutorTest {
         Thread.sleep(10000);
         executor.shutdown();
 
+        // Cast to ThreadPoolExecutor to access its methods
+        int numThreads = executor.getPoolSize();
+        System.out.println("Number of threads in the executor: " + numThreads);
+
         //First report at 2 sec, 8 reports over 8.5 seconds
         assertEquals(8, reportCount.get());
         assertEquals(8, customReportCount.get());
@@ -107,15 +119,14 @@ public class TaskCheckingExecutorTest {
         AtomicInteger reportCount = new AtomicInteger(0);
         TaskCheckHandler checkHandler = new KillerTaskCheckHandler() {
             @Override
-            public void checkTask(TaskCheckingThread thread, Runnable task, long taskDurationNanos, @Nullable Long taskTimeLimitNanos) {
+            public void checkTask(TaskCheckingThread thread, long taskDurationNanos, @Nullable Long taskTimeLimitNanos) {
                 reportCount.incrementAndGet();
-                super.checkTask(thread, task, taskDurationNanos, taskTimeLimitNanos);
+                super.checkTask(thread, taskDurationNanos, taskTimeLimitNanos);
             }
         };
 
         TaskCheckingExecutor executor = TaskCheckingExecutor.builder()
             .checker(DefaultTaskChecker.builder()
-                .useWeakMap(true)
                 .checkHandler(checkHandler)
                 .build())
             .build();
@@ -138,6 +149,10 @@ public class TaskCheckingExecutorTest {
         Thread.sleep(3000);
         executor.shutdown();
 
+        // Cast to ThreadPoolExecutor to access its methods
+        int numThreads = executor.getPoolSize();
+        System.out.println("Number of threads in the executor: " + numThreads);
+
         //A single report, at which point the task got killed
         assertEquals(1, reportCount.get());
     }
@@ -148,16 +163,15 @@ public class TaskCheckingExecutorTest {
         AtomicInteger killCount = new AtomicInteger(0);
         TaskCheckHandler checkHandler = new KillerTaskCheckHandler() {
             @Override
-            public void checkTask(TaskCheckingThread thread, Runnable task, long taskDurationNanos, @Nullable Long taskTimeLimitNanos) {
+            public void checkTask(TaskCheckingThread thread, long taskDurationNanos, @Nullable Long taskTimeLimitNanos) {
                 reportCount.incrementAndGet();
-                super.checkTask(thread, task, taskDurationNanos, taskTimeLimitNanos);
+                super.checkTask(thread, taskDurationNanos, taskTimeLimitNanos);
             }
         };
 
         TaskCheckingExecutor executor = TaskCheckingExecutor.builder()
             .corePoolSize(50)
             .checker(DefaultTaskChecker.builder()
-                .useWeakMap(true)
                 .checkHandler(checkHandler)
                 .build())
             .build();
@@ -198,9 +212,9 @@ public class TaskCheckingExecutorTest {
         AtomicInteger reportCount = new AtomicInteger(0);
         TaskCheckHandler checkHandler = new KillerTaskCheckHandler() {
             @Override
-            public void checkTask(TaskCheckingThread thread, Runnable task, long taskDurationNanos, @Nullable Long taskTimeLimitNanos) {
+            public void checkTask(TaskCheckingThread thread, long taskDurationNanos, @Nullable Long taskTimeLimitNanos) {
                 reportCount.incrementAndGet();
-                super.checkTask(thread, task, taskDurationNanos, taskTimeLimitNanos);
+                super.checkTask(thread, taskDurationNanos, taskTimeLimitNanos);
             }
         };
 
@@ -227,20 +241,24 @@ public class TaskCheckingExecutorTest {
         Thread.sleep(3000);
         executor.shutdown();
 
+        // Cast to ThreadPoolExecutor to access its methods
+        int numThreads = executor.getPoolSize();
+        System.out.println("Number of threads in the executor: " + numThreads);
+
         //A single report, at which point the task got killed
         assertEquals(1, reportCount.get());
     }
 
-    /** very flaky test */
-    //@Test
+    /** flaky test */
+    @Test
     public void testManyActiveWaitsOverTimeLimitKiller() throws InterruptedException {
         AtomicInteger reportCount = new AtomicInteger(0);
         AtomicInteger killCount = new AtomicInteger(0);
         TaskCheckHandler checkHandler = new KillerTaskCheckHandler() {
             @Override
-            public void checkTask(TaskCheckingThread thread, Runnable task, long taskDurationNanos, @Nullable Long taskTimeLimitNanos) {
+            public void checkTask(TaskCheckingThread thread, long taskDurationNanos, @Nullable Long taskTimeLimitNanos) {
                 reportCount.incrementAndGet();
-                super.checkTask(thread, task, taskDurationNanos, taskTimeLimitNanos);
+                super.checkTask(thread, taskDurationNanos, taskTimeLimitNanos);
             }
         };
 
@@ -270,7 +288,7 @@ public class TaskCheckingExecutorTest {
             });
         }
 
-        Thread.sleep(25000);
+        Thread.sleep(35000);
 
         // Cast to ThreadPoolExecutor to access its methods
         int numThreads = executor.getPoolSize();
@@ -281,7 +299,7 @@ public class TaskCheckingExecutorTest {
         //1 report and 1 kill per task
         assertEquals(555, reportCount.get());
 
-        //This doesn't work with this test
-        //assertEquals(555, killCount.get());
+        //This doesn't always work with this test
+        assertEquals(555, killCount.get());
     }
 }

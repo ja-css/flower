@@ -14,15 +14,14 @@ public class DefaultTaskCheckHandler implements TaskCheckHandler {
         this.customReporter = customReporter;
     }
 
-    public void checkTask(TaskCheckingThread thread, Runnable task, long taskDurationNanos,
+    public void checkTask(TaskCheckingThread thread, long taskDurationNanos,
                           @Nullable Long taskTimeLimitNanos) {
         final String message =
-            String.format("Task has been executing for %d ms, time limit is %s. Thread [%s] %s; task %s",
+            String.format("Task has been executing for %d ms, time limit is %s. Thread [%s] %s",
                 taskDurationNanos / 1_000_000L,
                 taskTimeLimitNanos == null ? "N/A" : taskTimeLimitNanos / 1_000_000L + " ms",
                 thread.getState(),
-                thread,
-                task);
+                thread);
 
         Exception stackTraceOutput = new Exception(message);
         stackTraceOutput.setStackTrace(thread.getStackTrace());

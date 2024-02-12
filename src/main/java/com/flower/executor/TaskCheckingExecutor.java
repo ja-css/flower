@@ -73,20 +73,20 @@ public class TaskCheckingExecutor extends ScheduledThreadPoolExecutor {
     }
 
     protected TaskCheckingExecutor(int corePoolSize, TaskChecker checker) {
-        super(corePoolSize, new TaskCheckingThreadFactory());
+        super(corePoolSize, new TaskCheckingThreadFactory(checker));
         this.checker = checker;
     }
 
     protected TaskCheckingExecutor(int corePoolSize, RejectedExecutionHandler handler, TaskChecker checker) {
-        super(corePoolSize, new TaskCheckingThreadFactory(), handler);
+        super(corePoolSize, new TaskCheckingThreadFactory(checker), handler);
         this.checker = checker;
     }
 
     @Override
-    protected void beforeExecute(Thread thread, Runnable r) {
+    protected void beforeExecute(Thread thread, Runnable task) {
         TaskCheckingThread t = (TaskCheckingThread)(thread);
         t.taskExecuteStart();
-        checker.registerTask(t, r);
+        //TODO: attach task to a thread object here, to output in the checker?
     }
 
     @Override

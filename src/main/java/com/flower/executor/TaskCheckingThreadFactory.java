@@ -9,8 +9,9 @@ public class TaskCheckingThreadFactory implements ThreadFactory {
     private final ThreadGroup group;
     private final AtomicInteger threadNumber = new AtomicInteger(1);
     private final String namePrefix;
+    private final TaskChecker checker;
 
-    TaskCheckingThreadFactory() {
+    TaskCheckingThreadFactory(TaskChecker checker) {
         //TODO: update to conform with future java versions?
         @SuppressWarnings("removal")
         SecurityManager s = System.getSecurityManager();
@@ -19,6 +20,7 @@ public class TaskCheckingThreadFactory implements ThreadFactory {
         namePrefix = "task-exec-time-checking-pool-" +
             poolNumber.getAndIncrement() +
             "-thread-";
+        this.checker = checker;
     }
 
     @Override
@@ -30,6 +32,7 @@ public class TaskCheckingThreadFactory implements ThreadFactory {
             t.setDaemon(false);
         if (t.getPriority() != Thread.NORM_PRIORITY)
             t.setPriority(Thread.NORM_PRIORITY);
+        checker.registerThread(t);
         return t;
     }
 }
