@@ -1,5 +1,7 @@
 package com.flower.executor;
 
+import com.google.common.annotations.Beta;
+
 import javax.annotation.Nullable;
 
 /** EXPERIMENTAL:
@@ -10,6 +12,7 @@ import javax.annotation.Nullable;
  * Thread.stop() is deprecated
  * https://docs.oracle.com/javase/8/docs/technotes/guides/concurrency/threadPrimitiveDeprecation.html
  */
+@Beta
 public class KillerTaskCheckHandler extends DefaultTaskCheckHandler {
     public KillerTaskCheckHandler() {
     }

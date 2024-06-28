@@ -111,6 +111,7 @@ public class DefaultTaskChecker implements TaskChecker {
 
                                     //Run handler logic
                                     if (isPastMaxExecTime || isThreadBlocked) {
+                                        //TODO: add thread state to reporting
                                         checkHandler.checkTask(thread, durationNanos, timeLimitNanos);
                                     }
                                 }
