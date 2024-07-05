@@ -523,7 +523,10 @@ public class FlowTypeRecord extends ContainerRecord {
         String stateFieldName = annotation.name();
         boolean isFinal = Modifier.isFinal(field.getModifiers());
 
-        if (Modifier.isStatic(field.getModifiers()) && !isFinal) {
+/*        reverted. I'm not sure why's that. Setter initialization of static field could be required for event profiles
+          that must have default constructors.
+
+          if (Modifier.isStatic(field.getModifiers()) && !isFinal) {
           throw new IllegalStateException(
               "Static state field must be final. Field: ["
                   + stateFieldName
@@ -534,7 +537,7 @@ public class FlowTypeRecord extends ContainerRecord {
                   + "] class ["
                   + flowType
                   + "]");
-        }
+        }*/
 
         if (stateFieldName.trim().equals("")) stateFieldName = field.getName();
         StateFieldRecord record =

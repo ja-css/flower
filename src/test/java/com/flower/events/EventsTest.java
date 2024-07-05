@@ -9,6 +9,7 @@ import com.flower.anno.flow.FlowType;
 import com.flower.anno.flow.GlobalFunctionContainer;
 import com.flower.anno.flow.State;
 import com.flower.anno.functions.GlobalFunction;
+import com.flower.anno.functions.SimpleStepFunction;
 import com.flower.anno.functions.StepFunction;
 import com.flower.anno.functions.TransitFunction;
 import com.flower.anno.params.common.In;
@@ -28,8 +29,12 @@ import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.Nullable;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EventsTest {
   @Test
@@ -54,6 +59,44 @@ public class EventsTest {
     System.out.println("Flow done. " + flow);
 
     Assertions.assertEquals(10, flow.currentIteration);
+  }
+
+  @Test
+  public void testException() throws ExecutionException, InterruptedException {
+    Flower flower = new Flower();
+    flower.registerFlow(TestExceptionFlow.class);
+    flower.registerEventProfile(TestEventProfile.class);
+    flower.registerEventProfile(TestEventProfile2.class);
+    flower.registerGlobalFunctions(TestGlobalFunctionContainer.class);
+    flower.initialize();
+
+    FlowExec<TestExceptionFlow> flowExec = flower.getFlowExec(TestExceptionFlow.class);
+
+    TestExceptionFlow testFlow = new TestExceptionFlow();
+    FlowFuture<TestExceptionFlow> flowFuture = flowExec.runFlow(testFlow);
+    System.out.println("Flow created. Id: " + flowFuture.getFlowId());
+
+    ListenableFuture<TestExceptionFlow> flowListenableFuture = flowFuture.getFuture();
+    Exception exc = null;
+    try {
+      flowListenableFuture.get();
+    } catch(Exception e) {
+      exc = e;
+    }
+
+    assertTrue(exc instanceof ExecutionException);
+    assertTrue(exc.getCause() instanceof RuntimeException);
+    assertEquals(exc.getCause().getMessage(), "Test Exception");
+    Thread.sleep(1000L);
+  }
+}
+
+@FlowType(firstStep = "exceptionStep")
+@EventProfiles({TestEventProfile2.class})
+class TestExceptionFlow {
+  @SimpleStepFunction
+  public static Transition exceptionStep() {
+    throw new RuntimeException("Test Exception");
   }
 }
 
@@ -145,8 +188,9 @@ class TestFlow {
           currentIteration.getInValue(), maxIterations);
       return end;
     } else {
-      if (currentDelay.getInValue() < FIRST_DELAY) currentDelay.setOutValue(FIRST_DELAY);
-      else if (currentDelay.getInValue() < MAX_DELAY_MS) {
+      if (currentDelay.getInValue() < FIRST_DELAY) {
+        currentDelay.setOutValue(FIRST_DELAY);
+      } else if (currentDelay.getInValue() < MAX_DELAY_MS) {
         currentDelay.setOutValue(currentDelay.getInValue() * 2);
         if (currentDelay.getInValue() > MAX_DELAY_MS) currentDelay.setOutValue(MAX_DELAY_MS);
       }

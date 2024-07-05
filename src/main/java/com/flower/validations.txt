@@ -79,7 +79,9 @@ Validation - parameter doesn't exist (thrown NPE now)
 * Function method can't be generic
 * Flow class can't be generic
 * Global function container class can't be generic
-* Static state field must be final
+* ~Static state field must be final~
+    reverted. I'm not sure why's that. Setter initialization of static field could be required for event profiles
+                        that must have default constructors.
 
 * Event function without binding
 * @Out and @InOut parameters are only allowed in @Exclusive events
