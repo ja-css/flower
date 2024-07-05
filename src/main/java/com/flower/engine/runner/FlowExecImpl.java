@@ -14,6 +14,7 @@ import com.flower.engine.runner.step.InternalTransition;
 import com.flower.engine.runner.step.StepCallContext;
 import com.flower.utilities.FlowerException;
 import com.flower.utilities.FutureCombiner;
+import com.flower.utilities.FuturesTool;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
@@ -24,7 +25,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
+import com.google.common.util.concurrent.SettableFuture;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
@@ -105,8 +109,17 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
       final FlowImpl<T> flowInstance = flowContextPair.getLeft();
       final ListenableFuture<InternalTransition> firstStepCallFuture = flowContextPair.getRight();
 
+      SettableFuture<T> settableFlowFuture = SettableFuture.create();
+      //Recursive flow execution routine, executes the flow
+      transitionToNextStep(
+          flowInstance,
+          firstStepCallFuture,
+          flowCallContext.flowName,
+          flowCallContext.firstStepName,
+          settableFlowFuture);
+
       ListenableFuture<T> flowFuture =
-          FluentFuture.from(transitionToNextStep(flowInstance, firstStepCallFuture, flowCallContext.flowName, flowCallContext.firstStepName))
+          FluentFuture.from(settableFlowFuture)
               .transform(
                   t -> {
                     flow.setStepInfo(null);
@@ -196,53 +209,75 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
         .transform(void_ -> flowInstance.getState(), scheduler);
   }
 
-  ListenableFuture<T> transitionToNextStep(
-      FlowImpl<T> flowInstance, ListenableFuture<InternalTransition> stepCallFuture, String flowTypeName, String stepName) {
-    return FluentFuture.from(stepCallFuture)
-        .transformAsync(
-            transition -> {
-              if (transition == null) {
-                throw new FlowerException("Step [" + stepName + "] of Flow type [" + flowTypeName + "] provided `null` Transition object.");
-              }
-
-              // 1. Check final state in the form of transition to Terminal step
-              if (transition.isTerminal()) {
-                if (transition.getDelay() != null) {
-                  Duration delay = transition.getDelay();
-
-                  // Flow finished after a delay
-                  return FutureCombiner.delayExecutionAsync(
-                      scheduler,
-                      delay.toNanos(),
-                      TimeUnit.NANOSECONDS,
-                      () -> runEventsForLastStep(flowInstance));
-                } else {
-                  // Flow finished
-                  return runEventsForLastStep(flowInstance);
+  void transitionToNextStep(
+      FlowImpl<T> flowInstance,
+      ListenableFuture<InternalTransition> stepCallFuture,
+      String flowTypeName,
+      String stepName,
+      SettableFuture<T> settableFuture) {
+    Futures.whenAllComplete(stepCallFuture)
+        .run(
+            () -> {
+              try {
+                InternalTransition transition = stepCallFuture.get();
+                if (transition == null) {
+                  throw new FlowerException(
+                      String.format("Step [%s] of Flow type [%s] provided `null` Transition object.",
+                              stepName, flowTypeName));
                 }
-              } else
 
-              // 2. Delay
-              if (transition.getDelay() != null) {
-                Duration delay = transition.getDelay();
-                return FutureCombiner.delayExecutionAsync(
-                    scheduler,
-                    delay.toNanos(),
-                    TimeUnit.NANOSECONDS,
-                    () ->
-                        runNextStep(
-                            flowInstance, Preconditions.checkNotNull(transition.getStepName())));
-              } else
-                return runNextStep(
-                    flowInstance, Preconditions.checkNotNull(transition.getStepName()));
+                // 1. Check final state in the form of transition to Terminal step
+                if (transition.isTerminal()) {
+                  if (transition.getDelay() != null) {
+                    Duration delay = transition.getDelay();
+
+                    // Flow finished after a delay
+                    FuturesTool.assignSettableFuture(
+                        FutureCombiner.delayExecutionAsync(
+                            scheduler,
+                            delay.toNanos(),
+                            TimeUnit.NANOSECONDS,
+                            () -> runEventsForLastStep(flowInstance)),
+                        settableFuture,
+                        scheduler);
+                  } else {
+                    // Flow finished
+                    FuturesTool.assignSettableFuture(
+                        runEventsForLastStep(flowInstance), settableFuture, scheduler);
+                  }
+                } else {
+                  transitionToNextStep0(flowInstance, transition, settableFuture);
+                }
+              } catch (ExecutionException e) {
+                settableFuture.setException(e.getCause());
+              } catch (Throwable t) {
+                settableFuture.setException(t);
+              }
             },
-            // We need this context switch between steps to allow stack trace to reset.
-            // If directExecutor will be used here stack overflow is possible for daemon flows or
-            // flows with large number of step iterations.
             scheduler);
   }
 
-  ListenableFuture<T> runNextStep(FlowImpl<T> flowInstance, String nextStepName) {
+  void transitionToNextStep0(
+      FlowImpl<T> flowInstance, InternalTransition transition, SettableFuture<T> settableFuture) {
+    if (transition.getDelay() != null) {
+      Duration delay = transition.getDelay();
+      FutureCombiner.delayExecutionAsync(
+          scheduler,
+          delay.toNanos(),
+          TimeUnit.NANOSECONDS,
+          () -> {
+            runNextStep(
+                flowInstance, Preconditions.checkNotNull(transition.getStepName()), settableFuture);
+            return null;
+          });
+    } else {
+      runNextStep(
+          flowInstance, Preconditions.checkNotNull(transition.getStepName()), settableFuture);
+    }
+  }
+
+  void runNextStep(
+      FlowImpl<T> flowInstance, String nextStepName, SettableFuture<T> settableFuture) {
     String currentStepName = flowInstance.getCurrentStep();
 
     ListenableFuture<InternalTransition> stepCallFuture;
@@ -268,7 +303,8 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
       stepCallFuture = flowCallContext.runStep(flowInstance, nextStepName);
     }
 
-    return transitionToNextStep(flowInstance, stepCallFuture, flowCallContext.flowName, nextStepName);
+    transitionToNextStep(
+        flowInstance, stepCallFuture, flowCallContext.flowName, nextStepName, settableFuture);
   }
 
   public Class<T> getFlowType() {

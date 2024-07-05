@@ -115,10 +115,12 @@ public class BatchFlow<CHILD_ID, PROGRESS_MSG, FLOW> {
             }
         }
 
-        //If there are still active flows, wait and repeat
-        return Futures.transform(
-            FuturesTool.whenAnyCompleteIgnoreResult(inProgressMap.values().stream().map(FlowFuture::getFuture).toList()),
-            ignored -> runBatch,
-            MoreExecutors.directExecutor());
+    // If there are still active flows, wait and repeat
+    return Futures.transform(
+        FuturesTool.whenAnyCompleteIgnoreResult(
+            inProgressMap.values().stream().map(FlowFuture::getFuture).toList(),
+            MoreExecutors.directExecutor()),
+        ignored -> runBatch,
+        MoreExecutors.directExecutor());
     }
 }
