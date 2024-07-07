@@ -17,9 +17,9 @@ public class DefaultTaskCheckHandler implements TaskCheckHandler {
     public void checkTask(TaskCheckingThread thread, long taskDurationNanos,
                           @Nullable Long taskTimeLimitNanos) {
         final String message =
-            String.format("Task has been executing for %d ms, time limit is %s. Thread [%s] %s",
-                taskDurationNanos / 1_000_000L,
-                taskTimeLimitNanos == null ? "N/A" : taskTimeLimitNanos / 1_000_000L + " ms",
+            String.format("Task has been executing for %d ns, time limit is %s. Thread [%s] %s",
+                taskDurationNanos,
+                taskTimeLimitNanos == null ? "N/A" : taskTimeLimitNanos + " ns",
                 thread.getState(),
                 thread);
 
