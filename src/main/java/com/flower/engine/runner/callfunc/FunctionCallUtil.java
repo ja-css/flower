@@ -745,7 +745,12 @@ public class FunctionCallUtil {
       if ((parameterType == ParameterType.OUT || parameterType == ParameterType.IN_OUT)
           && callParameter.getOutput() == Output.MANDATORY && !partial)
         //TODO: inject flow and function name here for better message clarity
-        throw new IllegalStateException(
+
+        //TODO: should we throw? this can cause NPE potentially
+        // BUT when we throw, it can destroy otherwise perfectly fine flow mid flight for no good reason and
+        // is VERY hard to catch since it's runtime.
+        // My current take on this is that possible future error-prone/null-away style code analysis should take better care of it.
+        System.err.println(
             String.format(
                 flowStepInfo + " Fatal: value of Out or InOut parameter with Output.MANDATORY wasn't set in the Function call. FlowField [%s] FunctionPrm [%s]",
                 callParameter.getStateFieldName(), callParameter.getFunctionParameterName()));
