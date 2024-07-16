@@ -27,8 +27,13 @@ public @interface Out {
   /**
    * MANDATORY (default) - setting Out value is mandatory, NullAway considers it a field
    * initializer. The way it's enforced is that failing to set Out value will cause an exception at
-   * runtime. TODO: For now, it's better than nothing and clearly outlines the idea. Hopefully in
-   * future versions the check will trigger at init or compile time.
+   * runtime.
+   *
+   * TODO: For now, it's better than nothing and clearly outlines the idea. Hopefully in
+   *  future versions the check will trigger at init or compile time.
+   *
+   * UPDATE: Since runtime Exception is so ANNOYING and DISRUPTIVE I disabled it in the engine,
+   * until we have compile-time or init-time check.
    *
    * <p>OPTIONAL - setting Out value is not mandatory, but NullAway won't consider it a field
    * initializer,
