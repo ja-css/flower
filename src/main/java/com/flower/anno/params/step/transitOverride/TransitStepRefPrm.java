@@ -17,4 +17,11 @@ public @interface TransitStepRefPrm {
 
   /** @return Referenced Step name */
   String stepName();
+
+  /**
+   * Optional: describes under what circumstances and with what goals this transition can happen.
+   *
+   * @return Transition desc
+   */
+  String desc() default "";
 }

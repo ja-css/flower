@@ -5,6 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+//TODO: refine the abstraction and possible implementation
 /** Marks FlowType's or EventProfile's state as serializable.
  * State serialization is disabled for all FlowType-s and EventProfile-s NOT annotated with @SerializableState.
  * Engine-level State serializer override fails for FlowType-s and EventProfile-s NOT annotated with @SerializableState.

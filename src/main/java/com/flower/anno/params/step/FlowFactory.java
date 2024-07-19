@@ -34,4 +34,10 @@ public @interface FlowFactory {
    * That can potentially result in runtime errors related to flow registry.
    * If possible, avoid using dynamic and specify FlowType explicitly, to fail fast in case of any configuration issues. */
   boolean dynamic() default false;
+
+  /**
+   * Optional: describes under what circumstances and with what goals ChildFlows are created.
+   * @return Child FlowFactory desc
+   */
+  String desc() default "";
 }

@@ -21,4 +21,12 @@ public @interface Terminal {
    * @return Parameter name
    */
   String name() default "";
+
+  /**
+   * Optional: describes under what circumstances and with what goals this transition can happen.
+   * This value can be overridden by TransitTerminalOverride.
+   *
+   * @return Transition desc
+   */
+  String desc() default "";
 }

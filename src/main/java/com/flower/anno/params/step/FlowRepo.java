@@ -23,4 +23,10 @@ public @interface FlowRepo {
    * @return Parameter name
    */
   String name() default "";
+
+  /**
+   * Optional: describes under what circumstances and with what goals Flow Futures are queried.
+   * @return FlowRepo desc
+   */
+  String desc() default "";
 }

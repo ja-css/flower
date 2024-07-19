@@ -14,4 +14,11 @@ import java.lang.annotation.Target;
 public @interface TransitTerminalPrm {
   /** @return TransitFunction parameter name to override */
   String paramName();
+
+  /**
+   * Optional: describes under what circumstances and with what goals this transition can happen.
+   *
+   * @return Transition desc
+   */
+  String desc() default "";
 }

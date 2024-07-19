@@ -32,4 +32,12 @@ public @interface StepRef {
    * @return Referenced Step name
    */
   String stepName() default "";
+
+  /**
+   * Optional: describes under what circumstances and with what goals this transition can happen.
+   * This value can be overridden by TransitStepRefOverride.
+   *
+   * @return Transition desc
+   */
+  String desc() default "";
 }
