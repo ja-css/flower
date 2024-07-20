@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 
-public class FlowRunner implements FlowExecCallback, FlowRepoPrm {
+public class FlowRunner implements FlowExecCallback {
   private static final int TIME_TO_LIVE_IN_CACHE_MILLIS = 30 * 60 * 1000;
   private static final int MAXIMUM_CACHE_SIZE = 1000;
 
@@ -175,7 +175,6 @@ public class FlowRunner implements FlowExecCallback, FlowRepoPrm {
     return activeFlows.get(flowId);
   }
 
-  @Override
   @Nullable
   public ListenableFuture<Object> getFlowFuture(FlowId flowId) {
     ListenableFuture<Object> flowFuture = getActiveFlow(flowId);

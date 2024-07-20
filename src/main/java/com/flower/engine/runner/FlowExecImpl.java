@@ -20,6 +20,8 @@ import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningScheduledExecutorService;
+
+import java.lang.reflect.ParameterizedType;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
@@ -172,6 +174,7 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
     Set<String> existingLinks = new HashSet<>();
 
     StringBuilder graphBuilder = new StringBuilder();
+    graphBuilder.append("- ").append(flowType.getSimpleName()).append("\n");
     graphBuilder
         .append("```mermaid\n" + DIAGRAM_NAME + "\n")
         .append(BEGIN)
@@ -202,18 +205,29 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
       }
 
       for (Pair<String, String> flowFactory : step.getFlowFactories()) {
-          String link = createFlowFactoryLink(stepName, "Flow:" + flowFactory.getKey(), flowFactory.getValue());
+          String link = createFlowFactoryLink(stepName, "Factory:" + getSimpleClassName(flowFactory.getKey()), flowFactory.getValue());
           graphBuilder.append(link).append('\n');
       }
       for (Pair<String, String> flowRepo : step.getFlowRepos()) {
-          String link = createFlowRepoLink(stepName, "Repo:" + flowRepo.getKey(), flowRepo.getValue());
+          String link = createFlowRepoLink(stepName, "Repo:" + getSimpleClassName(flowRepo.getKey()), flowRepo.getValue());
           graphBuilder.append(link).append('\n');
       }
     }
 
-    graphBuilder.append("```");
+    graphBuilder.append("```\n");
 
     return graphBuilder.toString();
+  }
+
+  static String getSimpleClassName(String className) {
+    if (StringUtils.isBlank(className)) {
+      return "";
+    }
+    int lastDotIndex = className.lastIndexOf('.');
+    if (lastDotIndex == -1) {
+      return className;
+    }
+    return className.substring(lastDotIndex + 1);
   }
 
   String createPreFormattedLink(String left, String right, @Nullable String note) {

@@ -49,8 +49,6 @@ public class FlowTypeFactoryParameterCreator extends ParameterCreator {
       ) {
     final String parameterName = baseParameter.name;
     final ParameterType functionParameterType = ParameterType.CHILD_FLOW_FACTORY_REF;
-    String childFlowName;
-    Class<?> flowType;
     FlowFactory flowFactoryAnnotation;
     final Type genericParameterType;
 
@@ -81,21 +79,7 @@ public class FlowTypeFactoryParameterCreator extends ParameterCreator {
       genericParameterType = parameterOverrideFromCall.genericParameterType;
     }
 
-    childFlowName = flowFactoryAnnotation.flowTypeName();
-    flowType = flowFactoryAnnotation.flowType();
     boolean dynamic = flowFactoryAnnotation.dynamic();
-
-    if (!dynamic) {
-      if (StringUtils.isBlank(childFlowName) && flowType.equals(void.class)) {
-        throw new IllegalStateException(
-            String.format(
-                "Function parameter of type [%s] should refer to a ChildFlow by name or type. Set @FlowFactory(name=) or @FlowFactory(flowTypeName=). Flow: [%s] Function/Call: [%s] Parameter: [%s]",
-                ParameterType.CHILD_FLOW_FACTORY_REF,
-                flowTypeRecord.flowTypeName,
-                functionOrCallName,
-                parameterName));
-      }
-    }
 
     if (!(genericParameterType instanceof ParameterizedType)) {
       throw new IllegalStateException(
@@ -113,12 +97,11 @@ public class FlowTypeFactoryParameterCreator extends ParameterCreator {
             functionOrCallName,
             parameterName,
             flowRunner,
-            childFlowName,
-            flowType,
             dynamic,
             (ParameterizedType) genericParameterType);
 
-    flowFactories.add(Pair.of(flowFactoryAnnotation.flowType().getSimpleName(), flowFactoryAnnotation.desc()));
+    Type genericParameterFlowType = ((ParameterizedType)genericParameterType).getActualTypeArguments()[0];
+    flowFactories.add(Pair.of(genericParameterFlowType.getTypeName(), flowFactoryAnnotation.desc()));
 
     // We can't ensure that FLOW_TYPE used in a parameter FlowFactoryPrm<FLOW_TYPE> is the right
     // type at this point,

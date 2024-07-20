@@ -47,7 +47,7 @@ public class FlowFactoryPrmTest {
 
     IllegalStateException e = assertThrows(IllegalStateException.class, flower::initialize);
     Assertions.assertTrue(
-        e.getMessage().contains("Flow factory parameter generic subtype mismatch"));
+        e.getMessage().contains("Registered FlowExec not found for Flow class [class com.flower.flows.F_ParentFlow]"));
   }
 
   @Test
@@ -58,7 +58,7 @@ public class FlowFactoryPrmTest {
 
     IllegalStateException e = assertThrows(IllegalStateException.class, flower::initialize);
     Assertions.assertTrue(
-        e.getMessage().contains("Flow factory parameter generic subtype mismatch"));
+        e.getMessage().contains("Registered FlowExec not found for Flow class [class com.flower.flows.F_ParentFlow]"));
   }
 
   @Test
@@ -95,7 +95,7 @@ class F_ParentFlow2 {
   @SimpleStepFunction
   static Transition step1(
       @StepRef Transition waitStep,
-      @FlowFactory(flowTypeName = "F_ChildFlow") FlowFactoryPrm<F_ChildFlow2> flowFactory,
+      @FlowFactory FlowFactoryPrm<F_ChildFlow2> flowFactory,
       @Out OutPrm<FlowId> childFlowId) {
     System.out.println("F_ParentFlow2 step1 start");
 
@@ -111,13 +111,11 @@ class F_ParentFlow2 {
 
   @SimpleStepFunction
   static ListenableFuture<Transition> waitStep(
-          @Terminal Transition end, @FlowRepo FlowRepoPrm flowRepo, @In FlowId childFlowId) {
+          @Terminal Transition end, @FlowRepo FlowRepoPrm<F_ChildFlow2> flowRepo, @In FlowId childFlowId) {
     System.out.println("F_ParentFlow2 waitStep start");
     System.out.println("F_ParentFlow2 waiting for " + childFlowId);
 
-    ListenableFuture<F_ChildFlow2> future =
-        (ListenableFuture<F_ChildFlow2>)
-            flowRepo.getFlowFuture(childFlowId);
+    ListenableFuture<F_ChildFlow2> future = flowRepo.getFlowFuture(childFlowId);
     return Futures.transform(
         future,
         flow2 -> {
@@ -153,7 +151,7 @@ class F_ParentFlow {
   @SimpleStepFunction
   static ListenableFuture<Transition> step(
       @Terminal Transition end,
-      @FlowFactory(flowTypeName = "F_ChildFlow") FlowFactoryPrm<F_ChildFlow> flowFactory)
+      @FlowFactory FlowFactoryPrm<F_ChildFlow> flowFactory)
       throws ExecutionException, InterruptedException {
     System.out.println("F_ParentFlow step start");
 
@@ -180,7 +178,7 @@ class F_ParentFlow_WrongTypeName {
   @SimpleStepFunction
   static Transition step(
       @Terminal Transition end,
-      @FlowFactory(flowTypeName = "F_ChildFlow") FlowFactoryPrm<F_ParentFlow> flowFactory) {
+      @FlowFactory FlowFactoryPrm<F_ParentFlow> flowFactory) {
     return end;
   }
 }
@@ -190,7 +188,7 @@ class F_ParentFlow_WrongType {
   @SimpleStepFunction
   static Transition step(
       @Terminal Transition end,
-      @FlowFactory(flowType = F_ChildFlow.class) FlowFactoryPrm<F_ParentFlow> flowFactory) {
+      @FlowFactory FlowFactoryPrm<F_ParentFlow> flowFactory) {
     return end;
   }
 }
@@ -200,7 +198,7 @@ class F_ParentFlow_ErrorNonParameterizedType {
   @SimpleStepFunction
   static Transition step(
       @Terminal Transition end,
-      @FlowFactory(flowTypeName = "F_ChildFlow") FlowFactoryPrm flowFactory) {
+      @FlowFactory FlowFactoryPrm flowFactory) {
     return end;
   }
 }

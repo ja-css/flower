@@ -6,9 +6,11 @@ import com.google.common.base.Preconditions;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import javax.annotation.Nullable;
+
+import com.google.common.util.concurrent.ListenableFuture;
 import org.apache.commons.lang3.StringUtils;
 
-public class FactoryOfFlowTypeFactories<T> {
+public class FactoryOfFlowTypeFactories<T> implements FlowRepoPrm<T> {
   final String parentFlowName;
   final String functionName;
   final String functionParameterName;
@@ -16,8 +18,6 @@ public class FactoryOfFlowTypeFactories<T> {
   final FlowRunner flowRunner;
   @Nullable InternalFlowExec<T> flowExec;
 
-  final String childFlowName;
-  final Class<T> childFlowType;
   final boolean dynamic;
   final ParameterizedType genericParameterType;
 
@@ -26,8 +26,6 @@ public class FactoryOfFlowTypeFactories<T> {
       String functionName,
       String functionParameterName,
       FlowRunner flowRunner,
-      String childFlowName,
-      Class<T> childFlowType,
       boolean dynamic,
       ParameterizedType genericParameterType) {
     this.parentFlowName = parentFlowName;
@@ -36,37 +34,26 @@ public class FactoryOfFlowTypeFactories<T> {
     this.dynamic = dynamic;
     this.flowRunner = flowRunner;
     this.flowExec = null;
-    this.childFlowName = childFlowName;
-    this.childFlowType = childFlowType;
     this.genericParameterType = genericParameterType;
   }
 
   public FlowFactoryPrm<T> getFactory(FlowId flowId) {
-    return new FlowFactoryPrmImpl<>(Preconditions.checkNotNull(flowExec), flowId, flowRunner);
+    return new FlowFactoryPrmImpl<>(Preconditions.checkNotNull(flowExec), flowId, this);
   }
 
   public void initFlowExec() {
     if (dynamic) {
       flowExec = flowRunner.getDynamicFlowExec();
     } else {
-      if (!StringUtils.isBlank(childFlowName)) {
-        flowExec = flowRunner.getInternalFlowExec(childFlowName);
-      } else {
-        flowExec = flowRunner.getInternalFlowExec(childFlowType);
-      }
-
       Type genericParameterFlowType = genericParameterType.getActualTypeArguments()[0];
-      Class<T> execFlowType = flowExec.getFlowType();
-      if (!genericParameterFlowType.equals(flowExec.getFlowType())) {
-        throw new IllegalStateException(
-            String.format(
-                "Flow factory parameter generic subtype mismatch: Flow type from FlowExec [%s] Parameter generic subtype [%s]. Flow: [%s] Function/Call: [%s] Parameter: [%s]",
-                execFlowType,
-                genericParameterFlowType,
-                parentFlowName,
-                functionName,
-                functionParameterName));
-      }
+      flowExec = flowRunner.getInternalFlowExec((Class)genericParameterFlowType);
     }
+  }
+
+  @Override
+  @Nullable
+  public ListenableFuture<T> getFlowFuture(FlowId flowId) {
+    //TODO: implement type safety
+    return (ListenableFuture<T>)flowRunner.getFlowFuture(flowId);
   }
 }

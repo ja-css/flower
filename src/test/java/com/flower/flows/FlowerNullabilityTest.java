@@ -150,8 +150,10 @@ public class FlowerNullabilityTest {
     assertEquals(flow.inOut, 34);
   }
 
+  /*
+  TODO: we decided this shouldn't cause runtime exception, We should implement NullAway-like static analysis to fail on init
   @Test
-  public void testOptionalOutThrows() {
+  public void testMandatoryOutThrows() {
     Flower flower = new Flower();
     flower.registerFlow(MandatoryOutThrows.class);
     flower.initialize();
@@ -166,9 +168,12 @@ public class FlowerNullabilityTest {
         e.getMessage()
             .contains("Fatal: value of Out or InOut parameter with Output.MANDATORY wasn't set in the Function call"));
   }
+*/
 
+  /*
+  TODO: we decided this shouldn't cause runtime exception, We should implement NullAway-like static analysis to fail on init
   @Test
-  public void testOptionalInOutThrows() {
+  public void testMandatoryInOutThrows() {
     Flower flower = new Flower();
     flower.registerFlow(MandatoryInOutThrows.class);
     flower.initialize();
@@ -182,7 +187,7 @@ public class FlowerNullabilityTest {
         e.getMessage()
             .contains("Fatal: value of Out or InOut parameter with Output.MANDATORY wasn't set in the Function call"));
   }
-
+*/
   @Test
   public void testNullableInInRetAllowed() throws ExecutionException, InterruptedException {
     Flower flower = new Flower();

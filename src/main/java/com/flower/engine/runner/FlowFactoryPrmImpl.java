@@ -9,7 +9,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.time.Duration;
 import javax.annotation.Nullable;
 
-public class FlowFactoryPrmImpl<T> implements FlowFactoryPrm<T> {
+public class FlowFactoryPrmImpl<T> implements FlowFactoryPrm<T>  {
   final InternalFlowExec flowExec;
   final FlowId flowId;
   final FlowRepoPrm flowRepoPrm;
@@ -34,7 +34,7 @@ public class FlowFactoryPrmImpl<T> implements FlowFactoryPrm<T> {
 
   @Nullable
   @Override
-  public ListenableFuture<?> getFlowFuture(FlowId flowId) {
+  public ListenableFuture<T> getFlowFuture(FlowId flowId) {
     return flowRepoPrm.getFlowFuture(flowId);
   }
 }

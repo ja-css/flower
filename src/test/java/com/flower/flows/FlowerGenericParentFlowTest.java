@@ -97,7 +97,7 @@ class RunGenericChildParentFlow {
     }
 
     @SimpleStepFunction
-    public static ListenableFuture<Transition> runChild(@FlowFactory(flowType=SuperFlow.class) FlowFactoryPrm<SuperFlow> childFlowFactory,
+    public static ListenableFuture<Transition> runChild(@FlowFactory FlowFactoryPrm<SuperFlow> childFlowFactory,
                                                         @In SuperFlow child,
                                                         @Terminal Transition end) {
         FlowFuture<SuperFlow> childFlowFuture = childFlowFactory.runChildFlow(child);

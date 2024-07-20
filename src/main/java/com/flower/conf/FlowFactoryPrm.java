@@ -2,7 +2,7 @@ package com.flower.conf;
 
 import java.time.Duration;
 
-public interface FlowFactoryPrm<T> extends FlowRepoPrm {
+public interface FlowFactoryPrm<T> extends FlowRepoPrm<T> {
   /**
    * Run a child flow of a current flow. Current flow is determined by flow execution context.
    *

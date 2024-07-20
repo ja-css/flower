@@ -14,7 +14,6 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER})
-//TODO: make FlowRepo generic to be able to understand which flow type we're querying on diagram?
 public @interface FlowRepo {
   /**
    * Function parameter name. Recommended to specify explicitly, since parameter names via

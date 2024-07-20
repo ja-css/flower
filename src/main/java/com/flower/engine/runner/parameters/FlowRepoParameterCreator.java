@@ -1,6 +1,8 @@
 package com.flower.engine.runner.parameters;
 
+import com.flower.anno.params.step.FlowFactory;
 import com.flower.anno.params.step.FlowRepo;
+import com.flower.conf.FactoryOfFlowTypeFactories;
 import com.flower.conf.FlowRepoPrm;
 import com.flower.engine.configuration.FlowTypeRecord;
 import com.flower.engine.configuration.FunctionParameterRecord;
@@ -13,9 +15,11 @@ import com.flower.engine.runner.state.StateAccessConfig;
 import com.flower.engine.runner.step.InternalTransition;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -47,6 +51,8 @@ public class FlowRepoParameterCreator extends ParameterCreator {
       ) {
     final String parameterName = baseParameter.name;
     final ParameterType functionParameterType = ParameterType.FLOW_REPO;
+    FlowRepo flowRepoAnnotation;
+    final Type genericParameterType;
 
     if (transitParameterOverride != null) {
       throw new IllegalStateException(
@@ -66,17 +72,42 @@ public class FlowRepoParameterCreator extends ParameterCreator {
         flowTypeRecord.flowTypeName,
         functionOrCallName);
 
-    FlowRepo flowRepoAnnotation;
     if (parameterOverrideFromCall == null) {
       flowRepoAnnotation = Preconditions.checkNotNull(baseParameter.flowRepoAnnotation);
+      genericParameterType = baseParameter.genericParameterType;
     } else {
       flowRepoAnnotation =
               Preconditions.checkNotNull(parameterOverrideFromCall.flowRepoAnnotation);
+      genericParameterType = parameterOverrideFromCall.genericParameterType;
     }
 
-    //TODO: make flow repo generic to be able to understand which flow type we're querying on diagram?
-    //TODO: see generic parameter logic in FlowTypeFactoryParameterCreator
-    flowRepos.add(Pair.of("?", flowRepoAnnotation.desc()));
+    if (!(genericParameterType instanceof ParameterizedType)) {
+      throw new IllegalStateException(
+              String.format(
+                  "Function parameter of type [%s] should be a parameterized type FlowRepoPrm<FLOW_TYPE>. Flow: [%s] Function/Call: [%s] Parameter: [%s]",
+                  ParameterType.CHILD_FLOW_FACTORY_REF,
+                  flowTypeRecord.flowTypeName,
+                  functionOrCallName,
+                  parameterName));
+    }
+
+    FactoryOfFlowTypeFactories specialObject =
+            new FactoryOfFlowTypeFactories(
+                    flowTypeRecord.flowTypeName,
+                    functionOrCallName,
+                    parameterName,
+                    flowRunner,
+                    false,
+                    (ParameterizedType) genericParameterType);
+
+    Type genericParameterFlowType = ((ParameterizedType)genericParameterType).getActualTypeArguments()[0];
+    flowRepos.add(Pair.of(genericParameterFlowType.getTypeName(), flowRepoAnnotation.desc()));
+
+    // We can't ensure that FLOW_TYPE used in a parameter FlowFactoryPrm<FLOW_TYPE> is the right
+    // type at this point,
+    // but we register the Factory here to perform this validation on Flower initialization
+    // (see FactoryOfFlowTypeFactories.initFlowExec(...))
+    flowRunner.registerFactoryOfFlowTypeFactories(specialObject);
 
     return new ParameterCreationResult(
         new FunctionCallParameter(
@@ -85,7 +116,9 @@ public class FlowRepoParameterCreator extends ParameterCreator {
             parameterName,
             functionParameterType,
             baseParameter.genericParameterType,
-            flowRunner,
+            //TODO: here we return flowRunner which can return futures for all types and cause issues,
+            // consider restricting returns to flows of this particular type
+            specialObject,
             baseParameter.nullableAnnotation != null,
             false),
         ImmutableList.of());
