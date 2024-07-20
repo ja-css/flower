@@ -78,12 +78,12 @@ public class StepRefOrTerminalParameterCreator extends ParameterCreator {
         functionParameterType = ParameterType.STEP_REF;
         InternalTransition stepRef =
             getStepRefObject(
-                flowTypeRecord.flowTypeName, stepRefAnnotation.stepName(), parameterName, stepRefAnnotation.desc());
+                flowTypeRecord.flowTypeName, stepRefAnnotation.stepName(), parameterName, stepRefAnnotation.note());
         stepRefPrms.add(stepRef);
         specialObject = stepRef;
       } else {
         functionParameterType = ParameterType.TERMINAL;
-        InternalTransition terminalStepRef = getTerminalStepRef(terminalAnnotation == null ? null : terminalAnnotation.desc());
+        InternalTransition terminalStepRef = getTerminalStepRef(terminalAnnotation == null ? null : terminalAnnotation.note());
         stepRefPrms.add(terminalStepRef);
         specialObject = terminalStepRef;
       }
@@ -104,12 +104,12 @@ public class StepRefOrTerminalParameterCreator extends ParameterCreator {
         functionParameterType = ParameterType.STEP_REF;
         InternalTransition stepRef =
             getStepRefObject(
-                flowTypeRecord.flowTypeName, stepRefOverrideAnnotation.stepName(), parameterName, stepRefOverrideAnnotation.desc());
+                flowTypeRecord.flowTypeName, stepRefOverrideAnnotation.stepName(), parameterName, stepRefOverrideAnnotation.note());
         stepRefPrms.add(stepRef);
         specialObject = stepRef;
       } else {
         functionParameterType = ParameterType.TERMINAL;
-        InternalTransition terminalStepRef = getTerminalStepRef(terminalOverrideAnnotation == null ? null : terminalOverrideAnnotation.desc());
+        InternalTransition terminalStepRef = getTerminalStepRef(terminalOverrideAnnotation == null ? null : terminalOverrideAnnotation.note());
         stepRefPrms.add(terminalStepRef);
         specialObject = terminalStepRef;
       }
@@ -134,12 +134,12 @@ public class StepRefOrTerminalParameterCreator extends ParameterCreator {
         functionParameterType = ParameterType.STEP_REF;
         InternalTransition stepRef =
             getStepRefObject(
-                flowTypeRecord.flowTypeName, transitStepRefPrmAnnotation.stepName(), parameterName, transitStepRefPrmAnnotation.desc());
+                flowTypeRecord.flowTypeName, transitStepRefPrmAnnotation.stepName(), parameterName, transitStepRefPrmAnnotation.note());
         stepRefPrms.add(stepRef);
         specialObject = stepRef;
       } else {
         functionParameterType = ParameterType.TERMINAL;
-        InternalTransition terminalStepRef = getTerminalStepRef(transitTerminalPrmAnnotation == null ? null : transitTerminalPrmAnnotation.desc());
+        InternalTransition terminalStepRef = getTerminalStepRef(transitTerminalPrmAnnotation == null ? null : transitTerminalPrmAnnotation.note());
         stepRefPrms.add(terminalStepRef);
         specialObject = terminalStepRef;
       }

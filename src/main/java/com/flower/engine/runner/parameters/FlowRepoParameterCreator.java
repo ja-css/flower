@@ -1,6 +1,5 @@
 package com.flower.engine.runner.parameters;
 
-import com.flower.anno.params.step.FlowFactory;
 import com.flower.anno.params.step.FlowRepo;
 import com.flower.conf.FactoryOfFlowTypeFactories;
 import com.flower.conf.FlowRepoPrm;
@@ -15,7 +14,6 @@ import com.flower.engine.runner.state.StateAccessConfig;
 import com.flower.engine.runner.step.InternalTransition;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.reflect.Method;
@@ -101,7 +99,7 @@ public class FlowRepoParameterCreator extends ParameterCreator {
                     (ParameterizedType) genericParameterType);
 
     Type genericParameterFlowType = ((ParameterizedType)genericParameterType).getActualTypeArguments()[0];
-    flowRepos.add(Pair.of(genericParameterFlowType.getTypeName(), flowRepoAnnotation.desc()));
+    flowRepos.add(Pair.of(genericParameterFlowType.getTypeName(), flowRepoAnnotation.note()));
 
     // We can't ensure that FLOW_TYPE used in a parameter FlowFactoryPrm<FLOW_TYPE> is the right
     // type at this point,

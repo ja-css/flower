@@ -39,5 +39,5 @@ public @interface StepRef {
    *
    * @return Transition desc
    */
-  String desc() default "";
+  String note() default "";
 }

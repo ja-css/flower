@@ -19,7 +19,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.apache.commons.lang3.StringUtils;
+
 import org.apache.commons.lang3.tuple.Pair;
 
 public class FlowTypeFactoryParameterCreator extends ParameterCreator {
@@ -101,7 +101,7 @@ public class FlowTypeFactoryParameterCreator extends ParameterCreator {
             (ParameterizedType) genericParameterType);
 
     Type genericParameterFlowType = ((ParameterizedType)genericParameterType).getActualTypeArguments()[0];
-    flowFactories.add(Pair.of(genericParameterFlowType.getTypeName(), flowFactoryAnnotation.desc()));
+    flowFactories.add(Pair.of(genericParameterFlowType.getTypeName(), flowFactoryAnnotation.note()));
 
     // We can't ensure that FLOW_TYPE used in a parameter FlowFactoryPrm<FLOW_TYPE> is the right
     // type at this point,

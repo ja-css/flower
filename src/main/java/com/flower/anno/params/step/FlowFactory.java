@@ -33,5 +33,5 @@ public @interface FlowFactory {
    * Optional: describes under what circumstances and with what goals ChildFlows are created.
    * @return Child FlowFactory desc
    */
-  String desc() default "";
+  String note() default "";
 }

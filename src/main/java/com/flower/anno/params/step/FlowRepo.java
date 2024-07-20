@@ -28,5 +28,5 @@ public @interface FlowRepo {
    * Optional: describes under what circumstances and with what goals Flow Futures are queried.
    * @return FlowRepo desc
    */
-  String desc() default "";
+  String note() default "";
 }

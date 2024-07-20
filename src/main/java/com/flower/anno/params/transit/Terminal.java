@@ -28,5 +28,5 @@ public @interface Terminal {
    *
    * @return Transition desc
    */
-  String desc() default "";
+  String note() default "";
 }

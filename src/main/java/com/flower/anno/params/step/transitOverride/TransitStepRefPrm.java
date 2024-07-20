@@ -23,5 +23,5 @@ public @interface TransitStepRefPrm {
    *
    * @return Transition desc
    */
-  String desc() default "";
+  String note() default "";
 }
