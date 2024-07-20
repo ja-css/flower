@@ -26,6 +26,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 //TODO: looks like InOut logic here is not used, due to InOutParameterCreator
 public class InParameterCreator extends ParameterCreator {
@@ -438,8 +439,10 @@ public class InParameterCreator extends ParameterCreator {
           @Nullable FunctionParameterRecord parameterOverrideFromCall,
           @Nullable TransitParameterOverrideRecord transitParameterOverride,
           @Nullable Type genericReturnType, // NOT USED
-          List<InternalTransition> stepRefPrms // NOT USED
-      ) {
+          List<InternalTransition> stepRefPrms, // NOT USED
+          List<Pair<String, String>> flowFactories,
+          List<Pair<String, String>> flowRepos
+  ) {
     if (parameterOverrideFromCall == null && transitParameterOverride == null) {
       return fromBaseParameter(
           flowTypeRecord,

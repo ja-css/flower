@@ -7,6 +7,7 @@ import com.flower.engine.configuration.FunctionReturnValueRecord;
 import com.flower.engine.configuration.TransitParameterOverrideRecord;
 import com.flower.engine.runner.state.StateAccessConfig;
 import com.flower.engine.runner.step.InternalTransition;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -253,5 +254,7 @@ public abstract class ParameterCreator {
       @Nullable FunctionParameterRecord parameterOverrideFromCall,
       @Nullable TransitParameterOverrideRecord transitParameterOverride,
       @Nullable Type genericInRetType,
-      List<InternalTransition> stepRefPrms);
+      List<InternalTransition> stepRefPrms,
+      List<Pair<String, String>> flowFactories,
+      List<Pair<String, String>> flowRepos);
 }

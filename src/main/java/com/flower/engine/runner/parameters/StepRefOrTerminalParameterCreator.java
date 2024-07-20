@@ -21,12 +21,13 @@ import java.lang.reflect.Type;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class StepRefOrTerminalParameterCreator extends ParameterCreator {
   StepRefOrTerminalParameterCreator() {}
 
-  InternalTransition getStepRefObject(String flowName, String stepName, String parameterName) {
-    return getStepRef(flowName, StringUtils.defaultIfEmpty(stepName, parameterName));
+  InternalTransition getStepRefObject(String flowName, String stepName, String parameterName, String note) {
+    return getStepRef(flowName, StringUtils.defaultIfEmpty(stepName, parameterName), note);
   }
 
   @Override
@@ -43,7 +44,10 @@ public class StepRefOrTerminalParameterCreator extends ParameterCreator {
       @Nullable FunctionParameterRecord parameterOverrideFromCall,
       @Nullable TransitParameterOverrideRecord transitParameterOverride,
       @Nullable Type genericInRetType, // NOT USED
-      List<InternalTransition> stepRefPrms) {
+      List<InternalTransition> stepRefPrms,
+      List<Pair<String, String>> flowFactories,
+      List<Pair<String, String>> flowRepos
+  ) {
     final String parameterName = baseParameter.name;
 
     final ParameterType functionParameterType;
@@ -74,12 +78,12 @@ public class StepRefOrTerminalParameterCreator extends ParameterCreator {
         functionParameterType = ParameterType.STEP_REF;
         InternalTransition stepRef =
             getStepRefObject(
-                flowTypeRecord.flowTypeName, stepRefAnnotation.stepName(), parameterName);
+                flowTypeRecord.flowTypeName, stepRefAnnotation.stepName(), parameterName, stepRefAnnotation.desc());
         stepRefPrms.add(stepRef);
         specialObject = stepRef;
       } else {
         functionParameterType = ParameterType.TERMINAL;
-        InternalTransition terminalStepRef = getTerminalStepRef();
+        InternalTransition terminalStepRef = getTerminalStepRef(terminalAnnotation == null ? null : terminalAnnotation.desc());
         stepRefPrms.add(terminalStepRef);
         specialObject = terminalStepRef;
       }
@@ -100,12 +104,12 @@ public class StepRefOrTerminalParameterCreator extends ParameterCreator {
         functionParameterType = ParameterType.STEP_REF;
         InternalTransition stepRef =
             getStepRefObject(
-                flowTypeRecord.flowTypeName, stepRefOverrideAnnotation.stepName(), parameterName);
+                flowTypeRecord.flowTypeName, stepRefOverrideAnnotation.stepName(), parameterName, stepRefOverrideAnnotation.desc());
         stepRefPrms.add(stepRef);
         specialObject = stepRef;
       } else {
         functionParameterType = ParameterType.TERMINAL;
-        InternalTransition terminalStepRef = getTerminalStepRef();
+        InternalTransition terminalStepRef = getTerminalStepRef(terminalOverrideAnnotation == null ? null : terminalOverrideAnnotation.desc());
         stepRefPrms.add(terminalStepRef);
         specialObject = terminalStepRef;
       }
@@ -130,12 +134,12 @@ public class StepRefOrTerminalParameterCreator extends ParameterCreator {
         functionParameterType = ParameterType.STEP_REF;
         InternalTransition stepRef =
             getStepRefObject(
-                flowTypeRecord.flowTypeName, transitStepRefPrmAnnotation.stepName(), parameterName);
+                flowTypeRecord.flowTypeName, transitStepRefPrmAnnotation.stepName(), parameterName, transitStepRefPrmAnnotation.desc());
         stepRefPrms.add(stepRef);
         specialObject = stepRef;
       } else {
         functionParameterType = ParameterType.TERMINAL;
-        InternalTransition terminalStepRef = getTerminalStepRef();
+        InternalTransition terminalStepRef = getTerminalStepRef(transitTerminalPrmAnnotation == null ? null : transitTerminalPrmAnnotation.desc());
         stepRefPrms.add(terminalStepRef);
         specialObject = terminalStepRef;
       }
@@ -154,11 +158,11 @@ public class StepRefOrTerminalParameterCreator extends ParameterCreator {
         ImmutableList.of());
   }
 
-  public InternalTransition getStepRef(String flowName, String stepName) {
-    return TransitionImpl.getStepTransition(stepName);
+  public InternalTransition getStepRef(String flowName, String stepName, @Nullable String transitionNote) {
+    return TransitionImpl.getStepTransition(stepName, transitionNote);
   }
 
-  public InternalTransition getTerminalStepRef() {
-    return TransitionImpl.getTerminalTransition();
+  public InternalTransition getTerminalStepRef(@Nullable String transitionNote) {
+    return TransitionImpl.getTerminalTransition(transitionNote);
   }
 }

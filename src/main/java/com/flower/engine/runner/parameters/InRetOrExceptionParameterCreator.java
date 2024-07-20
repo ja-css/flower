@@ -17,6 +17,8 @@ import com.flower.engine.runner.step.InternalTransition;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ListenableFuture;
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -184,7 +186,9 @@ public class InRetOrExceptionParameterCreator extends ParameterCreator {
           @Nullable FunctionParameterRecord parameterOverrideFromCall,
           @Nullable TransitParameterOverrideRecord transitParameterOverride,
           @Nullable Type genericReturnType,
-          List<InternalTransition> stepRefPrms // NOT USED
+          List<InternalTransition> stepRefPrms, // NOT USED
+          List<Pair<String, String>> flowFactories,
+          List<Pair<String, String>> flowRepos
       ) {
     if (parameterOverrideFromCall == null && transitParameterOverride == null) {
       return fromBaseParameter(

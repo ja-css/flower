@@ -20,6 +20,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class FlowTypeFactoryParameterCreator extends ParameterCreator {
   final FlowRunner flowRunner;
@@ -42,7 +43,9 @@ public class FlowTypeFactoryParameterCreator extends ParameterCreator {
           @Nullable FunctionParameterRecord parameterOverrideFromCall,
           @Nullable TransitParameterOverrideRecord transitParameterOverride,
           @Nullable Type genericInRetType, // NOT USED
-          List<InternalTransition> stepRefPrms // NOT USED
+          List<InternalTransition> stepRefPrms, // NOT USED
+          List<Pair<String, String>> flowFactories,
+          List<Pair<String, String>> flowRepos
       ) {
     final String parameterName = baseParameter.name;
     final ParameterType functionParameterType = ParameterType.CHILD_FLOW_FACTORY_REF;
@@ -114,6 +117,8 @@ public class FlowTypeFactoryParameterCreator extends ParameterCreator {
             flowType,
             dynamic,
             (ParameterizedType) genericParameterType);
+
+    flowFactories.add(Pair.of(flowFactoryAnnotation.flowType().getSimpleName(), flowFactoryAnnotation.desc()));
 
     // We can't ensure that FLOW_TYPE used in a parameter FlowFactoryPrm<FLOW_TYPE> is the right
     // type at this point,

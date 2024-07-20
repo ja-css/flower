@@ -12,5 +12,8 @@ public interface InternalTransition extends Transition {
   boolean isTerminal();
 
   @Nullable
+  String getNote();
+
+  @Nullable
   Duration getDelay();
 }

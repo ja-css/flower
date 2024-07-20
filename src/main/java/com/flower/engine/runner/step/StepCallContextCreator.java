@@ -28,6 +28,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -124,7 +126,9 @@ public class StepCallContextCreator {
       @Nullable Type genericInRetType,
       @Nullable String returnToFieldName,
       List<InternalTransition> stepRefPrms,
-      boolean isTransit) {
+      boolean isTransit,
+      List<Pair<String, String>> flowFactories,
+      List<Pair<String, String>> flowRepos) {
     List<GlobalFunctionAssumedType> assumedReturnTypes = new ArrayList<>();
 
     // functionOrCallMethod is null for Global Transitioner references
@@ -180,7 +184,9 @@ public class StepCallContextCreator {
             transitParameterOverrides,
             genericInRetType,
             stepRefPrms,
-            assumedReturnTypes);
+            assumedReturnTypes,
+            flowFactories,
+            flowRepos);
     function.setAccessible(true);
     return new FunctionCallContext(
         stepFunctionParametersWithOverrides, function, functionOrCallName);
@@ -195,6 +201,8 @@ public class StepCallContextCreator {
       TransitionerRecord transitionerRecord,
       StateAccessConfig flowStateAccess) {
     List<InternalTransition> stepRefPrms = new ArrayList<>();
+    List<Pair<String, String>> flowFactories = new ArrayList<>();
+    List<Pair<String, String>> flowRepos = new ArrayList<>();
 
     FunctionCallContext stepFunctionCallContext =
         createFunctionCallContext(
@@ -214,7 +222,9 @@ public class StepCallContextCreator {
             null,
             stepRecord.returnTo,
             stepRefPrms,
-            false);
+            false,
+            flowFactories,
+            flowRepos);
     FunctionCallContext transitFunctionCalContext =
         createFunctionCallContext(
             flowTypeRecord,
@@ -233,7 +243,9 @@ public class StepCallContextCreator {
             stepRecord.method.getGenericReturnType(),
             null,
             stepRefPrms,
-            true);
+            true,
+            flowFactories,
+            flowRepos);
     return new StepContext(
         stepFunctionCallContext,
         transitFunctionCalContext,
@@ -242,7 +254,9 @@ public class StepCallContextCreator {
         stepRecord.stepName,
         transitionerRecord.transitionerName,
         stepRefPrms,
-        stepRecord.isFirstStep);
+        stepRecord.isFirstStep,
+        flowFactories,
+        flowRepos);
   }
 
   // Step function, Transitioner call
@@ -253,6 +267,8 @@ public class StepCallContextCreator {
       GlobalFunctionRecord transitionerGlobalFunctionRecord,
       StateAccessConfig flowStateAccess) {
     List<InternalTransition> stepRefPrms = new ArrayList<>();
+    List<Pair<String, String>> flowFactories = new ArrayList<>();
+    List<Pair<String, String>> flowRepos = new ArrayList<>();
 
     FunctionCallContext stepFunctionCallContext =
         createFunctionCallContext(
@@ -272,7 +288,9 @@ public class StepCallContextCreator {
             null,
             stepRecord.returnTo,
             stepRefPrms,
-            false);
+            false,
+            flowFactories,
+            flowRepos);
     FunctionCallContext transitFunctionCalContext =
         createFunctionCallContext(
             flowTypeRecord,
@@ -291,7 +309,9 @@ public class StepCallContextCreator {
             stepRecord.method.getGenericReturnType(),
             null,
             stepRefPrms,
-            true);
+            true,
+            flowFactories,
+            flowRepos);
     return new StepContext(
         stepFunctionCallContext,
         transitFunctionCalContext,
@@ -300,7 +320,9 @@ public class StepCallContextCreator {
         stepRecord.stepName,
         transitionerCallRecord.transitionerName,
         stepRefPrms,
-        stepRecord.isFirstStep);
+        stepRecord.isFirstStep,
+        flowFactories,
+        flowRepos);
   }
 
   // Step function, Transitioner reference
@@ -310,6 +332,8 @@ public class StepCallContextCreator {
       GlobalFunctionRecord transitionerGlobalFunctionRecord,
       StateAccessConfig flowStateAccess) {
     List<InternalTransition> stepRefPrms = new ArrayList<>();
+    List<Pair<String, String>> flowFactories = new ArrayList<>();
+    List<Pair<String, String>> flowRepos = new ArrayList<>();
 
     FunctionCallContext stepFunctionCallContext =
         createFunctionCallContext(
@@ -329,7 +353,9 @@ public class StepCallContextCreator {
             null,
             stepRecord.returnTo,
             stepRefPrms,
-            false);
+            false,
+            flowFactories,
+            flowRepos);
     FunctionCallContext transitFunctionCalContext =
         createFunctionCallContext(
             flowTypeRecord,
@@ -348,7 +374,9 @@ public class StepCallContextCreator {
             stepRecord.method.getGenericReturnType(),
             null,
             stepRefPrms,
-            true);
+            true,
+            flowFactories,
+            flowRepos);
     return new StepContext(
         stepFunctionCallContext,
         transitFunctionCalContext,
@@ -357,7 +385,9 @@ public class StepCallContextCreator {
         stepRecord.stepName,
         transitionerGlobalFunctionRecord.functionName,
         stepRefPrms,
-        stepRecord.isFirstStep);
+        stepRecord.isFirstStep,
+        flowFactories,
+        flowRepos);
   }
 
   // Step call, Transitioner function
@@ -368,6 +398,8 @@ public class StepCallContextCreator {
       TransitionerRecord transitionerRecord,
       StateAccessConfig flowStateAccess) {
     List<InternalTransition> stepRefPrms = new ArrayList<>();
+    List<Pair<String, String>> flowFactories = new ArrayList<>();
+    List<Pair<String, String>> flowRepos = new ArrayList<>();
 
     FunctionCallContext stepFunctionCallContext =
         createFunctionCallContext(
@@ -387,7 +419,9 @@ public class StepCallContextCreator {
             null,
             stepCallRecord.returnTo,
             stepRefPrms,
-            false);
+            false,
+            flowFactories,
+            flowRepos);
     FunctionCallContext transitFunctionCalContext =
         createFunctionCallContext(
             flowTypeRecord,
@@ -406,7 +440,9 @@ public class StepCallContextCreator {
             stepGlobalFunctionRecord.method.getGenericReturnType(),
             null,
             stepRefPrms,
-            true);
+            true,
+            flowFactories,
+            flowRepos);
     return new StepContext(
         stepFunctionCallContext,
         transitFunctionCalContext,
@@ -415,7 +451,9 @@ public class StepCallContextCreator {
         stepCallRecord.stepName,
         transitionerRecord.transitionerName,
         stepRefPrms,
-        stepCallRecord.isFirstStep);
+        stepCallRecord.isFirstStep,
+        flowFactories,
+        flowRepos);
   }
 
   // Step call, Transitioner call
@@ -427,6 +465,8 @@ public class StepCallContextCreator {
       GlobalFunctionRecord transitionerGlobalFunctionRecord,
       StateAccessConfig flowStateAccess) {
     List<InternalTransition> stepRefPrms = new ArrayList<>();
+    List<Pair<String, String>> flowFactories = new ArrayList<>();
+    List<Pair<String, String>> flowRepos = new ArrayList<>();
 
     FunctionCallContext stepFunctionCallContext =
         createFunctionCallContext(
@@ -446,7 +486,9 @@ public class StepCallContextCreator {
             null,
             stepCallRecord.returnTo,
             stepRefPrms,
-            false);
+            false,
+            flowFactories,
+            flowRepos);
     FunctionCallContext transitFunctionCalContext =
         createFunctionCallContext(
             flowTypeRecord,
@@ -465,7 +507,9 @@ public class StepCallContextCreator {
             stepGlobalFunctionRecord.method.getGenericReturnType(),
             null,
             stepRefPrms,
-            true);
+            true,
+            flowFactories,
+            flowRepos);
     return new StepContext(
         stepFunctionCallContext,
         transitFunctionCalContext,
@@ -474,7 +518,9 @@ public class StepCallContextCreator {
         stepCallRecord.stepName,
         transitionerCallRecord.transitionerName,
         stepRefPrms,
-        stepCallRecord.isFirstStep);
+        stepCallRecord.isFirstStep,
+        flowFactories,
+        flowRepos);
   }
 
   // Step call, Transitioner reference
@@ -485,6 +531,8 @@ public class StepCallContextCreator {
       GlobalFunctionRecord transitionerGlobalFunctionRecord,
       StateAccessConfig flowStateAccess) {
     List<InternalTransition> stepRefPrms = new ArrayList<>();
+    List<Pair<String, String>> flowFactories = new ArrayList<>();
+    List<Pair<String, String>> flowRepos = new ArrayList<>();
 
     FunctionCallContext stepFunctionCallContext =
         createFunctionCallContext(
@@ -504,7 +552,9 @@ public class StepCallContextCreator {
             null,
             stepCallRecord.returnTo,
             stepRefPrms,
-            false);
+            false,
+            flowFactories,
+            flowRepos);
     FunctionCallContext transitFunctionCalContext =
         createFunctionCallContext(
             flowTypeRecord,
@@ -523,7 +573,9 @@ public class StepCallContextCreator {
             stepGlobalFunctionRecord.method.getGenericReturnType(),
             null,
             stepRefPrms,
-            true);
+            true,
+            flowFactories,
+            flowRepos);
     return new StepContext(
         stepFunctionCallContext,
         transitFunctionCalContext,
@@ -532,7 +584,9 @@ public class StepCallContextCreator {
         stepCallRecord.stepName,
         transitionerGlobalFunctionRecord.functionName,
         stepRefPrms,
-        stepCallRecord.isFirstStep);
+        stepCallRecord.isFirstStep,
+        flowFactories,
+        flowRepos);
   }
 
   // ----------- Steps combined with Transitioners -----------
@@ -542,6 +596,8 @@ public class StepCallContextCreator {
       StepAndTransitRecord stepAndTransitRecord,
       StateAccessConfig flowStateAccess) {
     List<InternalTransition> stepRefPrms = new ArrayList<>();
+    List<Pair<String, String>> flowFactories = new ArrayList<>();
+    List<Pair<String, String>> flowRepos = new ArrayList<>();
 
     FunctionCallContext stepAndTransitFunctionCallContext =
         createFunctionCallContext(
@@ -561,13 +617,17 @@ public class StepCallContextCreator {
             null,
             null,
             stepRefPrms,
-            true);
+            true,
+            flowFactories,
+            flowRepos);
     return new StepAndTransitContext(
         stepAndTransitFunctionCallContext,
         flowStateAccess,
         stepAndTransitRecord.stepName,
         stepRefPrms,
-        stepAndTransitRecord.isFirstStep);
+        stepAndTransitRecord.isFirstStep,
+        flowFactories,
+        flowRepos);
   }
 
   public StepAndTransitContext createStepAndTransitCallContext(
@@ -576,6 +636,8 @@ public class StepCallContextCreator {
       GlobalFunctionRecord globalFunctionRecord,
       StateAccessConfig flowStateAccess) {
     List<InternalTransition> stepRefPrms = new ArrayList<>();
+    List<Pair<String, String>> flowFactories = new ArrayList<>();
+    List<Pair<String, String>> flowRepos = new ArrayList<>();
 
     FunctionCallContext stepAndTransitFunctionCallContext =
         createFunctionCallContext(
@@ -595,13 +657,17 @@ public class StepCallContextCreator {
             null,
             null,
             stepRefPrms,
-            true);
+            true,
+            flowFactories,
+            flowRepos);
     return new StepAndTransitContext(
         stepAndTransitFunctionCallContext,
         flowStateAccess,
         stepAndTransitCallRecord.stepName,
         stepRefPrms,
-        stepAndTransitCallRecord.isFirstStep);
+        stepAndTransitCallRecord.isFirstStep,
+        flowFactories,
+        flowRepos);
   }
 
   // ----------- Event Handler Functions -----------
@@ -613,6 +679,8 @@ public class StepCallContextCreator {
       StateAccessConfig flowStateAccess,
       StateAccessConfig eventProfileStateAccess) {
     List<InternalTransition> stepRefPrms = new ArrayList<>();
+    List<Pair<String, String>> flowFactories = new ArrayList<>();
+    List<Pair<String, String>> flowRepos = new ArrayList<>();
 
     FunctionCallContext eventCallContext =
         createFunctionCallContext(
@@ -632,7 +700,9 @@ public class StepCallContextCreator {
             null,
             null,
             stepRefPrms,
-            false);
+            false,
+            flowFactories,
+            flowRepos);
     return new EventFunction(
         eventCallRecord.eventCallName, eventCallRecord.annotation.concurrency(), eventCallContext);
   }
@@ -643,6 +713,8 @@ public class StepCallContextCreator {
       StateAccessConfig flowStateAccess,
       StateAccessConfig eventProfileStateAccess) {
     List<InternalTransition> stepRefPrms = new ArrayList<>();
+    List<Pair<String, String>> flowFactories = new ArrayList<>();
+    List<Pair<String, String>> flowRepos = new ArrayList<>();
 
     FunctionCallContext eventContext =
         createFunctionCallContext(
@@ -662,7 +734,9 @@ public class StepCallContextCreator {
             null,
             null,
             stepRefPrms,
-            false);
+            false,
+            flowFactories,
+            flowRepos);
     return new EventFunction(
         eventRecord.eventFunctionName, eventRecord.annotation.concurrency(), eventContext);
   }
@@ -745,7 +819,9 @@ public class StepCallContextCreator {
       @Nullable List<TransitParameterOverrideRecord> transitParameterOverrides,
       @Nullable Type genericInRetType,
       List<InternalTransition> stepRefPrms,
-      List<GlobalFunctionAssumedType> assumedReturnTypes) {
+      List<GlobalFunctionAssumedType> assumedReturnTypes,
+      List<Pair<String, String>> flowFactories,
+      List<Pair<String, String>> flowRepos) {
     String flowName = flowTypeRecord.flowTypeName;
     final Map<String, FunctionParameterRecord> baseParametersMap =
         baseFunctionParameters.stream().collect(Collectors.toMap(p -> p.name, p -> p));
@@ -822,7 +898,9 @@ public class StepCallContextCreator {
               callOverrideMap.get(parameterName),
               transitOverrideMap.get(parameterName),
               genericInRetType,
-              stepRefPrms);
+              stepRefPrms,
+              flowFactories,
+              flowRepos);
 
       parameters.add(parameterCreationResult.parameter);
       assumedTypes.addAll(parameterCreationResult.assumedTypes);

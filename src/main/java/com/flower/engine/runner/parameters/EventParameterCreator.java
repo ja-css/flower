@@ -14,6 +14,8 @@ import com.flower.engine.runner.state.StateAccessConfig;
 import com.flower.engine.runner.step.InternalTransition;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -36,7 +38,9 @@ public class EventParameterCreator extends ParameterCreator {
           @Nullable FunctionParameterRecord parameterOverrideFromCall,
           @Nullable TransitParameterOverrideRecord transitParameterOverride,
           @Nullable Type genericInRetType, // NOT USED
-          List<InternalTransition> stepRefPrms // NOT USED
+          List<InternalTransition> stepRefPrms, // NOT USED
+          List<Pair<String, String>> flowFactories,
+          List<Pair<String, String>> flowRepos
       ) {
     final String parameterName = baseParameter.name;
 

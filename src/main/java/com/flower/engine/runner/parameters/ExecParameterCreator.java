@@ -10,6 +10,7 @@ import com.flower.engine.runner.state.StateAccessConfig;
 import com.flower.engine.runner.step.InternalTransition;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
@@ -38,7 +39,9 @@ public class ExecParameterCreator extends ParameterCreator {
           @Nullable FunctionParameterRecord parameterOverrideFromCall,
           @Nullable TransitParameterOverrideRecord transitParameterOverride,
           @Nullable Type genericInRetType, // NOT USED
-          List<InternalTransition> stepRefPrms // NOT USED
+          List<InternalTransition> stepRefPrms, // NOT USED
+          List<Pair<String, String>> flowFactories,
+          List<Pair<String, String>> flowRepos
       ) {
     final String parameterName = baseParameter.name;
 

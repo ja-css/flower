@@ -29,14 +29,22 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.util.concurrent.SettableFuture;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 
 public class FlowExecImpl<T> implements InternalFlowExec<T> {
-  static final String BEGIN = "BEGIN";
-  static final String END = "END";
-  static final String LINK = "-->";
+  static final String BEGIN = "BEGIN([BEGIN])";
+  static final String END = "END([END])";
+  static final String DIAGRAM_NAME = "flowchart";
+
+  static final String LINK_BEGIN = "--";
+  static final String LINK_END = "-->";
+  static final String FLOW_FACTORY_LINK_BEGIN = "-.";
+  static final String FLOW_FACTORY_LINK_END = ".->";
+  static final String FLOW_REPO_LINK_BEGIN = "-.";
+  static final String FLOW_REPO_LINK_END = ".->";
 
   final FlowRunner flowRunner;
   final Class<T> flowType;
@@ -165,7 +173,7 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
 
     StringBuilder graphBuilder = new StringBuilder();
     graphBuilder
-        .append("```mermaid\ngraph LR\n")
+        .append("```mermaid\n" + DIAGRAM_NAME + "\n")
         .append(BEGIN)
         .append('\n')
         .append(END)
@@ -177,20 +185,29 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
       boolean isFirst = step.getStepInfo().isFirstStep();
       List<InternalTransition> transitions = step.getTransitions();
 
-      graphBuilder.append(stepName).append('\n');
+      graphBuilder.append(stepName+"[["+stepName+"]]").append('\n');
       if (isFirst) {
-        String link = createLink(BEGIN, stepName);
-        if (existingLinks.add(link)) graphBuilder.append(link).append('\n');
+        String link = createLink(BEGIN, stepName, null);
+        if (existingLinks.add(link)) { graphBuilder.append(link).append('\n'); }
       }
 
       for (InternalTransition transition : transitions) {
         if (transition.isTerminal()) {
-          String link = createLink(stepName, END);
-          if (existingLinks.add(link)) graphBuilder.append(link).append('\n');
+          String link = createPreFormattedLink(stepName, END, transition.getNote());
+          if (existingLinks.add(link)) { graphBuilder.append(link).append('\n'); }
         } else {
-          String link = createLink(stepName, Preconditions.checkNotNull(transition.getStepName()));
-          if (existingLinks.add(link)) graphBuilder.append(link).append('\n');
+          String link = createLink(stepName, Preconditions.checkNotNull(transition.getStepName()), transition.getNote());
+          if (existingLinks.add(link)) { graphBuilder.append(link).append('\n'); }
         }
+      }
+
+      for (Pair<String, String> flowFactory : step.getFlowFactories()) {
+          String link = createFlowFactoryLink(stepName, "Flow:" + flowFactory.getKey(), flowFactory.getValue());
+          graphBuilder.append(link).append('\n');
+      }
+      for (Pair<String, String> flowRepo : step.getFlowRepos()) {
+          String link = createFlowRepoLink(stepName, "Repo:" + flowRepo.getKey(), flowRepo.getValue());
+          graphBuilder.append(link).append('\n');
       }
     }
 
@@ -199,8 +216,32 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
     return graphBuilder.toString();
   }
 
-  String createLink(String left, String right) {
-    return String.format("%s %s %s", left, LINK, right);
+  String createPreFormattedLink(String left, String right, @Nullable String note) {
+    if (StringUtils.isBlank(note)) {
+      return String.format("%s %s %s", left, LINK_END, right);
+    }
+    return String.format("%s %s%s%s %s", left, LINK_BEGIN, note, LINK_END, right);
+  }
+
+  String createLink(String left, String right, @Nullable String note) {
+    if (StringUtils.isBlank(note)) {
+      return String.format("%s %s %s[[%s]]", left, LINK_END, right, right);
+    }
+    return String.format("%s %s%s%s %s[[%s]]", left, LINK_BEGIN, note, LINK_END, right, right);
+  }
+
+  String createFlowFactoryLink(String left, String right, @Nullable String note) {
+    if (StringUtils.isBlank(note)) {
+      return String.format("%s %s %s>%s]", left, FLOW_FACTORY_LINK_END, right, right);
+    }
+    return String.format("%s %s%s%s %s>%s]", left, FLOW_FACTORY_LINK_BEGIN, note, FLOW_FACTORY_LINK_END, right, right);
+  }
+
+  String createFlowRepoLink(String left, String right, @Nullable String note) {
+    if (StringUtils.isBlank(note)) {
+      return String.format("%s %s %s{{%s}}", left, FLOW_REPO_LINK_END, right, right);
+    }
+    return String.format("%s %s%s%s %s{{%s}}", left, FLOW_REPO_LINK_BEGIN, note, FLOW_REPO_LINK_END, right, right);
   }
 
   ListenableFuture<T> runEventsForLastStep(FlowImpl<T> flowInstance) {

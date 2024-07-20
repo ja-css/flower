@@ -25,6 +25,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class OutParameterCreator extends ParameterCreator {
   OutParameterCreator() {}
@@ -379,7 +380,9 @@ public class OutParameterCreator extends ParameterCreator {
           @Nullable FunctionParameterRecord parameterOverrideFromCall,
           @Nullable TransitParameterOverrideRecord transitParameterOverride,
           @Nullable Type genericInRetType, // NOT USED
-          List<InternalTransition> stepRefPrms // NOT USED
+          List<InternalTransition> stepRefPrms, // NOT USED
+          List<Pair<String, String>> flowFactories,
+          List<Pair<String, String>> flowRepos
       ) {
     if (parameterOverrideFromCall == null && transitParameterOverride == null) {
       return fromBaseParameter(

@@ -17,6 +17,8 @@ import com.flower.engine.runner.state.StateAccessConfig;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.util.List;
 
 public class StepAndTransitContext implements StepCallContext {
@@ -27,6 +29,8 @@ public class StepAndTransitContext implements StepCallContext {
   final StepInfoPrm stepInfo;
 
   final List<InternalTransition> transitions;
+  final List<Pair<String, String>> flowFactories;
+  final List<Pair<String, String>> flowRepos;
   final StepParameterInitProfile stepParameterInitProfile;
 
   public StepAndTransitContext(
@@ -34,12 +38,16 @@ public class StepAndTransitContext implements StepCallContext {
       StateAccessConfig flowStateAccessConfig,
       String stepName,
       List<InternalTransition> transitions,
-      boolean isFirstStep) {
+      boolean isFirstStep,
+      List<Pair<String, String>> flowFactories,
+      List<Pair<String, String>> flowRepos) {
     this.stepAndTransitFunctionCall = stepAndTransitFunctionCall;
     this.flowStateAccessConfig = flowStateAccessConfig;
     // exec is the same as transit
     this.stepInfo = new StepInfo(stepName, stepName, isFirstStep, true);
     this.transitions = transitions;
+    this.flowFactories = flowFactories;
+    this.flowRepos = flowRepos;
 
     this.stepParameterInitProfile = new StepParameterInitProfile(stepAndTransitFunctionCall);
   }
@@ -53,6 +61,12 @@ public class StepAndTransitContext implements StepCallContext {
   public List<InternalTransition> getTransitions() {
     return transitions;
   }
+
+  @Override
+  public List<Pair<String, String>> getFlowFactories() { return flowFactories; }
+
+  @Override
+  public List<Pair<String, String>> getFlowRepos() { return flowRepos; }
 
   public ListenableFuture<InternalTransition> call(
       FlowId flowId,

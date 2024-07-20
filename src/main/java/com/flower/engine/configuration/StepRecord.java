@@ -9,7 +9,7 @@ import java.util.List;
 public class StepRecord extends StepFunctionRecord {
   public final Class<?> flowType;
   public final Method method;
-  final StepFunction annotation;
+  public final StepFunction annotation;
   public final String stepName;
   public final String transitionerName;
   public final Class<?> globalTransitionerContainer;

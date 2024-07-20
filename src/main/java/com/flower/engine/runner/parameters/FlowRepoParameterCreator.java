@@ -1,5 +1,6 @@
 package com.flower.engine.runner.parameters;
 
+import com.flower.anno.params.step.FlowRepo;
 import com.flower.conf.FlowRepoPrm;
 import com.flower.engine.configuration.FlowTypeRecord;
 import com.flower.engine.configuration.FunctionParameterRecord;
@@ -10,7 +11,10 @@ import com.flower.engine.function.ParameterType;
 import com.flower.engine.runner.FlowRunner;
 import com.flower.engine.runner.state.StateAccessConfig;
 import com.flower.engine.runner.step.InternalTransition;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -37,7 +41,9 @@ public class FlowRepoParameterCreator extends ParameterCreator {
           @Nullable FunctionParameterRecord parameterOverrideFromCall,
           @Nullable TransitParameterOverrideRecord transitParameterOverride, // NOT USED
           @Nullable Type genericInRetType, // NOT USED
-          List<InternalTransition> stepRefPrms // NOT USED
+          List<InternalTransition> stepRefPrms, // NOT USED
+          List<Pair<String, String>> flowFactories,
+          List<Pair<String, String>> flowRepos
       ) {
     final String parameterName = baseParameter.name;
     final ParameterType functionParameterType = ParameterType.FLOW_REPO;
@@ -59,6 +65,18 @@ public class FlowRepoParameterCreator extends ParameterCreator {
         FlowRepoPrm.class,
         flowTypeRecord.flowTypeName,
         functionOrCallName);
+
+    FlowRepo flowRepoAnnotation;
+    if (parameterOverrideFromCall == null) {
+      flowRepoAnnotation = Preconditions.checkNotNull(baseParameter.flowRepoAnnotation);
+    } else {
+      flowRepoAnnotation =
+              Preconditions.checkNotNull(parameterOverrideFromCall.flowRepoAnnotation);
+    }
+
+    //TODO: make flow repo generic to be able to understand which flow type we're querying on diagram?
+    //TODO: see generic parameter logic in FlowTypeFactoryParameterCreator
+    flowRepos.add(Pair.of("?", flowRepoAnnotation.desc()));
 
     return new ParameterCreationResult(
         new FunctionCallParameter(

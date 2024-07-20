@@ -22,6 +22,8 @@ import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.util.List;
 import javax.annotation.Nullable;
 
@@ -29,6 +31,8 @@ public class StepContext implements StepCallContext {
   final FunctionCallContext stepFunctionCall;
   final FunctionCallContext transitFunctionCall;
   final List<InternalTransition> transitions;
+  final List<Pair<String, String>> flowFactories;
+  final List<Pair<String, String>> flowRepos;
 
   @Nullable final String stepReturnValueToFlowParameterName;
   final StateAccessConfig flowStateAccessConfig;
@@ -51,7 +55,10 @@ public class StepContext implements StepCallContext {
       String stepName,
       String transitName,
       List<InternalTransition> transitions,
-      boolean isFirstStep) {
+      boolean isFirstStep,
+      List<Pair<String, String>> flowFactories,
+      List<Pair<String, String>> flowRepos
+  ) {
     this.stepFunctionCall = stepFunctionCall;
     this.transitFunctionCall = transitFunctionCall;
     this.stepReturnValueToFlowParameterName = stepReturnValueToFlowParameterName;
@@ -59,6 +66,8 @@ public class StepContext implements StepCallContext {
     this.isTransitionerCatching = isTransitionerCatching(transitFunctionCall);
     this.stepInfo = new StepInfo(stepName, transitName, isFirstStep, false);
     this.transitions = transitions;
+    this.flowFactories = flowFactories;
+    this.flowRepos = flowRepos;
     this.stepParameterInitProfile =
         new StepParameterInitProfile(
             stepFunctionCall, transitFunctionCall, stepReturnValueToFlowParameterName);
@@ -164,6 +173,12 @@ public class StepContext implements StepCallContext {
   public List<InternalTransition> getTransitions() {
     return transitions;
   }
+
+  @Override
+  public List<Pair<String, String>> getFlowFactories() { return flowFactories; }
+
+  @Override
+  public List<Pair<String, String>> getFlowRepos() { return flowRepos; }
 
   static class RetValAndTransition {
     final Object value;

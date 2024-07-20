@@ -7,6 +7,7 @@ import com.flower.engine.configuration.TransitParameterOverrideRecord;
 import com.flower.engine.runner.FlowRunner;
 import com.flower.engine.runner.state.StateAccessConfig;
 import com.flower.engine.runner.step.InternalTransition;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -56,7 +57,9 @@ public class FunctionCallParameterCreator {
       @Nullable FunctionParameterRecord parameterOverrideFromCall,
       @Nullable TransitParameterOverrideRecord transitParameterOverride,
       @Nullable Type genericInRetType,
-      List<InternalTransition> stepRefPrms) {
+      List<InternalTransition> stepRefPrms,
+      List<Pair<String, String>> flowFactories,
+      List<Pair<String, String>> flowRepos) {
     ParameterCreator parameterCreator;
     StateAccessConfig stateAccessConfig = flowStateAccess;
 
@@ -115,6 +118,8 @@ public class FunctionCallParameterCreator {
         parameterOverrideFromCall,
         transitParameterOverride,
         genericInRetType,
-        stepRefPrms);
+        stepRefPrms,
+        flowFactories,
+        flowRepos);
   }
 }
