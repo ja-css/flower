@@ -24,7 +24,7 @@ public interface FlowExec<T> {
 
   FlowFuture<T> runFlow(T flow, Duration startupDelay);
 
-  String buildMermaidGraph();
+  String buildMermaidGraph(boolean addHeader);
 
   Class<T> getFlowType();
 

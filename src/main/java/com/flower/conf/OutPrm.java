@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import javax.annotation.Nonnull;
 
+//TODO: NulableOutParam where setOutValue(@Nullable T value)
 /** Must be injected by FlowerEngine via @Out annotation. Do NOT implement. */
 public interface OutPrm<T> {
   /**

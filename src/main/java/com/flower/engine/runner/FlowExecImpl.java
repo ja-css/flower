@@ -170,11 +170,13 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
   }
 
   @Override
-  public String buildMermaidGraph() {
+  public String buildMermaidGraph(boolean addHeader) {
     Set<String> existingLinks = new HashSet<>();
 
     StringBuilder graphBuilder = new StringBuilder();
-    graphBuilder.append("- ").append(flowType.getSimpleName()).append("\n");
+    if (addHeader) {
+      graphBuilder.append("- ").append(flowType.getSimpleName()).append("\n");
+    }
     graphBuilder
         .append("```mermaid\n" + DIAGRAM_NAME + "\n")
         .append(BEGIN)
@@ -214,7 +216,10 @@ public class FlowExecImpl<T> implements InternalFlowExec<T> {
       }
     }
 
-    graphBuilder.append("```\n");
+    graphBuilder.append("```");
+    if (addHeader) {
+      graphBuilder.append("\n");
+    }
 
     return graphBuilder.toString();
   }

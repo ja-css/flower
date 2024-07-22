@@ -49,11 +49,11 @@ public class DynamicFlowExec implements InternalFlowExec {
 
     public String buildMermaidGraph(Class<?> flowType) {
         FlowExec flowExec = flowRunner.getFlowExec(flowType);
-        return flowExec.buildMermaidGraph();
+        return flowExec.buildMermaidGraph(false);
     }
 
     @Override
-    public String buildMermaidGraph() {
+    public String buildMermaidGraph(boolean addHeader) {
         throw new UnsupportedOperationException("Method buildMermaidGraph() can't be implemented in DynamicFlowExec, use buildMermaidGraph(Class<?>)");
     }
 
