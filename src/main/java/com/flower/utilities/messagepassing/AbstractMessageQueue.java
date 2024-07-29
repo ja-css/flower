@@ -4,15 +4,23 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
 abstract class AbstractMessageQueue<M> {
     protected final ConcurrentLinkedQueue<M> innerQueue;
-    protected final AtomicReference<List<SettableFuture<Void>>> queueListeners;
+    protected final AtomicReference<LinkedListenerNode> queueListeners;
+
+    static class LinkedListenerNode {
+        private final SettableFuture<Void> future;
+        @Nullable private final LinkedListenerNode next;
+
+        LinkedListenerNode(SettableFuture<Void> future, @Nullable LinkedListenerNode next) {
+            this.future = future;
+            this.next = next;
+        }
+    }
 
     public AbstractMessageQueue() {
         this.innerQueue = new ConcurrentLinkedQueue<>();
@@ -33,12 +41,8 @@ abstract class AbstractMessageQueue<M> {
     public ListenableFuture<Void> getMessageListener() {
         SettableFuture<Void> notificationFuture = SettableFuture.create();
         while (true) {
-            List<SettableFuture<Void>> oldList = queueListeners.get();
-            List<SettableFuture<Void>> newList = new ArrayList<>();
-            if (oldList != null && !oldList.isEmpty()) {
-                newList.addAll(oldList);
-            }
-            newList.add(notificationFuture);
+            LinkedListenerNode oldList = queueListeners.get();
+            LinkedListenerNode newList = new LinkedListenerNode(notificationFuture, oldList);
             if (queueListeners.compareAndSet(oldList, newList)) {
                 break;
             }
@@ -64,13 +68,15 @@ abstract class AbstractMessageQueue<M> {
             if (!force && innerQueue.isEmpty()) {
                 return;
             }
-            List<SettableFuture<Void>> oldList = queueListeners.get();
+            LinkedListenerNode oldList = queueListeners.get();
             if (oldList == null) {
                 return;
             }
             if (queueListeners.compareAndSet(oldList, null)) {
-                for (SettableFuture<Void> listener : oldList) {
-                    listener.set(null);
+                LinkedListenerNode cursor = oldList;
+                while (cursor != null) {
+                    cursor.future.set(null);
+                    cursor = cursor.next;
                 }
                 return;
             }
