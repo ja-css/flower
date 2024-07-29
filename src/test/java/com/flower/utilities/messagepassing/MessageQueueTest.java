@@ -47,10 +47,12 @@ public class MessageQueueTest {
         FlowFuture<ProcessorFlow> flowFuture2 = flowExec.runFlow(testFlow2);
         System.out.println("Flow created. Id: " + flowFuture2.getFlowId());
 
+        // We use MessageSink here to hide all non-Producer related functions
+        MessageSink<Integer, Integer> messageSink = messageQueue;
         List<ListenableFuture<Integer>> list = new ArrayList<>();
         for (int i = 0; i < MESSAGE_COUNT; i++) {
             System.out.println("Sending " + i);
-            ListenableFuture<Integer> future = messageQueue.add(i);
+            ListenableFuture<Integer> future = messageSink.add(i);
             list.add(future);
             if (i % 1000 == 0) {
                 Thread.sleep(10);
@@ -64,7 +66,7 @@ public class MessageQueueTest {
         while (!flowFuture1.getFuture().isDone() ||
                 !flowFuture2.getFuture().isDone()) {
           System.out.println("Forcing wake-up to finalize flows");
-          messageQueue.notifyMessageListeners(true);
+          messageSink.notifyMessageListeners();
           Thread.sleep(10);
         }
 

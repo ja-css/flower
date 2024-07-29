@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class AbstractMessageQueue<M> {
+abstract class AbstractMessageQueue<M> {
     protected final ConcurrentLinkedQueue<M> innerQueue;
     protected final AtomicReference<List<SettableFuture<Void>>> queueListeners;
 
@@ -49,7 +49,14 @@ public class AbstractMessageQueue<M> {
     }
 
     /**
-     * Check if the queue is not empty and notify all listeners
+     * Wake up all waiting consumers without sending a message
+     */
+    public void notifyMessageListeners() {
+        this.notifyMessageListeners(true);
+    }
+
+    /**
+     * Wake up all waiting consumers without sending a message, optionally checking if the queue is not empty
      * @param force False - won't notify if the queue is empty; True - will force notification even if there are no more messages in the queue
      */
     public void notifyMessageListeners(boolean force) {

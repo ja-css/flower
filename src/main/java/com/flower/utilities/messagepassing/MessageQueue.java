@@ -14,19 +14,21 @@ import java.util.Collection;
  * @param <M> Message
  * @param <R> Processing result
  */
-public class MessageQueue<M, R> extends AbstractMessageQueue<Pair<M, SettableFuture<R>>> {
+public class MessageQueue<M, R> extends AbstractMessageQueue<Pair<M, SettableFuture<R>>> implements MessageSink<M, R> {
     protected ListenableFuture<R> innerAddWithoutNotify(M message) {
         SettableFuture<R> future = SettableFuture.create();
         innerQueue.add(Pair.of(message, future));
         return future;
     }
 
+    @Override
     public ListenableFuture<R> add(M message) {
         ListenableFuture<R> resultFuture = innerAddWithoutNotify(message);
         notifyMessageListeners(false);
         return resultFuture;
     }
 
+    @Override
     public Collection<ListenableFuture<R>> addAll(Collection<? extends M> messages) {
         Collection<ListenableFuture<R>> resultFutures = messages.stream().map(
             this::innerAddWithoutNotify

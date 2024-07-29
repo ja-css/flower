@@ -9,11 +9,13 @@ import java.util.Collection;
  *
  * @param <M> Message
  */
-public class SimpleMessageQueue<M> extends AbstractMessageQueue<M> {
+public class SimpleMessageQueue<M> extends AbstractMessageQueue<M> implements SimpleMessageSink<M> {
+    @Override
     public void add(M message) {
         innerAdd(message);
     }
 
+    @Override
     public void addAll(Collection<? extends M> messages) {
         innerAddAll(messages);
     }
