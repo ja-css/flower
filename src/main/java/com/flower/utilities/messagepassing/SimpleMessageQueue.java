@@ -9,7 +9,7 @@ import java.util.Collection;
  *
  * @param <M> Message
  */
-public class SimpleMessageQueue<M> extends AbstractMessageQueue<M> implements SimpleMessageSink<M> {
+public class SimpleMessageQueue<M> extends AbstractMessageQueue<M> implements SimpleMessageSink<M>, SimpleMessageSource<M> {
     @Override
     public void add(M message) {
         innerAdd(message);
@@ -20,13 +20,13 @@ public class SimpleMessageQueue<M> extends AbstractMessageQueue<M> implements Si
         innerAddAll(messages);
     }
 
-    @Nullable
-    public M poll() {
+    @Override
+    @Nullable public M poll() {
         return innerPoll();
     }
 
-    @Nullable
-    public M peek() {
+    @Override
+    @Nullable public M peek() {
         return innerPeek();
     }
 }

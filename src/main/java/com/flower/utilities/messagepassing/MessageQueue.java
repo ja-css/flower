@@ -14,7 +14,7 @@ import java.util.Collection;
  * @param <M> Message
  * @param <R> Processing result
  */
-public class MessageQueue<M, R> extends AbstractMessageQueue<Pair<M, SettableFuture<R>>> implements MessageSink<M, R> {
+public class MessageQueue<M, R> extends AbstractMessageQueue<Pair<M, SettableFuture<R>>> implements MessageSink<M, R>, MessageSource<M, R> {
     protected ListenableFuture<R> innerAddWithoutNotify(M message) {
         SettableFuture<R> future = SettableFuture.create();
         innerQueue.add(Pair.of(message, future));
@@ -41,13 +41,13 @@ public class MessageQueue<M, R> extends AbstractMessageQueue<Pair<M, SettableFut
      * Returns a pair of message and SettableFuture to the Flow.
      * We expect the Flow to set result value to the Future to send back notification about message processing.
      */
-    @Nullable
-    public Pair<M, SettableFuture<R>> poll() {
+    @Override
+    @Nullable public Pair<M, SettableFuture<R>> poll() {
         return innerPoll();
     }
 
-    @Nullable
-    public M peek() {
+    @Override
+    @Nullable public M peek() {
         Pair<M, SettableFuture<R>> pair = innerPeek();
         return pair == null ? null : pair.getLeft();
     }

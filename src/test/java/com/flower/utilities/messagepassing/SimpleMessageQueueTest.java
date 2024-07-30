@@ -71,21 +71,21 @@ public class SimpleMessageQueueTest {
 
     @FlowType(firstStep = "PROCESS_MESSAGE")
     static class ProcessorFlow {
-        @State final SimpleMessageQueue<Integer> messageQueue;
+        @State final SimpleMessageSource<Integer> messageSource;
         @State final AtomicInteger processedCount;
         @State final int flowNumber;
         @State int processedByMe;
 
-        public ProcessorFlow(SimpleMessageQueue<Integer> messageQueue,
+        public ProcessorFlow(SimpleMessageSource<Integer> messageSource,
                              AtomicInteger processedCount,
                              int flowNumber) {
-          this.messageQueue = messageQueue;
+          this.messageSource = messageSource;
           this.processedCount = processedCount;
           this.flowNumber = flowNumber;
         }
 
         @SimpleStepFunction
-        public static ListenableFuture<Transition> PROCESS_MESSAGE(@In SimpleMessageQueue<Integer> messageQueue,
+        public static ListenableFuture<Transition> PROCESS_MESSAGE(@In SimpleMessageSource<Integer> messageSource,
                                                  @In AtomicInteger processedCount,
                                                  @In int flowNumber,
                                                  @InOut(throwIfNull = true) InOutPrm<Integer> processedByMe,
@@ -95,17 +95,14 @@ public class SimpleMessageQueueTest {
 
             System.out.println(flowNumber + " Flow woke up. Processed: " + processedCount.get() + "; By me: " + processedByMeVal);
 
-            while (!messageQueue.isEmpty()) {
-                Integer message = messageQueue.poll();
-                // We must add this null check because the queue is concurrent and race conditions are possible
-                if (message != null) {
-                  int i = message;
-                  System.out.println(flowNumber + " Processing " + i);
-                  processedCount.incrementAndGet();
-                  processedByMeVal++;
-                } else {
-                    System.out.println(flowNumber + " Null retrieved from queue");
-                }
+            Integer message = messageSource.poll();
+            while (message != null) {
+                int i = message;
+                System.out.println(flowNumber + " Processing " + i);
+                processedCount.incrementAndGet();
+                processedByMeVal++;
+
+                message = messageSource.poll();
             }
             processedByMe.setOutValue(processedByMeVal);
 
@@ -114,7 +111,7 @@ public class SimpleMessageQueueTest {
                 return Futures.immediateFuture(END);
             } else {
                 System.out.println(flowNumber + " Flow Gon'sleep. Processed: " + processedCount.get() + "; By me: " + processedByMeVal);
-                return Futures.transform(messageQueue.getMessageListener(),
+                return Futures.transform(messageSource.getMessageListener(),
                     unused_ -> PROCESS_MESSAGE,
                     MoreExecutors.directExecutor()
                 );
